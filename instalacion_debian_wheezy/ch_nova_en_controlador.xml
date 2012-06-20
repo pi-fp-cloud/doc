@@ -16,12 +16,25 @@
     <title>Instalación</title>
     <para>Instalamos desde el repositorio de Debian:</para>
     <screen>
-      <prompt>#</prompt><userinput>aptitude install nova-api nova-scheduler</userinput>
+      <prompt>#</prompt><userinput>aptitude install nova-api nova-scheduler nova-cert nova-console</userinput>
     </screen> 
     <para>Durante la configuración de los paquetes se nos pregunta si queremos
     configurar la base de datos con <command>dbconfig-common</command>, a lo que
     respondemos que no, posteriormente configuraremos la base de datos
     directamente sobre los ficheros de configuración de nova.</para>
+    <para>Además de los paquetes del repositorio Debian anteriormente
+    indicado, debemos instalar los siguientes paquetes, cuyas
+    versiones actuales que se encuentran en el repositorio testing de
+    Debian no funcionan correctamente. Además se debe activar la
+    propiedad "hold" para que estos paquetes no se actualicen en
+    futuras actualizaciones:</para>
+     <prompt>#</prompt><userinput>dpkg -i
+     novnc_2012.1~e3+dfsg-1_amd64.deb
+     dpkg -i python-novnc_2012.1~e3+dfsg-1_all.deb
+     echo novnc hold |  dpkg --set-selections
+     echo python-novnc hold |  dpkg --set-selections
+   </userinput>
+
   </section>
   <section xml:id="configuración_nova">
     <title>Configuración</title>
@@ -76,11 +89,43 @@ admin_tenant_name = service
 admin_user = "usuario jefe"
 admin_password = "password de usuario jefe"
     </programlisting>
+  <para>Para finalizar el proceso de configuración y después de
+  habernos autentificado, debemos crear la tablas necesarias en la
+  base de datos, para ello ejecutamos el siguiente comando:</para>
+  <programlisting>jupiter:~#nova-manga db sync</programlisting>
+  <para>Veamos detalladamente cada una de los grupos de
+  directivas:</para>
+  <section xml:id="conf_nova_1">
+   <title>Configuración de los logs</title>
   </section>
-  <section>
-    <title>Más cosas</title>
+  <section xml:id="conf_nova_2">
+   <title>Configuración del hypervisor</title>
+  </section>
+  <section xml:id="conf_nova_3">
+   <title>Configuración de la autentificación y la autorización</title>
+  </section>
+  <section xml:id="conf_nova_4">
+   <title>Configuración de la base de datos</title>
+  </section>
+  <section xml:id="conf_nova_5">
+   <title>Configuración del servicio de imágenes (glance)</title>
+  </section>
+  <section xml:id="conf_nova_6">
+   <title>Configuración de las migraciones en vivo</title>
+  </section>
+  <section xml:id="conf_nova_7">
+   <title>Configuración del sistema de mensajería interna
+   (RabbitMQ)</title>
+   </section>
+   <section xml:id="conf_nova_8">
+   <title>Configuración del esquema de red</title>
+  </section>
+  </section>
+  <section xml:id="configuracion_red_nova">
+    <title>Configuración de red: VLAN</title>
     <para>Creamos las redes estáticas:</para>
-    <para>nova-manage network create private --fixed_range_v4=10.1.0.0/16 --network_size=256 --num_networks=100</para>
+    <para>nova-manage network create private
+    --fixed_range_v4=10.1.0.0/16 --network_size=256 --num_networks=100</para>
     <para>Creamos las ip flotantes</para>
     <para>nova-manage floating create --ip_range=172.22.221.0/24</para>
   <para>Instalamos nova-console</para>
