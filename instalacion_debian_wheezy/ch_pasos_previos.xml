@@ -219,16 +219,17 @@ iface eth1 inet static
     </section>
     <section xml:id="instalacion_4_lunas">
       <title>Instalación de io, europa, ganimedes y calisto</title>
-      <para>La instalación de estos 4 nodos es idéntica, por lo que
+      <para>La instalación de estos cuatro nodos es idéntica, por lo que
       sólo explicaremos la instalación de uno de ellos.</para>
       <section xml:id="configuracion_raid_4_lunas">
 	<title>RAID</title>
 	<para>Cada uno de estos equipos incluye dos discos duros SAS
-	de 300 GiB a 15000 rpm y una controladora ??? que se configura
-	en modo RAID-0 al iniciar el equipo por primera vez. Una vez
-	configurado el raid, el sistema operativo que arranque en el
-	equipo sólo ve un disco duro en <code>/dev/sda</code> de
-	600GB.</para>
+	de 300 GiB a 15000 rpm y una controladora LSI MegaRAID SAS que se
+	configura en modo RAID 0 al iniciar el equipo por primera vez. En estos
+	equipos no hay ninguna configuración relevante y se configura en modo
+	RAID 0 para conseguir mayor rendimiento. Una vez configurado el raid, el
+	sistema operativo que arranque en el equipo sólo ve un disco duro en
+	<code>/dev/sda</code> de 600GB aproximadamente.</para>
       </section>
       <section xml:id="configuracion_bonding">
 	<title>Configuración de <emphasis>Link aggregation</emphasis></title>
@@ -240,40 +241,29 @@ iface eth1 inet static
       <para>Todos los componentes de OpenStack (incluso glance y
       keystone que por defecto utilizan sqlite) guardarán sus datos en
       bases de datos MySQL.</para>
-      <para>En primer lugar instalamos en jupiter el servidor de bases
-      de datos MySQL:</para>
-      <para><programlisting>root@jupiter:~# aptitude install mysql-server</programlisting></para>
+      <para>El servidor de bases de datos se instala en el nodo
+      controlador:</para>
+      <screen><prompt>#</prompt>aptitude install mysql-server</screen>
       <para>Introducimos la contraseña del usurio root cuando se
       requiera y esperamos a que finalice la instalación.</para>
-      <!-- Una vez concluida, abrimos el fichero /etc/mysql/my.cnf y
-	   editamos la línea bind_address = 127.0.0.1 , quedando de la
-	   siguiente forma: --> 
-
-      <!-- bind_address = 0.0.0.0 (cuando OpenStack esté funcionando
-	   habría que cambiarla por 172.22.0.0/16) -->
-      <!-- root@jupiter:~# service mysql restart -->
-      <para>Entramos en MySQL como root y creamos las bases de datos y
-      un usuario para OpenStack, que tendrá todos los permisos sobre
-      las bases de datos:</para>
+      <para>Una vez concluida, abrimos el fichero
+      <filename>/etc/mysql/my.cnf</filename> y editamos la línea <literallayout
+      class="monospaced">bind_address = 127.0.0.1</literallayout> por <literallayout
+      class="monospaced">bind_address = 192.168.222.0/24</literallayout> y
+      reiniciamos el servicio.</para>
+      <para>Entramos en MySQL como root y creamos diferentes bases de datos para
+      los componentes keystone, glance y nova y un usuario para OpenStack, que
+      tendrá todos los permisos sobre  las bases de datos:</para>
       <para><programlisting>
-	mysql> CREATE DATABASE keystone;
-	mysql> CREATE DATABASE glance;
-	mysql> CREATE DATABASE nova;
-	mysql> CREATE USER "usuario_admin_openstack" IDENTIFIED BY
-	'password';
-	mysql> GRANT ALL PRIVILEGES ON keystone.* TO
-	'"usuario_admin_openstack"'@'localhost' IDENTIFIED BY
-	'password';
-	>mysql> GRANT ALL PRIVILEGES ON glance.* TO
-	'"usuario_admin_openstack"'@'localhost';
-	mysql> GRANT ALL PRIVILEGES ON nova.* TO
-      '"usuario_admin_openstack"'@'localhost';
+mysql> CREATE DATABASE keystone;
+mysql> CREATE DATABASE glance;
+mysql> CREATE DATABASE nova;
+mysql> CREATE USER "usuario_admin_openstack" IDENTIFIED BY 'password';
+mysql> GRANT ALL PRIVILEGES ON keystone.* TO 'openstackadmin'@'localhost' \
+    -> IDENTIFIED BY 'password';
+mysql> GRANT ALL PRIVILEGES ON glance.* TO 'opentackadmin"'@'localhost';
+mysql> GRANT ALL PRIVILEGES ON nova.* TO 'openstackadmin"'@'localhost';
       </programlisting></para>
-    <para>En nuestra configuración, no es necesario que se realicen
-    conexiones a la base de datos desde otro equipo diferente a
-    jupiter, por lo que los usuarios se crean sólo en el ámbito local
-    y el servidor aceptará peticiones al puerto 3306, sólo realizadas
-    desde localhost.</para>
     </section>
     <section xml:id="otros_paquetes">
       <title>Instalación de otros paquetes</title>
@@ -287,6 +277,23 @@ iface eth1 inet static
       obligatorio que si no instalamos ahora se instalará por
       dependencias) y memcached de cachear en memoria peticiones a
       bases de datos o a APIs</para>      
-      <para>ntp</para>
+    </section>
+    <section xml:id="ntp">
+      <title>Sincronización de la hora de los equipos con ntp</title>
+      <para>Es muy importante que todos los equipos del cloud tengan sus relojes
+      sincronizados, por lo que lo más sencillo es configurar un servidor local
+      como servidor ntp, que se sincronice con los servidores de hora públicos
+      que hay disponibles en Internet y ofrezca la hora a todos los equipos del
+      cloud. Realmente no es fundamental que la hora de los equipos del cloud
+      sea muy exacta, pero sí que estén siempre sincronizados.</para>
+      <para>Ya que en la red local existía previamente un servidor ntp,
+      simplemente hay que instalar el paquete <literallayout
+      class="monospaced">ntp</literallayout>, comentar todas las líneas que
+      empiecen por <literallayout class="monospaced">server</literallayout> en
+      el fichero <filename>/etc/ntp.conf</filename> y añadir una línea del tipo:</para>
+      <screen>server ntp.your-provider.example</screen>
+      <para>Podemos comprobar el funcionamiento correcto tras reiniciar el
+      servicio ntp y realizar una consulta:</para>
+      <screen><userinput>ntpq -np</userinput></screen>
     </section>
   </chapter>
