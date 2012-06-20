@@ -16,7 +16,9 @@
       <listitem><para>jupiter: para el nodo controlador, que será el encargado
       de gestionar todos los recursos del cloud, interaccionar con los clientes
       y ordenar a los nodos de virtualización que ejecuten las instancias, pero
-      en el que no se ejecutarán instancias del cloud.</para></listitem>
+      en el que no se ejecutarán instancias del cloud. La mayor parte de
+      componentes del Cloud y configuración se realizará en este
+      equipo.</para></listitem>
       <listitem><para>io, europa, ganimedes y calisto (son las 4 lunas
       principales de júpiter): para los 4 nodos de virtualización. En estos
       equipos se instalará nova-compute y el resto de componentes necesarios
@@ -33,21 +35,22 @@
   </section>
   <section xml:id="esquema_red">
     <title>Esquema de red</title>
-    <para>Cada uno de estos equipos está conectado a dos redes, lo que en
-    terminología de OpenStack se conoce como una red
-    <emphasis>pública</emphasis> y una red <emphasis>privada</emphasis>,
-    términos que no hay que confundir con el sentido habitual que se da en redes
+    <para>Cada uno de estos equipos está conectado a dos redes (salvo venus), lo
+    que en terminología de OpenStack se conoce como una red
+    <emphasis>pública</emphasis> y una red <emphasis>privada</emphasis>, 
+    términos que a los que no se debe dar el sentido habitual que tienen en redes
     IPv4, ya que en OpenStack la red pública se refiere a la que interaccionará
     con los clientes y la privada la que se utiliza para la intercomunicación de
     los componentes del cloud y en nuestro caso muy destacadamente, de la
     transferencia de imágenes a los nodos en los que se deben ejecutar las
     instancias. La red privada es una red aislada que no está conectada con
-    otras redes, mientras que la red pública sí lo está, bien a una Intranet o
+    otras redes, mientras que la red pública sí lo está, bien a una red local o
     incluso a Internet. Las transferencias de datos más importante se realizan a
     través de la red privada, por lo que se ha optado por conectar cada equipo
     (salvo jupiter) mediante tres interfaces de red Gigabit, para que
-    configurándolas adecuadamente en <emphasis>link aggregation</emphasis>,
-    puedan triplicar las tasas de transferencia en la red privada.</para>
+    configurándolas adecuadamente en modo <emphasis>link aggregation</emphasis>
+    de acuerdo al estándar 802.3ad, puedan hasta triplicar las tasas de
+    transferencia en la red privada.</para>
     <para>En la siguiente imagen, se puede ver de forma esquemática los equipos
     y las redes a las que están conectados:</para>
     <mediaobject>
@@ -117,15 +120,16 @@
     <section xml:id="instalacion_jupiter">
       <title>Instalación de jupiter</title>
       <section xml:id="configuracion_raid_jupiter">
-	<title>Configuración previa del RAID</title>
+	<title>Configuración previa de los discos en RAID</title>
 	<para>jupiter incluye dos discos duros SATAII de 500 GiB y una
-	controladora 3ware 9650SE. Se ha optado por configurar esta controladora
-	de disco en modo RAID 1, para incluir un nivel elemental de seguridad y
-	consistencia de datos, aunque obviamente esto no descarta la utilización
-	adicional de otros mecanismos de copias de seguridad que se configurarán
-	posteriormente. Al tratarse de una RAID hardware y estar configurado
-	previamente, el sistema operativo que arranque en el equipo sólo verá un
-	disco duro en <code>/dev/sda</code> de 500GB.</para>
+	controladora de disco 3ware 9650SE. Se ha optado por configurar esta
+	controladora de disco en modo RAID 1, para incluir un nivel elemental de
+	seguridad y consistencia de datos, aunque obviamente esto no descarta la
+	utilización adicional de otros mecanismos de copias de seguridad que se
+	configurarán posteriormente. Al tratarse de una controladora RAID
+	hardware y estar configurado previamente, el sistema operativo que
+	arranque en el equipo sólo verá un disco duro en <code>/dev/sda</code>
+	de 500GB aproximadamente.</para>
 	<!-- <para>http;//jonas.genannt.name/  Hay repositorio, con -->
 	<!-- aplicaciones para manejar el RAID 3ware 9650SE</para> -->
       </section>
@@ -136,15 +140,18 @@
 	GNU/Linux, que actualmente se conoce con el nombre de código
 	<emphasis>wheezy</emphasis> y que cuando finalmente se estabilice se
 	conocerá como Debian 7. Pensamos que es la mejor opción en el caso de
-	Debian, ya que la <emphasis>squeeze</emphasis>, la versión estable
+	Debian, ya que <emphasis>squeeze</emphasis>, la versión estable
 	actualmente, no incluye paquetes de OpenStack y la opción de instalar
 	directamente desde los ficheros fuente o bien utilizar repositorios no
-	oficiales, no nos parece tan acertada.</para>
+	oficiales, no nos parece tan acertada. La
+	<emphasis>inestabilidad</emphasis> que comporta utilizar una versión no
+	estabilizda de Debian, nos parece en este momento asumible, más teniendo
+	en cuenta que vamos a implementar un cloud privado y no crítico.</para>
 	<para>De todas las versiones de Debian, obviamente elegimos el
 	<emphasis>port</emphasis> amd64, para aprovechar toda la capacidad de
 	los procesadores.</para>
-	<para>Realizamos el siguiente esquema de particionado durante
-	la instalación:</para>
+	<para>Durante la instalación realizamos el siguiente esquema de
+	particionado:</para>
 	<para>
 	  <programlisting>
 	    Disposit. Inicio    Comienzo      Fin      Bloques  Id Sistema
