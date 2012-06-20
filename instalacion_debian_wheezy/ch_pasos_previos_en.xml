@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="en">
+  <title>Previous tasks</title>
+  <para>Before we start with the installation, the network structure and the components to install in each computer must be clearly stated. The physical desciption of the equipment can be found <link xlink:href="???">here</link>, so we will focus in other aspects.</para>
+  <section xml:id="names">
+    <title>Computer names</title>
+    <para>The following names have been chosen for the computers involved in the Cloud installation:</para>
+    <itemizedlist>
+      <listitem><para>jupiter: the controller node, it will be in charge of managing all the resources of the Cloud, interacting with clients and ordering virtualization nodes to launch instances. Instances will not be executed on this computer, as Nova-compute is not to be installed on it.</para></listitem>
+      <listitem><para>io, europa, ganimedes y calisto (the four moons of Jupiter): the four virtualization nodes, as they will 'orbit' around jupiter. Nova-compute will be installed on these computers, as well as the rest of the required components to spin up instances.</para></listitem>
+      <listitem><para>saturno: the storage node, as it is as important as jupiter, but indenpendent at the same time. The software to be installed on it is not decided yet.</para></listitem>
+      <listitem><para>venus: an ordinary computer where all the required packages to use Nova client and manage the Cloud using the command line will be installed. The purpose of venus is avoiding to use jupiter to perform these tasks. Venus will only be connected to the private network.</para></listitem>
+    </itemizedlist>
+  </section>
+  <section xml:id="network_diagram">
+    <title>Network diagram</title>
+    <para>Every computer will be connected to two different networks that, using OpenStack terminology, are known as <emphasis>public</emphasis> network and <emphasis>private</emphasis> network. These concepts, also used in IPv4 networks but with a different meaning, are open to misinterpretation. Openstack public network is the network used to interact with clients, whereas private network is used for the communication between the Cloud components and to transfer the images to the nodes where instances will be launched. Private network is an isolated network not connected to other networks, whereas public network is connected to an Intranet and could even be connected to the Internet. The most important data transferences are performed through the private network and, therefore, every computer (but Jupiter) is connected through three Gigabit network interfaces configured in link aggregation so they can treble their rate transference. </para>
+    <para>The structure of computers and networks is depicted in the following picture:</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/esquema_red_iesgn.png" width="10cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Cloud network diagram showing the 6 computers connected to public and private networks.</para>
+      </caption>
+    </mediaobject>
+  </section>
+  <section xml:id="ip_addressing">
+    <title>Computers IP addresses</title>
+    <para>The following table indicates public and private IPv4 addresses for each cloud component.</para>
+    <table xml:id="tabla_ips">
+      <title>Cloud components IP addresses</title>
+      <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+	<thead>
+	  <row>
+	    <entry align="center"></entry>
+	    <entry align="center">Public IP</entry>
+	    <entry align="center">Private IP</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry align="center">jupiter</entry>
+	    <entry align="center">172.22.222.1</entry>
+	    <entry align="center">192.168.222.1</entry>
+	  </row>
+	  <row>
+	    <entry align="center">saturno</entry>
+	    <entry align="center">172.22.222.2</entry>
+	    <entry align="center">192.168.222.2</entry>
+	  </row>
+	  <row>
+	    <entry align="center">venus</entry>
+	    <entry align="center"></entry>
+	    <entry align="center">192.168.222.10</entry>
+	  </row>
+	  <row>
+	    <entry align="center">io</entry>
+	    <entry align="center">172.22.222.11</entry>
+	    <entry align="center">192.168.222.11</entry>
+	  </row>
+	  <row>
+	    <entry align="center">europa</entry>
+	    <entry align="center">172.22.222.12</entry>
+	    <entry align="center">192.168.222.12</entry>
+	  </row>
+	  <row>
+	    <entry align="center">ganimedes</entry>
+	    <entry align="center">172.22.222.13</entry>
+	    <entry align="center">192.168.222.13</entry>
+	  </row>
+	  <row>
+	    <entry align="center">calisto</entry>
+	    <entry align="center">172.22.222.14</entry>
+	    <entry align="center">192.168.222.14</entry>
+	  </row>
+	</tbody> 
+      </tgroup>
+    </table>
+    </section>
+    <section xml:id="jupiter_installation">
+      <title>Jupiter installation</title>
+      <section xml:id="raid_jupiter_configuration">
+	<title>RAID</title>
+	<para>jupiter is equipped with two 500 GiB Hard Drives and a 3ware 9650SE controller that will be configured in RAID-1 when the computer is booted for the first time. Once the RAID is configured, the operating system will only detect one 500 GiB Hard Drive in <code>/dev/sda</code>.</para>
+      </section>
+      <section>
+	<title>Operating System installation</title>
+	<para>The Operating System chosen for the cloud computers is Debian <emphasis>testing</emphasis> version, whose code name is currently <emphasis>wheezy</emphasis>, and will be known as Debian 7 once stable. Obviously, <emphasis>port</emphasis> amd64 has been selected in order to make the most of the processors capacity.</para>
+	<para>This is the partitioning scheme that will be created during installation:</para>
+	<para>
+	  <programlisting>
+	    Device    Boot      Start         End      Blocks   Id System
+	    /dev/sda1   *        2048     1953791      975872   83 Linux
+	    /dev/sda2         1953792   976539647   487292928   8e Linux LVM
+	  </programlisting>
+	</para>
+	<para>A small 1G partition is reserved to place /boot and the remaining disc will be managed with LVM. Initially, only two logical volumes will be created, one for the root system and the other one for the swap area:</para>
+	<para>
+	  <programlisting>
+	    LV           VG   Attr   LSize
+	    jupiter-root vg   -wi-ao 18,62g
+	    jupiter-swap vg   -wi-ao  1,86g
+	  </programlisting>
+	</para>
+	<para>Although this computer is equipped with a hardware RAID controller and the Operating System is not managing the raid, it is important that their state can be controlled through some kernel module. In this case, 3w-9xxx module, loaded automatically at boot time, sends these messages to log system:</para>
+	<para>
+	  <programlisting>
+[    2.381798] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
+[    2.381841] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
+[    2.381849] 3w-9xxx 0000:01:00.0: setting latency timer to 64
+[    2.612067] scsi0 : 3ware 9000 Storage Controller
+[    2.612128] 3w-9xxx: scsi0: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
+[    2.952039] 3w-9xxx: scsi0: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
+	  </programlisting>
+	</para>
+      </section>
+    </section>
+    <section xml:id="4_lunas__installation">
+      <title>io, europa, ganimedes and calisto installation</title>
+      <para>Since the installation of these four nodes is exactly the same, only one installation will be explained.</para>
+      <section xml:id="raid_4_lunas_conf">
+	<title>RAID</title>
+	<para>Each of these computers are equipped with two 300 GiB 15000 rpm SAS HD and a controller that is configured in RAID-0 when booting for the first time. Once raid is set up, the operating system will only detect one 600 GB HD in <code>/dev/sda</code>.</para>
+      </section>
+      <section xml:id="conf_bonding">
+	<title><emphasis>Link aggregation</emphasis> configuration</title>
+	<para></para>
+      </section>
+    </section>
+    <section xml:id="mysql__installation">
+      <title>MySQL installation and basic configuration</title>
+      <para>All OpenStack components (even glance and keystone, that use sqlite by default) will keep their data in MySQL databases.</para>
+      <para>MySQL installation in jupiter:</para>
+      <para><programlisting>root@jupiter:~# aptitude install mysql-server</programlisting></para>
+      <para>Introduce root password when required and wait for the installation to end.</para>
+      <!-- Una vez concluida, abrimos el fichero /etc/mysql/my.cnf y
+	   editamos la línea bind_address = 127.0.0.1 , quedando de la
+	   siguiente forma: --> 
+
+      <!-- bind_address = 0.0.0.0 (cuando OpenStack esté funcionando
+	   habría que cambiarla por 172.22.0.0/16) -->
+      <!-- root@jupiter:~# service mysql restart -->
+      <para>Login as root and create databases and one user for OpenStack, that will be granted all the permissions on the databases:</para>
+      <para><programlisting>
+	mysql> CREATE DATABASE keystone;
+	mysql> CREATE DATABASE glance;
+	mysql> CREATE DATABASE nova;
+	mysql> CREATE USER "admin_user_openstack" IDENTIFIED BY
+	'password';
+	mysql> GRANT ALL PRIVILEGES ON keystone.* TO
+	'"admin_user_openstack"'@'localhost' IDENTIFIED BY
+	'password';
+	>mysql> GRANT ALL PRIVILEGES ON glance.* TO
+	'admin_user_openstack'@'localhost';
+	mysql> GRANT ALL PRIVILEGES ON nova.* TO
+      '"usuario_admin_openstack"'@'localhost';
+      </programlisting></para>
+    <para>Regarding our configuration, there is no need for remote connections and, therefore, only connections from localhost to port 3306 will be accepted.</para>
+    </section>
+    <section xml:id="other_packages"> 
+      <title>Other packages installation</title>
+      <para>Before installing the packages related to the different OpenStack components it is advisable to install the following packages:</para>
+      <para><code>root@jupiter:~# apt-get install rabbitmq-server
+      memcached</code></para>
+      <para>rabbitmq-server is in charged of managing messages between OpenStack components (this package is mandatory and would be installed by dependencies either way), while memchached is a memory object caching system for speeding up database or API calls.</para>      
+    </section>
+  </chapter>

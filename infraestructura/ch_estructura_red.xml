@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Configuración de la red</title>
+  <para>En este capítulo se detallan las diferentes redes que van a formar el
+  cloud y cómo se integran tanto en las redes locales de los centros como en la
+  conexión con el exterior.</para>
+  <section xml:id="red-elementos">
+    <title>Elmentos de la red</title>
+    <para>Se van a configurar varias redes con los siguientes elementos:</para>
+    <itemizedlist>
+      <listitem><para><link linkend="serv-gest">Servidor de gestión</link>, que
+      tiene una interfaz de red IPMI y dos interfaces de red Gigabit Ethernet,
+      que irán conectadas, una a la red privada y otra a la pública.</para> 
+      </listitem>
+    </itemizedlist>
+
+  </section>
+  <section xml:id="red-ipmi">
+    <title>Red de gestión IPMI</title>
+    <para>Todos los servidores del cloud incluyen una interfaz de red dedicada
+    IPMI <emphasis>Intelligent Platform Management Interface</emphasis> que
+    permite administrar los equipos de forma remota.</para>
+    <para>La red de gestión debe ser una red independiente, al menos desde el
+    punto de vista lógico, por lo que optaremos por configurar una VLAN
+    específica para estos dispositivos</para>
+  </section>
+  <section xml:id="red-publica">
+    <title>Red "pública"</title>
+    <para>En la terminología de OpenStack, la red pública es la que permite
+    acceder a las instancias desde fuera, aunque se trate propiamente de una red
+    privada IPv4 en el sentido de la RFC 1918.</para>
+  </section>
+
+</chapter>

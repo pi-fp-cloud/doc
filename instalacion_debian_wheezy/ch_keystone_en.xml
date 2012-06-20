@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="en">
+  <title>Keystone</title>
+  <para>This chapter describes Keystone installation and configuration. This OpenStack module is in charge of the authentication and authorization of the different modules of the system.</para>
+  <section xml:id="introduction">
+    <title>Introduction</title>
+    <para>From OpenStack Essex, the module in charge of the authentication and authorization of the system components is Keystone. This module has two primary functions:</para>
+    <itemizedlist>
+      <listitem><para>Users management: It is in charge of keeping track of users and their permissions in the system.</para></listitem>
+      <listitem><para>Service catalog: It offers a catalog with the available services, as well as the way to access their APIs.</para></listitem>
+    </itemizedlist>
+    <para><emphasis>Users management</emphasis> essentials:</para>
+    <itemizedlist>
+      <listitem><para>User: We can keep their name, email and password.</para></listitem>
+      <listitem><para>Project (tenant): a set of instances can be executed in a tenant.</para></listitem>
+      <listitem><para>Role: It indicates the operations available for each user in a given tenant. Users could have different roles in different tenants.</para></listitem>
+    </itemizedlist>
+    <para><emphasis>Service registry</emphasis> essentials:</para>
+    <itemizedlist>
+      <listitem><para>Service: it belongs to an OpenStack component that can use authentication module.</para></listitem>
+      <listitem><para>Endpoints: they represent the URLs that allow us to access OpenStack components APIs.</para></listitem>
+    </itemizedlist>
+  </section>
+  <section xml:id="installation">
+    <title>Keystone installation</title>
+    <para>The package in the official Debian Wheezy repository will be used to install Keystone:</para>
+    <code>root@jupiter:~#aptitude install keystone</code>
+    <para>During installation, we will be asked to introduce ADMIN_TOKEN, that will be used during the initial configuration and that is stored in the admin_token directive in the configuration file /etc/keystone/keystone.conf.</para>    
+  </section>
+  <section xml:id="configuration">
+    <title>Keystone configuration</title>
+    <para>Keystone configuration file can be found in /etc/keystone/keystonwe.conf . The first thing to modify is the connection to MySQL database:</para>
+    <code>connection =
+    mysql://"usuario_admin_openstack":"password"@127.0.0.1
+    :3306/"base_de_datos_keystone"</code>
+    <para>After restarting keystone, database must be sincronized, creating the required tables with the following command:</para>
+    <code>root@jupiter:~# keystone-manage db_sync</code>
+    <para>As no user has been created yet, ADMIN_TOKEN must be used in order to configure the system. Two environment variables must be added: one of them to indicate the URL to access keyston administration URL and the other one to set the administration token:</para>
+    <code>export SERVICE_ENDPOINT=http://127.0.0.1:35357/v2.0/</code>
+    <code>export SERVICE_TOKEN=""keystone admin_token value in keystone.conf"</code>
+    <para>This way SERVICE_TOKEN variable keeps the same value than ADMIN_TOKEN parameter in the configuration file.</para>
+    <para>Once users, tenants and roles are defined, this authentication method will not be required and, thus, ADMIN_TOKEN parameter will not be used in the configuration file.</para>
+  </section>
+  <section xml:id="user">
+    <title>Tenants, users and roles creation</title>
+    <section xml:id="tenants">
+      <title>Project (tenants) creation</title>
+      <para>We start by creating the initial projects (tenants) with which we will work: admin and service. To do so, the following instructions are used:</para>
+      <code>root@jupiter:~# keystone tenant-create --name admin</code>
+      <code>root@jupiter:~# keystone tenant-create --name service</code>
+      <para>After these operations are performed, ID from first instruction is asociated to ADMIN_TENANT environment variable (although this could be done using get_id command, as recommended in Debian Wiki):</para>
+      <code>root@jupiter:~# export ADMIN_TENANT="tenant id"</code>
+    </section>
+     <section xml:id="users">
+      <title>Users creation</title>
+      <para>In this section we are not following OpenStack documentation and two users will be created (one of them will have admin role on admin tenant and the other one will have admin role for service tenant, that will be used by others OpenStack components):</para>
+      <programlisting>
+	root@jupiter:~# keystone user-create --name "gran jefe name" --pass "password" --email "email"
+      	root@jupiter:~# keystone user-create --name "jefe name" --pass "password" --email "email"
+      </programlisting>
+      <para>After these operations are performed, ID from first instruction is asociated to ADMIN_TENANT environment variable, although technically that user is not adminitrator yet.</para>
+      <code>root@jupiter:~# export ADMIN_USER="user id"</code>
+     </section>
+      <section xml:id="roles">
+	<title>Roles creation</title>
+	<para>Admin and Member roles, that will have different pivileges, are created:</para>
+	<code>root@jupiter:~# keystone role-create --name admin</code>
+	<code>root@jupiter:~# keystone role-create --name Member</code>
+	<para>Roles are listed to assign admin role to ADMIN_ROLE variable:</para>
+	<code>root@jupiter:~# ADMIN_ROLE = $(keystone role-list|awk '/
+	admin / { print $2 }')</code>
+      </section>
+       <section xml:id="Roles-users-tenants assignment">
+	<title>Roles assignment</title>
+	<para>Admin role on admin tenant is assigned to the user that will be administrator:</para>
+	<code>root@jupiter:~# keystone user-role-add --user
+	"big boss user id" --role "admin role id" --tenant_id
+	"admin tenant id"</code>
+	<para>Admin role on service tenant is assigned to the other user:</para>
+	<code>root@jupiter:~# keystone user-role-add --user "boss user id" --role "admin role id" --tenant_id "service tenant
+	id"></code>
+       </section>
+       <section xml:id="politicas">
+	 <title>Authorization policy configuration</title>
+	 <para>policy.json</para>
+	 <para>http://docs.openstack.org/essex/openstack-compute/admin/content/keystone-concepts.html</para>
+       </section>
+  </section>
+
+
+  <section xml:id="service">
+    <title>Service configuration</title>
+    <para>In Debian Wheezy, endpoints are defined in /etc/keystone/default_catalog.templates and services in ram :-m, wheras in OpenStack official documentation, steps to include them on the database are explained. In order to do so, /etc/keystone/keystone.conf is edited:</para>
+    <programlisting>
+      [catalog]
+      #driver = keystone.catalog.backends.templated.TemplatedCatalog
+      #template_file = /etc/keystone/default_catalog.templates
+      driver = keystone.catalog.backends.sql.Catalog
+    </programlisting>
+    <section xml:id="addservice">
+      <title>Service creation</title>
+      <para>Keystone, nova, volume and glance services are created (swift and ec2 services are not created at this time):</para>
+      <programlisting>
+	root@jupiter:# keystone service-create --name keystone --type identity --description 'OpenStack Identity Service'
+	root@jupiter:~# keystone service-create --name nova --type compute --description 'OpenStack Compute Service'
+	root@jupiter:~# keystone service-create --name volume --type volume --description 'OpenStack Volume Service'
+	root@jupiter:~# keystone service-create --name glance --type image --description 'OpenStack Image Service'
+      </programlisting>
+    </section>
+    <section xml:id="addendpoints">
+      <title>Endpoints creation</title>
+      <para>Endpoints are the urls used to manage the different APIs. For each OpenStack component, three URLs are defined (public, administration and internal). This step must be carefully revised as it is highly error-prone. In our installation, jupiter public IP address is used for public url and private one is used for admin and internal urls:</para>
+      <programlisting>
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de keystone" --publicurl http://172.22.222.1:5000/v2.0 \
+	--adminurl http://192.168.222.1:35357/v2.0 --internalurl http://192.168.222.1:5000/v2.0
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de nova"  --publicurl 'http://172.22.222.1:8774/v2/$(tenant_id)s' \
+	--adminurl 'http://192.168.222.1:8774/v2/$(tenant_id)s' --internalurl 'http://192.168.222.1:8774/v2/$(tenant_id)s'
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de nova-volume" --publicurl 'http://172.22.222.1:8776/v1/$(tenant_id)s' \
+	--adminurl 'http://192.168.222.1:8776/v1/$(tenant_id)s'	--internalurl 'http://192.168.222.1:8776/v1/$(tenant_id)s'
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de glance" --publicurl 'http://172.22.222.1:9292/v1' \
+	--adminurl 'http://192.168.222.1:9292/v1' --internalurl	'http://192.168.222.1:9292/v1'
+      </programlisting>
+    </section>
+  </section>
+
+  <section xml:id="final">
+    <title>Authentication method</title>
+    <para>Once users are created and their roles in the different tenants are defined, the common way to access the system is using these users.</para>
+    <para>In order to do so, two configuration files are created with the environment variables. The first one could be called /root/.bigboss:</para>
+    <programlisting>
+      export OS_USERNAME="big boss user"
+      export OS_PASSWORD="password"
+      export OS_TENANT_NAME=admin
+      export OS_AUTH_URL=http://192.168.222.1:5000/v2.0/
+      export OS_VERSION=1.1
+    </programlisting>
+    <para>The other file could be called /root/.boss:</para>
+    <programlisting>
+      export OS_USERNAME="boss user"
+      export OS_PASSWORD="password"
+      export OS_TENANT_NAME=service
+      export OS_AUTH_URL=http://192.168.222.1:5000/v2.0/
+      export OS_VERSION=1.1
+    </programlisting>
+    <para>These files must be protected:</para>
+    <programlisting>
+      root@jupiter:~# chmod 600 /root/.bigboss
+      root@jupiter:~# chmod 600 /root/.boss
+    </programlisting>
+  </section>
+  <section xml:id="api">
+    <title>API use</title>
+    <para>As have been described earlier in this document, keystone client could be used to manage users, toles, tenants, services and endpoints. So far, only instructions to create new elements have been shown.</para>
+    <para>Other interesting commands could be the ones used to list the created objects:</para>
+    <programlisting>
+      root@jupiter:~# keystone role-list
+      root@jupiter:~# keystone user-list
+      root@jupiter:~# keystone tenant-list
+      root@jupiter:~# keystone service-list
+      root@jupiter:~# keystone endpoint-list
+    </programlisting>
+    <para>Another interesting command is the one used to change a user password:</para>
+    <code>root@jupiter:~# keystone user-password-update uuid --pass
+    new-password</code>
+    <para>A detailed description with all the possible commands of keystone client can be found in the following link:<link
+    xlink:href="http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html">
+    http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html</link></para>
+
+  </section>
+
+
+</chapter>

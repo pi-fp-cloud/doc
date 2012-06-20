@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    version="5.0"
+    xml:id="infraestructura">
+    <title>Infraestructura</title>
+    <info>
+        <author>
+            <personname>
+                <firstname/>
+                <surname/>
+            </personname>
+            <affiliation>
+                <orgname>Proyecto</orgname>
+            </affiliation>
+        </author>
+        <copyright>
+            <year>2012</year>
+        </copyright>
+        <abstract>
+	  <para>En este documento se describen las principales características
+	  de los equipos utilizados en el proyecto, así como las adaptaciones
+	  hechas en las instalaciones de los centros implicados.</para> 
+        </abstract>
+    </info>
+<!--    <xi:include href="salas.xml"/>-->
+    <xi:include href="ch_servidores.xml"/>
+    <preface>
+      <title>sdf</title>
+      <para>asd</para>
+    </preface>
+    
+</book>

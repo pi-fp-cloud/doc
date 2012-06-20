@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Nova en el nodo controlador</title>
+  <para>Este capítulo describe la instalación y configuración del
+  módulo nova de OpenStack. Este módulo es el encargado de gestionar
+  las instancias del cloud y por tanto es el elemento central para un
+  cloud de infraestructura como el nuestro.</para>
+  <section xml:id="introduccion_nova">
+    <title>Introducción al módulo nova</title>
+    <para>Se explica posteriormente.</para>
+  </section>
+  
+  <section xml:id="instalación_nova">
+    <title>Instalación</title>
+    <para>Instalamos desde el repositorio de Debian:</para>
+    <screen>
+      <prompt>#</prompt><userinput>aptitude install nova-api nova-scheduler</userinput>
+    </screen> 
+    <para>Durante la configuración de los paquetes se nos pregunta si queremos
+    configurar la base de datos con <command>dbconfig-common</command>, a lo que
+    respondemos que no, posteriormente configuraremos la base de datos
+    directamente sobre los ficheros de configuración de nova.</para>
+  </section>
+  <section xml:id="configuración_nova">
+    <title>Configuración</title>
+    <para>Veamos la configuración necesaria para que funcione
+    adecuadamente el componente nova:</para>
+    <para><filename>/etc/nova/nova.conf</filename></para>
+    <programlisting>
+[DEFAULT]
+logdir=/var/log/nova
+state_path=/var/lib/nova
+lock_path=/var/lock/nova
+connection_type=libvirt
+root_helper=sudo nova-rootwrap
+auth_strategy=keystone
+dhcpbridge_flagfile=/etc/nova/nova.conf
+dhcpbridge=/usr/bin/nova-dhcpbridge
+iscsi_helper=tgtadm
+sql_connection=mysql://"usuario":"passwd"@127.0.0.1/nova
+
+#General
+scheduler_driver=nova.scheduler.simple.SimpleScheduler
+rabbit_host=172.22.222.1
+cc_host=172.22.222.1
+nova_url=http://172.22.222.1:8774/v1.1/
+routing_source_ip="$my_ip"
+glance_api_servers=172.22.222.1:9292
+image_service=nova.image.glance.GlanceImageService
+api_paste_config=/etc/nova/api-paste.ini
+
+# Configuración VNC
+vnc_enabled=true
+vnc_keymap="es-es"
+novncproxy_base_url="http://127.0.0.1:6080/vnc_auto.html"
+vncserver_proxyclient_address="127.0.0.1"
+vncserver_listen="127.0.0.1"
+
+# Configuración de red VLAN
+# A nova-network on each compute node
+multi_host=true
+# VLan manger
+network_manager=nova.network.manager.VlanManager
+vlan_interface=eth1
+my-ip=172.22.222.1
+public_interface=eth0
+    </programlisting>
+    <para><filename>/etc/nova/api-paste.ini</filename></para>
+    <para>En este fichero se añaden las mismas líneas que ne la
+    configuración de glance, donde se indica el usuario, la contraseña y
+    el tenant con el que nos vamos a autentificar.</para>
+    <programlisting>
+admin_tenant_name = service
+admin_user = "usuario jefe"
+admin_password = "password de usuario jefe"
+    </programlisting>
+  </section>
+  <section>
+    <title>Más cosas</title>
+    <para>Creamos las redes estáticas:</para>
+    <para>nova-manage network create private --fixed_range_v4=10.1.0.0/16 --network_size=256 --num_networks=100</para>
+    <para>Creamos las ip flotantes</para>
+    <para>nova-manage floating create --ip_range=172.22.221.0/24</para>
+  <para>Instalamos nova-console</para>
+  </section>
+</chapter>
+
+    
