@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook"
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es">
@@ -122,7 +122,7 @@ admin_password = "password de usuario jefe"
   </section>
   </section>
   <section xml:id="configuracion_red_nova">
-    <title>Configuración de red: VLAN</title>
+    <title>Tipos de configuración de red</title>
     <para>Como hemos vistos en puntos anteriores, los usuarios
     organizan sus recursos en el cloud en proyectos. Un royecto es un
     conjunto de instancias o máquinas virtuales creadas por el
@@ -156,7 +156,33 @@ admin_password = "password de usuario jefe"
     conseguimos aislar las instancias de los diferentes
     proyectos. Esta características es lo que nos ha decidido a
     escoger este modo de red para nuestra infraestructura.</para>
-    
+    <section xml:id="configuracion_vlan">
+      <title>Configuración del tipo de red VLAN</title>
+      <para>Los requisitos para utilizar el modo VLAN como
+      configuración de red son los siguientes:</para>
+      <itemizedlist>
+	<listitem><para>El ip forwading debe estar
+	habilitado.</para></listitem>
+	<listitem><para>Los nodos de computación (que tienen instalado
+	nova-network y nova-compute) tienen que tener cargado el
+	módulo del kernel 8021q.</para></listitem>
+	<listitem><para>Los switches de la red deben soportar la
+	configuración de vlan.</para></listitem>
+	<listitem><para>Los switches de de la red deben estar
+	configurados con las mismas vlan que hayamos
+	creado.</para></listitem>
+      </itemizedlist>
+      <para>Para configurar este modo de red tenemos que añadir al
+      fichero de configuración
+      <filename>/etc/nova/nova.conf</filename>:</para>
+      <programlisting>
+	network_manager=nova.network.manager.VlanManager
+	vlan_interface=eth1
+	fixed_range=10.0.0.0/8
+	network_size=256
+      </programlisting>
+      
+    </section>
     <para>nova-manage network create private
     --fixed_range_v4=10.1.0.0/16 --network_size=256 --num_networks=100</para>
     <para>Creamos las ip flotantes</para>
