@@ -2,4 +2,16 @@
 <chapter xmlns="http://docbook.org/ns/docbook"
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es">
+  <title>Nova en los nodos de computación</title>
+  <para>Este capítulo describe la instalación y configuración de los
+  módulos de nova de OpenStack necesarios en los nodos de computación:
+  nova-network y nova-compute.</para>
+  <section xml:id="instalacion_nova_nodos">
+    <title>Instalación</title>
+    <para>Instalamos desde el repositorio de Debian:</para>
+    <screen>
+      <prompt>#</prompt><userinput>aptitude install nova-api nova-cert
+      nova-network nova-compute</userinput>
+    </screen> 
+  </section>
 </chapter>
