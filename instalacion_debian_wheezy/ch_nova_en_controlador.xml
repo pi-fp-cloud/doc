@@ -181,14 +181,54 @@ admin_password = "password de usuario jefe"
 	fixed_range=10.0.0.0/8
 	network_size=256
       </programlisting>
-      
+    <para>En la primera línea se especifica que vamos a usar el modo
+    de red VLAN. Con la directiva <command>vlan_interface</command>
+    indicamos la interfaz de red con la que se va asociar el bridge
+    que se ha creado. La directiva <command>fixed_range</command>
+    indica el rango completo de ip que se va a dividir en subredes
+    para cada vlan creada. Por último, la directiva
+    <command>network_size</command> indica el tmaña de cada subred
+    asociada a cada vlan. </para>
     </section>
-    <para>nova-manage network create private
-    --fixed_range_v4=10.1.0.0/16 --network_size=256 --num_networks=100</para>
-    <para>Creamos las ip flotantes</para>
-    <para>nova-manage floating create --ip_range=172.22.221.0/24</para>
-  <para>Instalamos nova-console</para>
-  </section>
+    <section xml:id="creacion_vlan">
+      <title>Creación de un VLAN</title>
+      <para>Como cada proyecto (tenant) se asocia a una vlan, debemos
+      crear el número de vlan suficientes para los proyectos que en el
+      futuro vayamos a crear. Ahora mismo, vamos a crear una sola vlan
+      que se asociará a un sólo proyecto, para ello usamos el comando
+      <command>nova-manage network create</command>:</para>
+      <programlisting>
+	nova-manage network create --label=vlan1
+	--fixed_range_v4=10.0.1.0/24 --vlan=1 --bridge=br1 
+      </programlisting>
+      <para>Con este comando hemos creado la vlan1 que tendrá la
+      etiqueta vlan "1" y que posee como rango de ip la
+      10.0.1.0/24. Todas las instancias que usen esta vlan estarán
+      conectadas al bridge br1.</para>
+      <para>Cuando creemos una instancia de un proyecto, dicho
+      proyecto se asocia a una vlan que este libre, a partir de
+      entonces todas las instancias de ese proyecto utilizarán la
+      misma vlan.</para>
+      </section>
+      <section xml:id="creacion_ip_flotante">
+	<title>Creación de un rango de ip flotantes (ip
+	públicas)</title>
+	<para>Como indicábamos anteriormente a las instancias se le
+	puede asignar dinámicamente una ip pública o flotante que nos
+	permite el acceso a ella desde la red pública. En esta sección
+	vamos a indicar como se crea el rango de ip flotantes.</para>
+	<para> Nosotros vamos a crear un rango de ip flotante con el
+	siguiente <command> nova-manage floating create</command> de
+	la siguiente manera:</para>
+	<programlisting>
+	   nova-manage floating create --ip_range=172.22.221.0/24
+	</programlisting>
+	<para> Posteriormente estudiaremos la utilización de estas ips
+	en las distintas instancias.</para>
+      </section>
+    </section>
+   
+
 </chapter>
 
     
