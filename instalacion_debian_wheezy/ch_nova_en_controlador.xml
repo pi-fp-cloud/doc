@@ -92,7 +92,7 @@ admin_password = "password de usuario jefe"
   <para>Para finalizar el proceso de configuración y después de
   habernos autentificado, debemos crear la tablas necesarias en la
   base de datos, para ello ejecutamos el siguiente comando:</para>
-  <programlisting>jupiter:~#nova-manga db sync</programlisting>
+  <programlisting>jupiter:~#nova-manage db sync</programlisting>
   <para>Veamos detalladamente cada una de los grupos de
   directivas:</para>
   <section xml:id="conf_nova_1">
@@ -123,7 +123,40 @@ admin_password = "password de usuario jefe"
   </section>
   <section xml:id="configuracion_red_nova">
     <title>Configuración de red: VLAN</title>
-    <para>Creamos las redes estáticas:</para>
+    <para>Como hemos vistos en puntos anteriores, los usuarios
+    organizan sus recursos en el cloud en proyectos. Un royecto es un
+    conjunto de instancias o máquinas virtuales creadas por el
+    usuario. A cada instancia se le asigna una ip privada.</para>
+    <para>Actualmente podemos configurar la red de nuestra nube de
+    tres formas distintas:</para>
+    <itemizedlist>
+     <listitem><para>Flat Network Manager</para></listitem>
+     <listitem><para>Flat DHCP Network Manager</para></listitem>
+     <listitem><para>VLAN Network Mananger</para></listitem>
+    </itemizedlist>
+    <para>Tenemos que señalar la diferencia entre ip fija o privada,
+    que es la dirección que se le asigna a la instancia desde su
+    creación hasta su destrucción, y las ip flotantes, que son
+    direcciones que dinámicamente se pueden asignar a una instancia y
+    que nos va a permitir acceder a ellas desde una red
+    pública.</para>
+    <para>En los dos primeros modos de red (Flat Mode) el administrador
+    debe indicar un conjunto de direcciones que serán asignadas como
+    ip fijas o privadas cuando se creen las instancias. La diferencia
+    entre los dos modos es, que mientras en el primero la ip se
+    intecta en la configuración de la máquina (es decir se escribe en
+    el fichero /etc/network/interfaces), en la segunda opción exite un
+    servidor DHCP que es el responsable de asignar las ip a las
+    distintas instancias.</para>
+    <para>En el modo VLAN, se crea una vlan y un bridge para cada
+    proyecto (tenant), de esta manera conseguimos que las máquinas
+    virtuales pertenecientes a un proyecto reciban direcciones
+    privadas de un rango que será sólo accesible desde la propia
+    vlan, se decir cada proyecto está relacionado con vlan, con lo que
+    conseguimos aislar las instancias de los diferentes
+    proyectos. Esta características es lo que nos ha decidido a
+    escoger este modo de red para nuestra infraestructura.</para>
+    
     <para>nova-manage network create private
     --fixed_range_v4=10.1.0.0/16 --network_size=256 --num_networks=100</para>
     <para>Creamos las ip flotantes</para>
