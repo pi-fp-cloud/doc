@@ -58,6 +58,7 @@
     <xi:include href="ch_keystone.xml"/> 
     <xi:include href="ch_glance.xml"/> 
     <xi:include href="ch_nova_en_controlador.xml"/>
+    <xi:include href="ch_nova_en_nodos.xml"/> 
     <!-- <xi:include href="ch_nova_en_nodos.xml"/> -->
     <!-- <preface> -->
     <!--   <title>sdf</title> -->
