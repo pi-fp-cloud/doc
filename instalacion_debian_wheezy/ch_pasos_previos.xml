@@ -5,9 +5,10 @@
   <title>Pasos previos</title>
   <para>Antes de comenzar con la instalación de paquetes en sí, hay que
   plantear claramente la estructura de red y los componentes que se
-  instalarán en cada equipo. La descripción física de los equipos ya se realizó
-  en <link xlink:href="???">enlace</link>, por lo que nos centraremos
-  ahora en los demás aspectos.</para>
+  instalarán en cada equipo. La descripción física de los equipos que
+  componen el cloud ya se realizó en <link
+  xlink:href="???">enlace</link>, por lo que nos centraremos ahora en
+  la instalación en sí.</para>
   <section xml:id="nombres">
     <title>Nombres de los equipos</title>
     <para>Se han elegido los siguientes nombres para los equipos en los que se
@@ -16,13 +17,19 @@
       <listitem><para>jupiter: para el nodo controlador, que será el encargado
       de gestionar todos los recursos del cloud, interaccionar con los clientes
       y ordenar a los nodos de virtualización que ejecuten las instancias, pero
-      en el que no se ejecutarán instancias del cloud. La mayor parte de
+      en el que no se ejecutarán máquinas virtuales. La mayor parte de
       componentes del Cloud y configuración se realizará en este
-      equipo.</para></listitem>
+      equipo, pero comparado con los <emphasis>nodos de
+      computación</emphasis> la carga de trabajo será pequeña, por lo
+      que no es necesario un equipo con mucha memoria RAM o gran
+      capacidad de procesamiento.</para></listitem>
       <listitem><para>io, europa, ganimedes y calisto (son las 4 lunas
-      principales de júpiter): para los 4 nodos de virtualización. En estos
-      equipos se instalará nova-compute y el resto de componentes necesarios
-      para que se ejecuten las instancias en ellos.</para></listitem>
+      principales de júpiter): para los 4 nodos de virtualización o
+      nodos de computación, como se les denomina habitualmente en la
+      jerga propia de OpenStack. En estos equipos se instalarán
+      sólo los componentes necesarios para que se ejecuten las
+      instancias en ellos y estarán esperando las órdenes de
+      jupiter.</para></listitem>
       <listitem><para>saturno: para el nodo de almacenamiento, ya que es tan
       importante como júpiter y a la vez independiente. En este equipo todavía
       no está definido el software que se instalará.</para></listitem>
@@ -38,24 +45,25 @@
     <para>Cada uno de estos equipos está conectado a dos redes (salvo venus), lo
     que en terminología de OpenStack se conoce como una red
     <emphasis>pública</emphasis> y una red <emphasis>privada</emphasis>, 
-    términos que a los que no se debe dar el sentido habitual que tienen en redes
+    términos a los que no se debe dar el sentido habitual que tienen en redes
     IPv4, ya que en OpenStack la red pública se refiere a la que interaccionará
     con los clientes y la privada la que se utiliza para la intercomunicación de
     los componentes del cloud y en nuestro caso muy destacadamente, de la
     transferencia de imágenes a los nodos en los que se deben ejecutar las
     instancias. La red privada es una red aislada que no está conectada con
-    otras redes, mientras que la red pública sí lo está, bien a una red local o
-    incluso a Internet. Las transferencias de datos más importante se realizan a
-    través de la red privada, por lo que se ha optado por conectar cada equipo
-    (salvo jupiter) mediante tres interfaces de red Gigabit, para que
-    configurándolas adecuadamente en modo <emphasis>link aggregation</emphasis>
-    de acuerdo al estándar 802.3ad, puedan hasta triplicar las tasas de
+    otras redes, mientras que la red pública sí lo está, bien a una
+    red local bien a Internet. Las transferencias de datos más
+    importante se realizan a través de la red privada, por lo que se
+    ha optado por conectar cada equipo (salvo jupiter) mediante tres
+    interfaces de red Gigabit Ethernet, para que configurándolas
+    adecuadamente en modo <emphasis>link aggregation</emphasis> 
+    de acuerdo al estándar 802.3ad, puedan aumentar las tasas de
     transferencia en la red privada.</para>
     <para>En la siguiente imagen, se puede ver de forma esquemática los equipos
     y las redes a las que están conectados:</para>
     <mediaobject>
       <imageobject>
-	<imagedata fileref="figures/esquema_red_iesgn.png" width="10cm" format="PNG"/>
+	<imagedata fileref="figures/esquema_red_iesgn.png" width="20cm" format="PNG"/>
       </imageobject>
       <caption>
 	<para>Esquema de red del Cloud, en la que aparecen los 6 equipos
@@ -66,7 +74,7 @@
   <section xml:id="direccionamieno_ip">
     <title>Direcciones IP de los equipos</title>
     <para>En la siguiente tabla aparecen las direcciones IPv4 privadas
-    y públicas que tienen todos los nodos del cloud.</para>
+    y públicas elegidas para los nodos del cloud.</para>
     <table xml:id="tabla_ips">
       <title>Direcciones IP de los equipos del cloud</title>
       <tgroup cols='3' align='left' colsep='1' rowsep='1'>
@@ -120,7 +128,7 @@
     <section xml:id="instalacion_jupiter">
       <title>Instalación de jupiter</title>
       <section xml:id="configuracion_raid_jupiter">
-	<title>Configuración previa de los discos en RAID</title>
+	<title>Configuración previa de RAID</title>
 	<para>jupiter incluye dos discos duros SATAII de 500 GiB y una
 	controladora de disco 3ware 9650SE. Se ha optado por configurar esta
 	controladora de disco en modo RAID 1, para incluir un nivel elemental de
@@ -130,8 +138,6 @@
 	hardware y estar configurado previamente, el sistema operativo que
 	arranque en el equipo sólo verá un disco duro en <code>/dev/sda</code>
 	de 500GB aproximadamente.</para>
-	<!-- <para>http;//jonas.genannt.name/  Hay repositorio, con -->
-	<!-- aplicaciones para manejar el RAID 3ware 9650SE</para> -->
       </section>
       <section xml:id="instalacion_debian_jupiter">
 	<title>Instalación de Debian Wheezy</title>
@@ -146,7 +152,9 @@
 	oficiales, no nos parece tan acertada. La
 	<emphasis>inestabilidad</emphasis> que comporta utilizar una versión no
 	estabilizda de Debian, nos parece en este momento asumible, más teniendo
-	en cuenta que vamos a implementar un cloud privado y no crítico.</para>
+	en cuenta que vamos a implementar un cloud privado y no
+	crítico, que se utilizará a partir del curso próximo con fines
+	formativos.</para>
 	<para>De todas las versiones de Debian, obviamente elegimos el
 	<emphasis>port</emphasis> amd64, para aprovechar toda la capacidad de
 	los procesadores.</para>
@@ -171,21 +179,27 @@
 	    jupiter-swap vg   -wi-ao  1,86g
 	  </programlisting>
 	</para>
-	<para>Aunque la controladora RAID es hardware y el sistema
-	operativo no la gestiona, es importante que se pueda controlar
-	su estado a través de alǵun módulo del kernel. En este caso el
-	módulo 3w-9xxx que se carga automáticamente y nos envía estos
-	mensajes al log del sistema:</para>
-	<para>
-	  <programlisting>
+	<section xml:id="gestion_raid_jupiter">
+	  <title>Gestión del RAID desde el sistema operativo</title>
+	  <para>Aunque la controladora RAID es hardware y el sistema
+	  operativo no la gestiona, es importante que se pueda controlar
+	  su estado a través de alǵun módulo del kernel. En este caso el
+	  módulo 3w-9xxx que se carga automáticamente y nos envía estos
+	  mensajes al log del sistema:</para>
+	  <para>
+	    <programlisting>
 [    2.381798] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
 [    2.381841] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
 [    2.381849] 3w-9xxx 0000:01:00.0: setting latency timer to 64
 [    2.612067] scsi0 : 3ware 9000 Storage Controller
 [    2.612128] 3w-9xxx: scsi0: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
 [    2.952039] 3w-9xxx: scsi0: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
-	  </programlisting>
-	</para>
+	    </programlisting>	    
+	  </para>
+	  <para>Pendiente de hacer:</para>
+	  <para>http;//jonas.genannt.name/  Hay repositorio, con
+	  aplicaciones para manejar el RAID 3ware 9650SE</para>
+	</section>
       </section>
       <section xml:id="configuracion_red_jupiter">
 	<title>Configuración de red jupiter</title>
@@ -225,9 +239,13 @@ iface eth1 inet static
 	<title>RAID</title>
 	<para>Cada uno de estos equipos incluye dos discos duros SAS
 	de 300 GiB a 15000 rpm y una controladora LSI MegaRAID SAS que se
-	configura en modo RAID 0 al iniciar el equipo por primera vez. En estos
-	equipos no hay ninguna configuración relevante y se configura en modo
-	RAID 0 para conseguir mayor rendimiento. Una vez configurado el raid, el
+	configura en modo RAID 0 al iniciar el equipo por primera
+	vez. Se opta por RAID 0 ya que en estos equipos la
+	configuración es muy sencilla y no hay datos persistentes,
+	sólo los discos volátiles de las instancias que se estén
+	ejecutando en ese momento, por lo que es más conveniente
+	utilizar RAID 0 para conseguir mayor rendimiento en el proceso
+	de lectura/escritura a disco. Una vez configurado el raid, el
 	sistema operativo que arranque en el equipo sólo ve un disco duro en
 	<code>/dev/sda</code> de 600GB aproximadamente.</para>
       </section>
@@ -240,20 +258,24 @@ iface eth1 inet static
       <title>Instalación y configuración básica de MySQL</title>
       <para>Todos los componentes de OpenStack (incluso glance y
       keystone que por defecto utilizan sqlite) guardarán sus datos en
-      bases de datos MySQL.</para>
-      <para>El servidor de bases de datos se instala en el nodo
-      controlador:</para>
-      <screen><prompt>#</prompt>aptitude install mysql-server</screen>
-      <para>Introducimos la contraseña del usurio root cuando se
-      requiera y esperamos a que finalice la instalación.</para>
-      <para>Una vez concluida, abrimos el fichero
-      <filename>/etc/mysql/my.cnf</filename> y editamos la línea <literallayout
-      class="monospaced">bind_address = 127.0.0.1</literallayout> por <literallayout
-      class="monospaced">bind_address = 192.168.222.0/24</literallayout> y
-      reiniciamos el servicio.</para>
-      <para>Entramos en MySQL como root y creamos diferentes bases de datos para
-      los componentes keystone, glance y nova y un usuario para OpenStack, que
-      tendrá todos los permisos sobre  las bases de datos:</para>
+      bases de datos MySQL. El servidor de bases de datos se instala
+      en jupiter, el nodo controlador:</para>
+      <screen><prompt>#</prompt><userinput>aptitude install
+      mysql-server</userinput></screen> 
+      <para>Introducimos la contraseña del usuario root de MySQL
+      cuando se requiera y esperamos a que finalice la
+      instalación. Una vez concluida, abrimos el fichero
+      <filename>/etc/mysql/my.cnf</filename> y realizamos la siguiente
+      modificación:</para>
+      <literallayout class="monospaced">
+      bind_address = 192.168.222.0/24</literallayout> 
+      <para>Para que la base de datos sea accesible sólo a través de
+      la red privada.</para>
+      <para>Entramos en MySQL con el usuario root que se crea durante
+      la instalación y creamos diferentes bases de datos para
+      los componentes keystone, glance y nova y un usuario para
+      OpenStack, que tendrá todos los permisos sobre  las bases de
+      datos:</para>
       <para><programlisting>
 mysql> CREATE DATABASE keystone;
 mysql> CREATE DATABASE glance;
@@ -287,10 +309,10 @@ mysql> GRANT ALL PRIVILEGES ON nova.* TO 'openstackadmin"'@'localhost';
       cloud. Realmente no es fundamental que la hora de los equipos del cloud
       sea muy exacta, pero sí que estén siempre sincronizados.</para>
       <para>Ya que en la red local existía previamente un servidor ntp,
-      simplemente hay que instalar el paquete <literallayout
-      class="monospaced">ntp</literallayout>, comentar todas las líneas que
-      empiecen por <literallayout class="monospaced">server</literallayout> en
-      el fichero <filename>/etc/ntp.conf</filename> y añadir una línea del tipo:</para>
+      simplemente hay que instalar el paquete ntp, comentar todas las
+      líneas que empiecen por server en el fichero
+      <filename>/etc/ntp.conf</filename> y añadir una línea del
+      tipo:</para>
       <screen>server ntp.your-provider.example</screen>
       <para>Podemos comprobar el funcionamiento correcto tras reiniciar el
       servicio ntp y realizar una consulta:</para>

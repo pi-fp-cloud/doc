@@ -51,7 +51,9 @@
         <abstract>
 	  <para>En este documento se describe de forma detallada la instalación
 	  de OpenStack Essex en la versión de pruebas de Debian (actualmente
-	  <emphasis>Wheezy</emphasis>).</para> 
+	  <emphasis>Wheezy</emphasis>). Este documento aún se
+	  encuentra en borrador, espera a la versión definitiva o
+	  asume los riesgos de usarlo ;).</para> 
         </abstract>
     </info>
     <xi:include href="ch_pasos_previos.xml"/>
