@@ -328,4 +328,19 @@ Disposit. Inicio    Comienzo      Fin      Bloques  Id  Sistema
     <para>De forma paulatina, el reloj del equipo se irá sincronizanco
     con el del servidor de hora de la red.</para>
   </section>
+  <section xml:id="pretty-table">
+    <title>Instalación manual de python-prettytable</title>
+    <para>Uno de los paquetes que se instalan por dependencias
+    (python-prettytable), tiene abierto el <link
+    xlink:href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=673790">
+    bug 673790</link> en la versión 0.6 que actualmente está
+    en Debian Wheezy, por lo que es necesario instalar la versión 0.5
+    de forma manual y ponerla en estado <emphasis>hold</emphasis> para
+    que no se actualice, mientras persista este bug:</para>
+    <screen><userinput>
+wget http://ftp.es.debian.org/debian/pool/main/p/prettytable/python-prettytable_0.5-1_all.deb
+apt-get install python-prettytable=0.5-1
+echo python-prettytable hold |  dpkg --set-selections
+    </userinput></screen>
+  </section>
 </chapter>
