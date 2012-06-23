@@ -4,16 +4,15 @@
 	 version="5.0" xml:lang="es">
   <title>Keystone</title>
   <para>Este capítulo describe la instalación y configutación del
-  módulo de OpenSack, Keystone. Este módulo es el encargado del
+  módulo de OpenStack, Keystone. Este módulo es el encargado del
   sistema de autentificación y autorización de los distintos módulos
   que conforman el sistema.</para>
   <section xml:id="introduccion">
     <title>Introducción al módulo keystone</title>
     <para>Desde la versión Essex de OpenStack, el módulo encargado de
-    la autentificación y la autorización de los distitnos componentes
+    la autentificación y la autorización de los distintos componentes
     del sistema es Keystone. Este servicio tiene dos funciones
     principales:</para>
-
     <itemizedlist>
       <listitem><para>La gestión de usuarios: Es el encargado de
       mantener un registro de usuarios y los permisos que tienen cada
@@ -27,8 +26,12 @@
     <itemizedlist>
       <listitem><para>Usuario: Podemos guardar su nombre, 
       correo electrónico y contraseña.</para></listitem>
-      <listitem><para>Proyecto (tenant): En un proyecto se puede
-      ejcutar un conjunto de instancias.</para></listitem>
+      <listitem><para>Proyecto (<emphasis>tenant</emphasis> en la jerga de
+      OpenStack): En un proyecto se puede ejecutar un conjunto de instancias con
+      algunas propiedades y limitaciones en común, por ejemplo pueden estar
+      todas las instancias en el misma red, pueden utilizar una serie de
+      imágenes de sistemas o limitarse el uso de recursos del
+      cloud.</para></listitem>
       <listitem><para>Rol: Nos indica qué operaciones puede realizar
       cada usuario. A un usuario se le pueden asignar diferentes roles
       en cada proyecto.</para></listitem>
@@ -43,6 +46,21 @@
       acceder a las API de cada uno de los servicios o componentes de
       OpenStack</para></listitem>
     </itemizedlist>
+  </section>
+  <section xml:id="pretty-table">
+    <title>Instalación manual de python-prettytable</title>
+    <para>Uno de los paquetes que se instalan por dependencias
+    (python-prettytable), tiene el <link
+    xlink:href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=673790"> bug
+    673790</link> abierto en la versión 0.6 que actualmente está en Debian
+    Wheezy, por lo que es necesario instalar la versión 0.5 de forma manual y
+    ponerla en estado <emphasis>hold</emphasis> para que no se modifique,
+    mientras persista este bug:</para>
+    <screen><userinput>
+wget http://ftp.es.debian.org/debian/pool/main/p/prettytable/python-prettytable_0.5-1_all.deb
+apt-get install python-prettytable=0.5-1
+echo python-prettytable hold |  dpkg --set-selections
+    </userinput></screen>
   </section>
   <section xml:id="instalación">
     <title>Instalación de keystone</title>
