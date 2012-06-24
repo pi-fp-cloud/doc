@@ -121,7 +121,8 @@
     datos, ya que como dijimos anteriormente, vamos a utilizar bases
     de datos en MySQL para cada uno de los componentes de
     OpenStack:</para>
-    <code>connection = mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/keystone</code>
+    <para><code>connection =
+    mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/keystone</code></para> 
     <para>Reiniciamos keystone y ejecutamos el comando que sincroniza
     la BBDD de keystone, es decir, crea la tablas necesarias para el
     funcionamiento de Keystone:</para>
@@ -138,16 +139,18 @@
       <para>Comenzamos creando los dos proyectos (tenants) inciales
       con los que vamos a trabajar: admin y service. Para ello
       ejecutamos las siguientes intrucciones:</para>
-      <code>root@jupiter:~# keystone tenant-create --name admin</code>
-      <code>root@jupiter:~# keystone tenant-create --name
-      service</code>
+      <para><code>root@jupiter:~# keystone tenant-create --name admin</code></para>
+      <para><code>root@jupiter:~# keystone tenant-create --name
+      service</code></para>
       <para>Los valores de los id resultantes de cada instrucción, los
       asociamos a las variables de entorno ADMIN_TENANT y
       SERVICE_TENANT (podría hacerse en un solo paso utilizando la
       función get_id que recomiendan en la wiki de Debian), para que
       sea más cómodo utilizarlo luego:</para>
-      <code>root@jupiter:~# export ADMIN_TENANT="id del tenant admin"</code>
-      <code>root@jupiter:~# export SERVICE_TENANT="id del tenant service"</code>
+      <para><code>root@jupiter:~# export ADMIN_TENANT="id del tenant
+      admin"</code></para>
+      <para><code>root@jupiter:~# export SERVICE_TENANT="id del tenant
+      service"</code></para>
     </section>
      <section xml:id="usuarios">
       <title>Creación de usuarios</title>
@@ -168,25 +171,25 @@
 	<para>Creamos los roles admin y Member que tendrán diferentes
 	privilegios (de momento sólo utilizaremos el rol
 	admin):</para> 
-	<code>root@jupiter:~# keystone role-create --name admin</code>
-	<code>root@jupiter:~# keystone role-create --name
-	Member</code>
+	<para><code>root@jupiter:~# keystone role-create --name admin</code></para>
+	<para><code>root@jupiter:~# keystone role-create --name
+	Member</code></para>
 	<para>Listamos los roles y asignamos el rol de admin a la
 	variable ADMIN_ROLE:</para>
-	<code>root@jupiter:~# ADMIN_ROLE = $(keystone role-list|awk '/
-	admin / { print $2 }')</code>
+	<para><code>root@jupiter:~# ADMIN_ROLE = $(keystone role-list|awk '/
+	admin / { print $2 }')</code></para>
       </section>
        <section xml:id="asignacion-roles-usuarios-proyectos">
 	<title>Asignación de los roles</title>
 	<para>Asignamos el rol admin en el tenant admin al usuario que
 	queremos que sea el administrador:</para>
-	<code>root@jupiter:~# keystone user-role-add --user
-	$ADMIN_USER --role $ADMIN_ROLE --tenant_id $ADMIN_TENANT</code>
+	<para><code>root@jupiter:~# keystone user-role-add --user
+	$ADMIN_USER --role $ADMIN_ROLE --tenant_id $ADMIN_TENANT</code></para>
 	<para>Asignamos el rol admin en el tenant service al otro
 	usuario:</para>
-	<code>root@jupiter:~# keystone user-role-add --user
+	<para><code>root@jupiter:~# keystone user-role-add --user
 	$SERVICE_USER --role $ADMIN_ROLE --tenant_id
-	$SERVICE_TENANT</code>
+	$SERVICE_TENANT</code></para>
        </section>
        <section xml:id="politicas">
 	 <title>Configuración de las políticas de autorización</title>
@@ -296,8 +299,8 @@ root@jupiter:~# keystone endpoint-list
     </programlisting>
     <para>Otro ejemplo de comando que podemos usar a menudo, es el que
     nos permite cambiar la contraseña de un usuario:</para>
-    <code>root@jupiter:~# keystone user-password-update uuid --pass
-    nueva_contraseña</code>
+    <para><code>root@jupiter:~# keystone user-password-update uuid --pass
+    nueva_contraseña</code></para>
     <para>Para encontrar una descripción detallada de todos los
     comandos que podemos usar con el cliente keystone, podemos visitar
     el siguiente enlace: <link
