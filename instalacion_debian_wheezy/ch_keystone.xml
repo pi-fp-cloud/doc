@@ -9,10 +9,9 @@
   que conforman el sistema.</para>
   <section xml:id="introduccion">
     <title>Introducción al módulo keystone</title>
-    <para>Desde la versión Essex de OpenStack, el módulo encargado de
-    la autentificación y la autorización de los distintos componentes
-    del sistema es Keystone, que tiene dos funciones
-    principales:</para>
+    <para>Keystone, es el componente de OpenStack encargado de la
+    autentificación y la autorización de los distintos componentes
+    desde la versión Essex y tiene dos funciones principales:</para>
     <itemizedlist>
       <listitem><para>Gestión de usuarios: Keystone es el encargado de
       mantener un registro de usuarios y los permisos que tienen cada 
@@ -69,52 +68,68 @@
       OpenStack puede verse en la siguiente imagen, en la que se
       muestran los pasos que se dan desde que el usuario se acredita
       frente a Keystone hasta que lanza una instancia.</para>
-      <mediaobject>
-	<imageobject>
-	  <imagedata width="20cm" fileref="figures/keystone.png"
-		     format="PNG" />
-	</imageobject>
-	<caption>Diagrama que describe el funcionamiento típico de
-	keystone</caption>
-      </mediaobject>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/keystone.png" width="20cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Diagrama que describe el funcionamiento típico de
+	keystone.</para>
+      </caption>
+    </mediaobject>
       <para>Con Keystone recién instalado no tenemos ningún usuario
       con privilegios de administración en la base de datos de
-      keystone, por lo no podemos hacer ninguna modificación. En lugar
-      de eso, utilizamos el ADMIN_TOKEN, que es un token que definimos
-      directamente en la instalación o cuando queramos en el
-      fichero <filename>/etc/keystone/keystone.conf</filename> y que
-      nos otorga privilegios de administración en
-      keystone, el ADMIN_TOKEN puede tener cualquier valor, pero hay
-      que custodiarlo adecuadamente mientras esté activo, ya que
-      otorga privilegios de administración sobre Keystone a quien lo
-      conozca. Posteriormente, una vez definidos los usuarios en 
+      keystone, por lo no podríamos hacer ninguna modificación. El
+      mecanismo que proporciona keystone para solventar esta situación
+      es definir en el fichero de configuración un token con
+      privilegios de administración, que recibe el nombre de
+      ADMIN_TOKEN, que puede definirse directamente en la instalación
+      o cuando queramos en el fichero
+      <filename>/etc/keystone/keystone.conf</filename>, el ADMIN_TOKEN
+      puede tener cualquier valor, pero hay que custodiarlo
+      adecuadamente mientras esté activo, ya que otorga privilegios de
+      administración sobre Keystone a quien lo
+      conozca. Posteriormente, una vez definidos los usuarios en  
       keystone y los demás elementos, podemos borrar este campo del
       fichero de configuración de keystone y no volver a
       utilizarlo.</para>
+    </section>
+    <section>
+      <title>Uso del ADMIN_TOKEN</title>
+      <para>De forma general en Keystone, un usuario deberá tener algo
+      con que demostrar su autenticidad (una contraseña o un token) y
+      la URL de un API con la que desea interaccionar, en este caso
+      vamos a definir con dos variables de entorno el token con
+      privilegios de administrador y la URL del servicio de
+      administración de keystone:</para>
+      <screen><userinput>export SERVICE_ENDPOINT=http://127.0.0.1:35357/v2.0/</userinput></screen>
+      <screen><userinput>export SERVICE_TOKEN=12345678</userinput></screen>
+      <para>donde 12345678 representa el valos que hayamos elegido para
+      nuestro ADMIN_TOKEN y tendrá el mismo valor que el parámetro
+      ADMIN_TOKEN que tenemos guardado en el fichero de
+      configuración. Una vez realizado esto el usuario de esa sesión
+      actúa como administrador de keystone, por lo que los pasos
+      siguientes serán crear usuarios, darles roles, definir los
+      servicios, etc.</para>      
     </section>
   </section>
   <section xml:id="configuración">
     <title>Configuración de keystone</title>
     <para>El fichero de configuración de keystone lo encontramos en
     <filename>/etc/keystone/keystone.conf</filename>. La primera
-    configuración que realizamos será la conexión con la base de datos
-    (MySQL):</para>
-    <code>connection = mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/"base_de_datos_keystone"</code>
+    configuración que realizamos será la conexión con la base de
+    datos, ya que como dijimos anteriormente, vamos a utilizar bases
+    de datos en MySQL para cada uno de los componentes de
+    OpenStack:</para>
+    <code>connection = mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/keystone</code>
     <para>Reiniciamos keystone y ejecutamos el comando que sincroniza
     la BBDD de keystone, es decir, crea la tablas necesarias para el
     funcionamiento de Keystone:</para>
     <screen><userinput>keystone-manage db_sync</userinput></screen>
-    <para>Al no tener todavía ningún usuario creado, necesitamos
-    utilizar el ADMIN_TOKEN para poder configurar el sistema, para
-    ello tenemos que crear dos variables de entorno: una donde
-    indicamos la URL para acceder a la API de administración de
-    Keystone y otra donde indicamos el token de administración:</para>
-    <screen><userinput>export SERVICE_ENDPOINT=http://127.0.0.1:35357/v2.0/</userinput></screen>
-    <screen><userinput>export SERVICE_TOKEN=12345678</userinput></screen>
-    <para>donde 12345678 representa el valos que hayamos elegido para
-    nuestro ADMIN_TOKEN y tendrá el mismo valor que el parámetro
-    ADMIN_TOKEN que tenemos guardado en el fichero de
-    configuración.</para>
+    <para>Esto simplemente crea las tablas necesarias en la base de
+    datos que hemos llamado keystone, pero no añade ningún registro,
+    este procedimiento todavía no está automatizado y lo haremos en
+    las siguientes secciones.</para>
   </section>
   <section xml:id="user">
     <title>Creación de proyectos, usuarios y roles</title>
@@ -126,11 +141,13 @@
       <code>root@jupiter:~# keystone tenant-create --name admin</code>
       <code>root@jupiter:~# keystone tenant-create --name
       service</code>
-      <para>El valor del id resultante de la primera instrucción, lo
-      asociamos a la variable de entorno ADMIN_TENANT (podría hacerse en
-      un solo paso utilizando la función get_id que recomiendan en la
-      wiki de Debian):</para>
-      <code>root@jupiter:~# export ADMIN_TENANT="id del tenant"</code>
+      <para>Los valores de los id resultantes de cada instrucción, los
+      asociamos a las variables de entorno ADMIN_TENANT y
+      SERVICE_TENANT (podría hacerse en un solo paso utilizando la
+      función get_id que recomiendan en la wiki de Debian), para que
+      sea más cómodo utilizarlo luego:</para>
+      <code>root@jupiter:~# export ADMIN_TENANT="id del tenant admin"</code>
+      <code>root@jupiter:~# export SERVICE_TENANT="id del tenant service"</code>
     </section>
      <section xml:id="usuarios">
       <title>Creación de usuarios</title>
@@ -140,16 +157,17 @@
       utilizan el resto de componentes de OpenStack):</para>
       <screen><userinput>keystone user-create --name "nombre gran jefe" --pass "contraseña" --email "correo-e" </userinput></screen>
       <screen><userinput>keystone user-create --name "nombre jefe" --pass "contraseña" --email "correo-e"</userinput></screen>
-      <para>El id resultante de la primera instrucción, lo asociamos a
-      la variable de entorno ADMIN_USER, aunque con propiedad, ese
-      usuario todavía no es administrador:</para>
-      <screen><userinput>export ADMIN_USER="id del usuario"</userinput></screen>
+      <para>De nuevo asociamos los id resultantes de ambas
+      instrucciones a variables de entorno que utilizaremos después
+      (ADMIN_USER y SERVICE_USER):</para>
+      <screen><userinput>export ADMIN_USER="id del usuario gran jefe"</userinput></screen>
+      <screen><userinput>export SERVICE_USER="id del usuario jefe"</userinput></screen>
      </section>
      <section xml:id="roles">
        <title>Creación de roles</title>
 	<para>Creamos los roles admin y Member que tendrán diferentes
 	privilegios (de momento sólo utilizaremos el rol
-	admin):</para>
+	admin):</para> 
 	<code>root@jupiter:~# keystone role-create --name admin</code>
 	<code>root@jupiter:~# keystone role-create --name
 	Member</code>
@@ -163,13 +181,12 @@
 	<para>Asignamos el rol admin en el tenant admin al usuario que
 	queremos que sea el administrador:</para>
 	<code>root@jupiter:~# keystone user-role-add --user
-	"id user gran jefe" --role "id admin role" --tenant_id
-	"id tenant admin"</code>
+	$ADMIN_USER --role $ADMIN_ROLE --tenant_id $ADMIN_TENANT</code>
 	<para>Asignamos el rol admin en el tenant service al otro
 	usuario:</para>
-	<code>root@jupiter:~# keystone user-role-add --user "id user
-	jefe" --role "id admin role" --tenant_id "id tenant
-	service"></code>
+	<code>root@jupiter:~# keystone user-role-add --user
+	$SERVICE_USER --role $ADMIN_ROLE --tenant_id
+	$SERVICE_TENANT</code>
        </section>
        <section xml:id="politicas">
 	 <title>Configuración de las políticas de autorización</title>
@@ -179,12 +196,14 @@
   </section>
   <section xml:id="service">
     <title>Configuración de los servicios</title>
-    <para>En Debian Wheezy, los "endpoints" se definen en el
-    fichero /etc/keystone/default_catalog.templates y los servicios en
-    ram :-m, mientras que en la documentación oficial de OpenStack, se
-    explican los pasos para incluirlos en la base de datos MySQL. Es
-    lo que vamos a hacer nosotros, para lo que editamos el fichero
-    /etc/keystone/keystone.conf:</para>
+    <para>En Debian Wheezy inicialmente, los "endpoints" se definen de
+    forma estática en el fichero
+    <filename>/etc/keystone/default_catalog.templates</filename> y los 
+    servicios en ram, mientras que en la documentación oficial de
+    OpenStack, se explican los pasos para incluirlos en la base de
+    datos MySQL. Es lo que vamos a hacer nosotros, para lo que
+    editamos el fichero
+    <filename>/etc/keystone/keystone.conf</filename>:</para>
     <programlisting>
       [catalog]
       #driver = keystone.catalog.backends.templated.TemplatedCatalog
@@ -202,7 +221,7 @@
 	root@jupiter:~# keystone service-create --name glance --type image --description 'OpenStack Image Service'
       </programlisting>
     </section>
-    <section xml:id="addendpoints">
+    <section xml:id="add_endpoints">
       <title>Creación de los "endpoints"</title>
       <para>Los endpoints son las urls para el manejo de las
       diferentes APIS. Para cada componente de OpenStack se definen
@@ -211,7 +230,10 @@
       necesario revisar muy bien este paso porque es bastante propenso
       a errores. En nuestro caso, utilizaremos la dirección IP pública
       de jupiter para la url pública y la IP privada para la de
-      administración e interna:</para>
+      administración e interna, además definimos una sola región con
+      el nombre iesgn (OpenStack permite crear cloud de gran tamaño en
+      los que pueden definirse regiones, cada una de ellas con
+      parámetros propios, pero no es nuestro caso):</para>
       <programlisting>
 	root@jupiter:~# keystone endpoint-create --region iesgn
 	--service_id "id de keystone" --publicurl http://172.22.222.1:5000/v2.0 \
@@ -228,12 +250,11 @@
       </programlisting>
     </section>
   </section>
-
   <section xml:id="final">
     <title>Método de autentificación</title>
     <para>Un vez que tenemos añadidos nuestros usuarios, con sus
-    respectivos roles en los distitntos proyectos, la forma normal de
-    acceder es autentificandose con algunos de estos usuarios.</para>
+    respectivos roles en los distintos proyectos, la forma normal de
+    acceder es autentificándose con algunos de estos usuarios.</para>
     <para>Para ello creamos dos ficheros de configuración de las
     variables de entorno de los dos usuarios creados, lo llamamos por
     ejemplo /root/.granjefe:</para>
@@ -267,11 +288,11 @@
     <para>Otros comandos interesantes nos permiten listar los objetos
     que hemos creado:</para>
     <programlisting>
-      root@jupiter:~# keystone role-list
-      root@jupiter:~# keystone user-list
-      root@jupiter:~# keystone tenant-list
-      root@jupiter:~# keystone service-list
-      root@jupiter:~# keystone endpoint-list
+root@jupiter:~# keystone role-list
+root@jupiter:~# keystone user-list
+root@jupiter:~# keystone tenant-list
+root@jupiter:~# keystone service-list
+root@jupiter:~# keystone endpoint-list
     </programlisting>
     <para>Otro ejemplo de comando que podemos usar a menudo, es el que
     nos permite cambiar la contraseña de un usuario:</para>
@@ -282,8 +303,5 @@
     el siguiente enlace: <link
     xlink:href="http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html">
     http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html</link></para>
-
   </section>
-
-
 </chapter>
