@@ -102,13 +102,13 @@
                             <postProcess>
                                 <!-- Copies the figures to the correct location for webhelp -->
                                 
-                                <copy todir="${basedir}/target/docbkx/webhelp/${release.path.name}/openstack-compute/admin/content/figures">
+                                <copy todir="${basedir}/target/docbkx/webhelp/${release.path.name}/admin-openstack/content/figures">
                                     <fileset dir="${basedir}/figures">
                                         <include name="**/*.*" />
                                     </fileset>
                                 </copy>
                                 
-                                <copy todir="${basedir}/target/docbkx/webhelp/${release.path.name}/openstack-compute/admin/content/figures">
+                                <copy todir="${basedir}/target/docbkx/webhelp/${release.path.name}/admin-openstack/content/figures">
                                     <fileset dir="../common/figures">
                                         <include name="**/*.*" />
                                     </fileset>
@@ -117,22 +117,22 @@
                                 <!-- Copies webhelp (HTML output) to desired URL location on docs.openstack.org -->
                                                    
                                 <copy
-                                    todir="${basedir}/target/docbkx/webhelp/${release.path.name}/openstack-compute/admin">
+                                    todir="${basedir}/target/docbkx/webhelp/${release.path.name}/admin-openstack">
                                     <fileset
-                                        dir="${basedir}/target/docbkx/webhelp/bk-compute-adminguide/">
+                                        dir="${basedir}/target/docbkx/webhelp/bk-admin-openstack/">
                                         <include name="**/*" />
                                     </fileset>
                                 </copy>
                                 
                                 <!--Moves PDFs to the needed placement -->
                                
-                                <move failonerror="false"
-                                    file="${basedir}/target/docbkx/pdf/bk-compute-adminguide.pdf"
-                                    tofile="${basedir}/target/docbkx/webhelp/${release.path.name}/openstack-compute/admin/bk-compute-adminguide-${release.path.name}.pdf"/>                
+                                <copy failonerror="false"
+                                    file="${basedir}/target/docbkx/pdf/bk-admin-openstack.pdf"
+                                    tofile="${basedir}/target/docbkx/webhelp/${release.path.name}/admin-openstack/AdminOpenStack.pdf"/>                
                                                        
                                 <!--Deletes leftover uneeded directories -->
                                 
-                                <delete dir="${basedir}/target/docbkx/webhelp/bk-compute-adminguide"/>
+                                <delete dir="${basedir}/target/docbkx/webhelp/bk-admin-openstack"/>
                                                                 
                             </postProcess>
                         </configuration>
@@ -145,7 +145,7 @@
                     <includes>
 		      bk-admin-openstack.xml
                     </includes>
-                    <canonicalUrlBase>http://docs.openstack.org/${release.path.name}/openstack-compute/admin/content/</canonicalUrlBase>
+                    <canonicalUrlBase>http://localhost.localdomain/${release.path.name}/admin-openstack/content/</canonicalUrlBase>
                     <profileSecurity>reviewer</profileSecurity>
                     <branding>openstack</branding>
                 </configuration>
