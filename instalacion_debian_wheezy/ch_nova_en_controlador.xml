@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook"
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	  xmlns:xi="http://www.w3.org/2001/XInclude"
 	 version="5.0" xml:lang="es">
   <title>Nova en el nodo controlador</title>
   <para>Este capítulo describe la instalación y configuración del
@@ -42,43 +43,7 @@
     adecuadamente el componente nova:</para>
     <para><filename>/etc/nova/nova.conf</filename></para>
     <programlisting>
-[DEFAULT]
-logdir=/var/log/nova
-state_path=/var/lib/nova
-lock_path=/var/lock/nova
-connection_type=libvirt
-root_helper=sudo nova-rootwrap
-auth_strategy=keystone
-dhcpbridge_flagfile=/etc/nova/nova.conf
-dhcpbridge=/usr/bin/nova-dhcpbridge
-iscsi_helper=tgtadm
-sql_connection=mysql://"usuario":"passwd"@127.0.0.1/nova
-
-#General
-scheduler_driver=nova.scheduler.simple.SimpleScheduler
-rabbit_host=172.22.222.1
-cc_host=172.22.222.1
-nova_url=http://172.22.222.1:8774/v1.1/
-routing_source_ip="$my_ip"
-glance_api_servers=172.22.222.1:9292
-image_service=nova.image.glance.GlanceImageService
-api_paste_config=/etc/nova/api-paste.ini
-
-# Configuración VNC
-vnc_enabled=true
-vnc_keymap="es-es"
-novncproxy_base_url="http://127.0.0.1:6080/vnc_auto.html"
-vncserver_proxyclient_address="127.0.0.1"
-vncserver_listen="127.0.0.1"
-
-# Configuración de red VLAN
-# A nova-network on each compute node
-multi_host=true
-# VLan manger
-network_manager=nova.network.manager.VlanManager
-vlan_interface=eth1
-my-ip=172.22.222.1
-public_interface=eth0
+      <xi:include href="nova.conf.controlador"/> 
     </programlisting>
     <para><filename>/etc/nova/api-paste.ini</filename></para>
     <para>En este fichero se añaden las mismas líneas que ne la
