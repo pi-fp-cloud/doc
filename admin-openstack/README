@@ -1,0 +1,15 @@
+Bienvenidos TODOS a la edición de este documento.
+
+este documento trata de documentar:
+	Instalación de OpenStack (en Ubuntu de momento).
+	Configuración de OpenStack.
+	Administración de OpenStack.
+
+Tenéis el índice provisional comentado en el archivo ráiz del documento:
+	bk-admin-openstack.xml
+
+Podéis general la salida PDF a través del comando:
+	make
+
+Si lleváis poca prisa y queréis generar los PDF/Web como el proyecto OpenStack:
+	mvn clean generate-sources	
