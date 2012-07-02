@@ -43,7 +43,7 @@
     adecuadamente el componente nova:</para>
     <para><filename>/etc/nova/nova.conf</filename></para>
     <programlisting>
-      <xi:include href="nova.conf.controlador"/> 
+      <xi:include href="nova.conf.controlador"  parse="text"/> 
     </programlisting>
     <para><filename>/etc/nova/api-paste.ini</filename></para>
     <para>En este fichero se añaden las mismas líneas que ne la
