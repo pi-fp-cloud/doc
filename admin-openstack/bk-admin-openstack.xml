@@ -9,13 +9,49 @@
     <?rax pdf.url="../adminOpenStack.pdf"?>
     <title>Despliegue y explotación de OpenStack en GNU/Linux</title>
     <info>
-        <author>
+      <author>
+             <personname>
+                <firstname>Carlos</firstname>
+                <surname>Álvarez Barba</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+	<author>
             <personname>
                 <firstname>Miguel Ángel</firstname>
                 <surname>Ibáñez Mompeán</surname>
             </personname>
             <affiliation>
                 <orgname>IES Ingeniero de la Cierva</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>Alberto</firstname>
+                <surname>Molina Coballes</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>Jesús</firstname>
+                <surname>Moreno León</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>José Domingo</firstname>
+                <surname>Muñoz Rodríguez</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
             </affiliation>
         </author>
         <author>
