@@ -37,7 +37,7 @@
     </itemizedlist>
     <para>Por lo tanto ya tenemos todo prepara para la instlación de
     glance:</para>
-    <code>root@jupiter:~#aptitude install glance</code>
+    <para><code>root@jupiter:~#aptitude install glance</code></para>
     <para>Seleccionamos keystone como servicio de autenticación,
     introducimos la dirección del servicio de keystone (esto se puede
     cambiar más adelante, de momento dejaremos localhost), definimos
@@ -96,7 +96,7 @@
     </programlisting>
     <para>Para finalizar podemos ejecutar la siguiente
     instrucción:</para>
-    <code>glance index </code>
+    <para><code>glance index </code></para>
   </section>
 
 </chapter>

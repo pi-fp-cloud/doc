@@ -29,12 +29,12 @@
     Debian no funcionan correctamente. Además se debe activar la
     propiedad "hold" para que estos paquetes no se actualicen en
     futuras actualizaciones:</para>
-     <prompt>#</prompt><userinput>dpkg -i
+     <para><prompt>#</prompt><userinput>dpkg -i
      novnc_2012.1~e3+dfsg-1_amd64.deb
      dpkg -i python-novnc_2012.1~e3+dfsg-1_all.deb
      echo novnc hold |  dpkg --set-selections
      echo python-novnc hold |  dpkg --set-selections
-   </userinput>
+   </userinput></para>
 
   </section>
   <section xml:id="configuración_nova">
@@ -62,28 +62,36 @@ admin_password = "password de usuario jefe"
   directivas:</para>
   <section xml:id="conf_nova_1">
    <title>Configuración de los logs</title>
+   <para></para>
   </section>
   <section xml:id="conf_nova_2">
    <title>Configuración del hypervisor</title>
+   <para></para>
   </section>
   <section xml:id="conf_nova_3">
    <title>Configuración de la autentificación y la autorización</title>
+   <para></para>
   </section>
   <section xml:id="conf_nova_4">
    <title>Configuración de la base de datos</title>
+   <para></para>
   </section>
   <section xml:id="conf_nova_5">
    <title>Configuración del servicio de imágenes (glance)</title>
+   <para></para>
   </section>
   <section xml:id="conf_nova_6">
    <title>Configuración de las migraciones en vivo</title>
+   <para></para>
   </section>
   <section xml:id="conf_nova_7">
    <title>Configuración del sistema de mensajería interna
    (RabbitMQ)</title>
+   <para></para>
    </section>
    <section xml:id="conf_nova_8">
    <title>Configuración del esquema de red</title>
+   <para></para>
   </section>
   </section>
   <section xml:id="configuracion_red_nova">
