@@ -6,8 +6,8 @@
     xmlns:html="http://www.w3.org/1999/xhtml"
     version="5.0"
     xml:id="AdminOpenStack">
-    <?rax pdf.url="../adminOpenStack.pdf"?>
-    <title>Despliegue y explotación de OpenStack en GNU/Linux</title>
+    <?rax pdf.url="../AdminOpenStack.pdf"?>
+    <title>Administración de OpenStack</title>
     <info>
         <author>
             <personname>
@@ -70,7 +70,7 @@
         </revhistory>
     </info>
 <!--Indice a seguir (provisional)
-Título: Despliegue y explotación de OpenStack en GNU/Linux
+Título: Administración de OpenStack
 
 	Documentos base:
 		OpenStack Compute. Administration Manual (OCAM)
