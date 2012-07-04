@@ -4,7 +4,322 @@
          xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
          xml:id="ch-gest-imagenes">
   <title>Gestión de imágenes</title>
+  <para>OpenStack utiliza imágenes de sistemas operativos previamente instalados
+  para crear las instancias que se ejecutan en los nodos de computación, estas
+  imágenes pueden ser diferentes formatos, pueden ser sistemas operativos
+  limpios o muy configurados y pueden ser incluso instantáneas
+  (<emphasis>snapshots</emphasis>) de instancias que se están ejecutando en
+  alguno de los nodos de computación.</para>
+  <para>Inicialmente las imágenes de glance se almacenan en el directorio
+  <filename>/var/lib/glance/images</filename>, aunque es posible utilizar
+  también un componente de almacenamiento de objetos como swift.</para>
+  <section xml:id="sec_glance_formato">
+    <title>Formato de Disco y Contenido</title>
+    <para>Cuando añadimos una imagen a Glance, necesitamos especificar el
+    formato de disco de la maquina virtual y el formato del contenido de éste.</para>
+    <section>
+      <title>Formato del disco</title>
+      <para>Tendremos que dar un formato a nuestra imagen para cuando creemos
+      una máquina virtual. Existen muchos tipos de formatos de imagen,
+      actualmente podemos utilizar los siguientes en OpenStack (<link xlink:href="http://docs.openstack.org/developer/glance/formats.html">http://docs.openstack.org/developer/glance/formats.html</link>):</para>
+      <variablelist>
+	<varlistentry>
+	  <term><filename>raw</filename></term>
+	  <listitem>
+	    <para>Formato de imagen de disco no estructurado.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>vhd</filename></term>
+	  <listitem>
+	    <para>Usado por herramientas de virtualización como VMWare, Xen,
+	    Microsoft, VirtualBox y otros.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>vmdk</filename></term>
+	  <listitem>
+	    <para>Otro formato usado por herramientas de virtualización como por
+	    ejemplo VMWare player.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>vdi</filename></term>
+	  <listitem>
+	    <para>Formato soportado por VirtualBox y el emulador QEMU</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>iso</filename></term>
+	  <listitem>
+	    <para>Formato de ficheros o contenido de un dispostivos óptico como
+	    un CDROM o DVD.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>qcow2</filename></term>
+	  <listitem>
+	    <para>Formato de disco soportado por el emulador QEMU que
+	    permite expandir dinámicamente y soporta Copy on Write.</para> 
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>aki</filename></term>
+	  <listitem>
+	    <para>Indica que la imagen guardada en Glance es una Amazon Kernel
+	    Image.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>ari</filename></term>
+	  <listitem>
+	    <para>Indica que la imagen guardada en Glance es una Amazon Ramdisk
+	    Image.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term><filename>ami</filename></term>
+	  <listitem>
+	    <para>Indica que la imagen guardada en Glance es una Amazon Machine
+	    Image.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </section>
+    <section>
+      <title>Formato del contenido</title>
+      <para>El formato de contenido se refiere a si la imagen de la máquina
+      virtual está en un formato de archivo que contiene metadatos.</para>
+      <para>Nota: El contenido de la imagen no es utilizado por Glance o otros
+      componentes de Openstack, así que si no estamos seguros de que formato
+      poner, utilizaremos <emphasis>bare</emphasis>.</para>
+      <para>Podremos utilizar uno de los siguientes tipos de formato para
+      nuestro contenido:</para>
+      <variablelist>
+	<varlistentry>
+	  <term>bare</term>
+	  <listitem>
+	    <para>Esto indica que no existe formato sobre los metadatos de
+	    la imagen.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>ovf</term>
+	  <listitem>
+	    <para><emphasis>Open Virtualization Format</emphasis>.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>aki</term>
+	  <listitem>
+	    <para>Indica que la imagen guardada en Glance es una Amazon
+	    Kernel Image.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>ari</term>
+	  <listitem>
+	    <para>Indica que la imagen guardada en Glance es una Amazon
+	    Ramdisk Image.</para>
+	  </listitem>
+	</varlistentry>
+	<varlistentry>
+	  <term>ami</term>
+	  <listitem>
+	    <para>Indica que la imagen guardada en Glance es una Amazon
+	    Machine Image.</para>
+	  </listitem>
+	</varlistentry>
+      </variablelist>
+    </section>
+  </section>
+  <section xml:id="glance_instalacion_maquinas">
+    <title>Procedimiento general de provisión de imágenes</title>
+    <para>Las imagenes las deberemos de crear en nuestra máquina física para
+    posteriormente subirlas al nodo donde se encuentra glance.</para>
+    <para>Para conectarnos y hacer la instalación utilizaremos el cliente vnc
+    xvnc4viewer, por lo que habrá que instalarlo en el equipo si no se encuentra
+    instalado<footnote><para>Podría hacerse sin vnc directamente con sdl, pero
+    VNC es más versátil y nos perimte por ejemplo trabajar en
+    remoto</para></footnote>.</para>
+    <para>Los pasos principales para crear una imagen con un sistema son:</para>
+    <orderedlist>
+      <listitem>
+	<para>Crear una imagen en nuestro máquina. Esta imagen se corresponde
+	con el disco duro de la máquina virtual. Por ejemplo para crear una
+	imagen de 1 GiB en formato qcow2:</para>
+	<para><code>kvm-img create -f qcow2 Nombre-imagen.img 1G</code></para>
+      </listitem>
+      <listitem>
+	<para>Arrancar la máquina virtual con KVM incluyendo la iso con el
+	instalador del SO. Esto desplegará una conexión VNC a las que nos
+	tendremos que conectar para hacer la instalación. Por ejemplo:</para>
+	<para><code>kvm -m 512 -cdrom instalador-SO.iso -drive file=Nombre-imagen.img,if=scsi,index=0 -boot d -net nic -net user -nographic  -vnc</code></para>
+      </listitem>
+      <listitem><para>Conectamos mediante VNC a la máquina virtual y terminar la
+      instalación</para></listitem>
+      <listitem><para>Copiar la imagen al nodo de glance y añadirla a la base de
+      datos, especificando si la imagen será pública o no y el formato del
+      contenedor:</para>
+      <para><code>glance add name="Debian Squeeze 6.0.5" is_public=true container_format=ovf disk_format=qcow2 &lt; Nombre-imagen.img</code></para>
+      </listitem>
+    </orderedlist>
+  </section>
+<!-- Linux -->
 
-  <para>Para seguir esta guía se necesita:</para>
+<!-- Creamos la imagen -->
+
+<!-- kvm-img create -f raw Debian6.0.5.img 1G -->
+
+<!-- Iniciamos una instancia con KVM con la ISO de instalación descargada anteriormente. De esta manera iniciaremos el proceso de instalación y estableceremos una conexión VNC para ello. -->
+
+<!-- kvm -m 512 -cdrom debian-6.0.5-amd64-netinst.iso -drive   file=debian6.0.5.img,if=scsi,index=0 -boot d -net nic -net user -nographic  -vnc :0 -->
+
+<!-- vncviewer :0 -->
+
+<!-- Nota: -->
+<!-- *Sera necesario hacer la instalación en una partición formateada con ext4 y situada en / -->
+<!-- *En ubuntu o debian no es necesario crear una partición de swap -->
+
+<!-- Para poder realizar cualquier configuración después de la instalación del sistema necesitaremos arrancarlo de la siguiente manera. Es exactamente igual sin indicarle un CD de instalación. -->
+
+<!-- kvm -m 512 -drive file=debian6.0.5.img,if=scsi,index=0,boot=on -boot c -net nic -net user -nographic -vnc :1 -->
+
+<!-- vncviewer :1 -->
+
+<!-- Desde aquí podremos hacer la instalación de todos los paquetes, actualizaciones, configuraciones... que creamos necesarias para nuestra imagen. -->
+
+<!-- Como mínimo deberemos de actualizar los paquetes e instalar ssh (este paso es posible que se haya realizado en la misma instalación del sistema) -->
+
+<!-- apt-get update -->
+
+<!-- apt-get upgrade -->
+
+<!-- aptitude install openssh-server -->
+
+<!-- Necesitaremos copiar la imagen a Jupiter para posteriormente subirla a Glance -->
+
+<!-- scp Debian6.0.5.img root@jupiter:/mnt/imagenes/ -->
+
+<!-- Añadimos a Glance -->
+
+<!-- glance add name="Debian Squeeze 6.0.5" is_public=true container_format=ovf disk_format=raw < Debian6.0.5.img -->
+
+<!-- Windows -->
+
+<!-- Creamos la imagen -->
+
+<!-- kvm-img create -f raw win7.img 10G -->
+
+<!-- Nota: -->
+<!-- *El tamaño mínimo de la imagen de una máquina Windows 7 debe ser de 7 GB para poder hacer la instalación, aunque es recomendable al menos 10. -->
+
+<!-- Procedemos a hacer la instalación, en el caso de Windows es necesario que añadamos una disquetera con los drivers de virtio con: * -fda /Directorio/de/virtio-win.vfd -->
+
+<!-- kvm -m 1024 -cdrom ../Isos/Windows7.iso -drive file=win7.img,if=virtio,boot=on -fda /home/usuario/Descargas/virtio-win-1.1.16.vfd -boot d -nographic -vnc :0 -->
+
+<!-- Conectamos hacia la instalación -->
+
+<!-- vncviewer :0 -->
+
+<!-- Cuando tengamos que elegir el disco duro (imagen en este caso) nos encontraremos con que no existe ninguno, entonces deberemos de hacer click en “Cargar controladores” en el botón de la izquierda y cargar los drivers de nuestro sistema desde A:\amd64\win7. -->
+<!-- Una vez cargado, si todavía no aparece lo volvemos a cargar y ya nos aparecerá nuestro disco. -->
+<!-- Nota: Estos pasos son similares en una máquina Windows 2008 Server, pero en una Windows XP no es necesario cargar los controladores. -->
+
+<!-- Una vez acabada la instalación activaremos RDP. -->
+
+<!-- Pasos: -->
+
+<!--     Ir a "Panel de Control", "Sistema", "Configuración avanzada del sistema", "Acceso Remoto" -->
+<!--     Clicar donde dice: "Permitir que las conexiones desde equipos que se ejecuten en cualquier version de escritorio remoto" -->
+<!--     Por defecto solo el administrador tiene acceso así que después haremos clic en en: "Seleccionar usuarios remotos", Agregaremos el nombre de los usuarios con el que se van a querer conectar desde las otras máquinas (ej: usuario, pepe, o el usuario con el que se entra a Windows o directamente el “usuario” Todos.). -->
+
+<!-- Para realizar un cambio después de la instalación por si se nos ha olvidado algo -->
+
+<!-- kvm -m 1024 -drive file=win7.img,if=virtio,index=0,boot=on -boot c -net nic -net user -nographic -vnc :1 -->
+
+<!-- vncviewer :1 -->
+
+<!-- Necesitaremos copiar la imagen a Jupiter para posteriormente subirla a Glance -->
+
+<!-- scp win7.img root@jupiter:/mnt/imagenes/ -->
+
+<!-- Añadimos a Glance -->
+
+<!-- glance add name="Windows 7 Profesional 64bits" is_public=true container_format=ovf disk_format=raw <  win7.img -->
+
+<!-- Imagenes AMI -->
+
+<!-- Estos pasos los realizaremos directamente en la máquina Jupiter -->
+
+<!-- Descargaremos el fichero tar.gz que incluye las images ami, ari y aki y procederemos a subirlas a glance. -->
+
+<!-- wget http://informatica.gonzalonazareno.org/openstack/cirros-0.3.0-x86_64-uec.tar.gz -->
+
+<!-- El primer paso será descomprimirlo -->
+
+<!-- tar -xvf cirros-0.3.0-x86_64-uec.tar.gz -->
+
+<!-- Una vez descomprimido, comprobamos los directorios y podemos observar que existen 3 ficheros -->
+
+<!-- ls  -->
+<!--  cirros-0.3.0-x86_64-blank.img  cirros-0.3.0-x86_64-initrd    cirros-0.3.0-x86_64-vmlinuz -->
+
+<!-- Necesitaremos subir las imagenes a glance, conociendo cual es el kernel y el ramdisk podremos empezar a subirlas, para luego asignarselo a la imagen ami. -->
+
+<!--     Kernel = -vmlinuz -->
+<!--     Ramdisk = -initrd -->
+<!--     Machine image files = .img -->
+
+<!-- Una forma de diferencia el disk_format y el container_format (*K*ernel = a*K*i) -->
+<!-- glance add disk_format=aki container_format=aki name="cirros-0.3.0-x86_64-vmlinuz" < cirros-0.3.0-x86_64-vmlinuz -->
+
+<!-- Uploading image 'cirros-0.3.0-x86_64-vmlinuz'  -->
+<!--  ========================================================================================================================================[100%] 5.77M/s, ETA  0h    0m  0s  -->
+<!--  Added new image with ID: cdbd8865-a088-4bb6-ada2-f3bca6b13820 -->
+
+<!-- Una forma de diferencia el disk_format y el container_format (*R*amdisk = a*R*i) -->
+<!-- glance add disk_format=ari container_format=ari name="cirros-0.3.0-x86_64-initrd" < cirros-0.3.0-x86_64-initrd -->
+
+<!-- Uploading image 'cirros-0.3.0-x86_64-initrd'  -->
+<!--  ========================================================================================================================================[100%] 10.7M/s, ETA  0h  0m  0s  -->
+<!--  Added new image with ID: 48fadc60-97a2-4250-bbd2-69ca298a94b9 -->
+
+<!-- Una vez hemos subido las imagenes ARI y AKI nos tendremos que fijar en la ID (Added new image with ID: < ID >) -->
+<!-- Estas ID las necesitaremos a la hora de subir la imagen, porque tendremos que indicarle la ID del kernel y del ramdisk que nos ha dado para asignarselos a la imagen el Kernel y el Ramdisk. -->
+
+<!-- glance add disk_format=ami container_format=ami name="cirros-ami-img 64bits - javi"  kernel_id=cdbd8865-a088-4bb6-ada2-f3bca6b13820 ramdisk_id=48fadc60-97a2-4250-bbd2-69ca298a94b9 < cirros-0.3.0-x86_64-blank.img -->
+
+<!-- Uploading image 'cirros-ami-img 64bits - javi'  -->
+<!--  ========================================================================================================================================[100%] 59.8M/s, ETA  0h  0m  0s  -->
+<!--  Added new image with ID: 0df9e245-3bbe-474d-add9-0f50a70f23dc -->
+
+<!-- Imagen de Snapshot -->
+
+<!-- Crear una imagen de una instancia corriendo. -->
+
+<!-- Primero necesitamos el ID de la máquina que vamos a hacer un Snapshot, para esto necesitaremos sacar un listado de las máquinas en funcionamiento. -->
+
+<!-- nova list -->
+
+<!-- Nota: Los snapshots se hacen de máquinas activas. -->
+
+<!-- Nos fijamos en el ID de la maquina de la que queramos crear una imagen y -->
+
+<!-- nova image-create < ID > NombreNuevaMaquina -->
+
+<!-- Ej: nova image-create 9dccd6ba-d19a-494a-a110-fd003d453616  "Snapshot de 3" -->
+
+<!-- Comprobaremos que se ha creado la imagen, con el siguiente comando: -->
+
+<!-- nova image-list -->
+
+<!-- Deberemos esperar que pase de “SAVING” a “ACTIVE”, cuando esto ocurra veremos que el Snapshot se ha creado correctamente. -->
+
+<!-- Al hacer el snapshot, por defecto la imagen se crea como privada, para cambiar este parámetro deberemos de utilizar glance update -->
+
+<!-- glance update < ID > is_public=true -->
+
+<!-- Una vez terminado este proceso ya podremos ponernos a lanzar instancias de la Snapshot como si de una imagen se tratara. -->
 
 </chapter>
