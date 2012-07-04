@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="ch-emacs-nxml">
+  <title>Trabajando con Docbook: emacs y nxml-mode</title>
+  <para>Párrafo de introducción del capítulo.</para>
+
+  <section xml:id="emacs-nxml">
+    <title>¿Por qué emacs?</title>
+    <para>Para alguien que empieza con emacs es complicado justificar su uso, hasta que poco a poco cada vez va gustando más. Entre las razones para lanzarse a emacs se podrían destacar:</para>
+
+    <itemizedlist>
+      <listitem>
+        <para>Es Software Libre, y creado en su origen por el mismísimo Richard Stallman.</para>
+      </listitem>
+      <listitem>
+        <para>Es un editor de texto, no un procesador, se puede llegar a ser muy productivo a la hora de escribir documentación si se usa junto con Latex ó con DocBook.</para>
+      </listitem>
+      <listitem>
+        <para>Tiene modos específicos para una infinidad de lenguajes de programación: C/C++, Python, Bash...</para>
+      </listitem>
+      <listitem>
+        <para>Uno de los mejores editores de marcas (XML, SGML, (X)HTML, y como no, de DocBook.</para>
+      </listitem>
+      <listitem>
+        <para>Muy configurable y fácilmente extensible a través de Lisp.</para>
+      </listitem>
+      <listitem>
+        <para>Muchas de las combinaciones de teclas que se aplican en Emacs también se aplican en Bash.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Pero por desgracia, también tiene desventajas, la única remarcable sería la curva de aprendizaje, hay que hacerse un poco con la filosofía de emacs y sobretodo con sus combinaciones/atajos de teclado.</para>
+    
+  </section>
+
+  <section xml:id="emacs-instalacion">
+    <title>Instalación y configuración</title>
+    <para>Para el uso de Emacs+DocBook vamos a utilizar <emphasis role="bold">nxml-mode</emphasis>, nxml-mode es un plugin para GNU Emacs que lo convierte en un poderoso editor XML. Todos los comandos de emacs se pueden utilizar sin restricción alguna en este nuevo modo. El modo nXML permite asociar cualquier esquema al documento XML que se está editando, incluso sin que el documento XMl sea en todo momento ni válido ni bien formado.</para>
+
+    <para>nXML permite asociar un esquema al documento que se está editando, el esquema utilizado proporciona dos características básicas para la edición:</para>
+    <itemizedlist>
+      <listitem>
+        <para>Validación continua. nXML valida el documento conforme se va editando, resaltando en todo momento cualquier parte errónea.</para>
+      </listitem>
+      <listitem>
+        <para>Completado automático. nXML puede ayudar a la hora de insertar etiquetas, nombres de elemento, nombres de atributos o valores  según la información que obtiene del esquema y del contexto.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>El modo nXML utiliza RelaxNG como lenguaje de definición de esquemas, RelaxNG utiliza dos sintaxis: una basada en XML y otra más legible y compacta pero que no está basada en XML. nXML soporta la sintaxis compacta. Aunque existen herramientas para convertir tanto DTDs copo otros lenguajes de esquema a la sintaxis de RelaxNG, no van a ser necesarias ya que el paque de software de nXML incluye los esquemas para Docbook, XHTML, RDF y RelaxNG.</para>
+
+    <para>También se puede utiliza nXML sin utilizar ningún esquema, no están disponibles todas las características, pero por ejemplo, nXML sigue autocompletando cerrando de forma automática los tags.</para>
+
+    <para>nXML está escrito completamente en Lisp, por lo que está disponible para cualquier plataforma en la que Emacs esté disponible.</para>
+
+    <para>Para instalar tanto emacs como nXML basta seguir los siguientes pasos:</para>
+
+    <orderedlist>
+      <listitem>
+	<para>Instalamos los siguientes paquetes:</para>
+	<screen><prompt>$ </prompt><userinput>apt-get install emacs</userinput></screen>
+	<para>Nos descargamos el siguiente fichero de la página oficial del proyecto:</para>
+	<screen>
+	<prompt>$ </prompt><userinput>cd ~/Descargas</userinput>
+	<prompt>$ </prompt><userinput>wget http://www.thaiopensource.com/download/nxml-mode-20041004.tar.gz</userinput>
+	</screen>
+	<para>Tenemos todas las versiones disponibles desde: <filename>http://www.thaiopensource.com/download/</filename></para>
+	<para>Instalamos también todos los paquetes necesarios para trabajar con DocBook y para aplicar todas las transformaciones necesarias y convertir nuestros documentos en PDF y páginas web:</para>
+	<screen><prompt>$ </prompt><userinput>apt-get install xsltproc docbook5-xml fop docbook-xsl-ns docbook-xsl-doc-pdf</userinput></screen>
+      </listitem>
+      <listitem>
+	<para>Instalamos el plugin en el directorio de Emacs:</para>
+	<screen>
+	<prompt>$ </prompt><userinput>cd ~/.emacs.d</userinput>
+	<prompt>$ </prompt><userinput>tar -xvzf ~/Descargas/nxml-mode-20041004.tar.gz</userinput>
+	</screen>
+      </listitem>
+
+      <listitem>
+	<para>Indicamos a Emacs que utilice el plugin, para ello basta añadir el siguiente contenido al fichero <filename>~/.emacs.d/init.el</filename>:</para>
+	<programlisting>
+;;--
+;; Make sure nxml-mode can autoload
+;;--
+(load "~/.emacs.d/nxml-mode-20041004/rng-auto.el")
+
+;;--
+;; Load nxml-mode for files ending in .xml, .xsl, .rng, .xhtml
+;;--
+(setq auto-mode-alist
+      (cons '("\\.\\(xml\\|xsl\\|rng\\|xhtml\\)\\'" . nxml-mode)
+	    auto-mode-alist))  
+	</programlisting>
+
+	<note><para>Si estos ficheros no existen es porque emacs nunca se ha ejecutado, basta iniciar y cerrar el programa.</para></note>
+
+      </listitem>
+
+      <listitem>
+	<para>Emacs necesita saber dónde encontrar los esquemas para poder validar el documento al mismo tiempo que se está escribiendo. Para ello basta con crear el fichero <filename>schemas.xml</filename> dentro del directorio <filename>~/.schemas</filename> con el siguiente contenido:</para>
+	<programlisting>
+<![CDATA[
+<locatingRules xmlns="http://thaiopensource.com/ns/locating-rules/1.0">
+  <namespace ns="http://docbook.org/ns/docbook" uri="/usr/share/xml/docbook/schema/rng/5.0/docbookxi.rnc"/>
+</locatingRules>
+]]>
+	</programlisting>
+      </listitem>
+      <listitem><para>... e indicar a Emacs que cargue los esquemas, modificando el fichero <filename>~/.emacs</filename> con el siguiente contenido:</para>
+      <programlisting>
+(eval-after-load 'rng-loc '(add-to-list 'rng-schema-locating-files "~/.schemas/schemas.xml"))	
+      </programlisting>
+      </listitem>
+    </orderedlist>
+  </section>
+
+  <section xml:id="comandos-nxml-mode">
+    <title>Comandos nXML a utilizar</title>
+    <para>Los comandos más utilizados a la hora de escribir en Emacs con el modo nXML son:</para>
+
+    <table rules="all">
+      <caption>Comandos del modo nXML</caption>
+      <col width="20%"/>
+      <col width="80%"/>
+
+      <thead>
+	<tr>
+	  <td>Comando</td>
+	  <td>Descripción</td>
+	</tr>
+      </thead>
+      <tbody>
+	<tr>
+	  <td>Tabulador</td>
+	  <td>Identa la actual línea (o la región actual) al nivel de indentación del bloque en el que estemos.</td>
+	</tr>
+	<tr>
+	  <td>C-ENTER</td>
+	  <td>Completa el nombre de la etiqueta o el nombre del atributo que estemos escribiendo en ese momento, si hay varios mostraŕa una lista de posibilidades.</td>
+	</tr>
+	<tr>
+	  <td>C-c-C-f</td>
+	  <td>Completa la línea cerrando el tag que corresponda. Si la utilizamos repetidamente irá cerrando todos los tags que estén abiertos.</td>
+	</tr>
+	<tr>
+	  <td>C-c-C-i</td>
+	  <td>Cuando se acaba de escribir el nombre de la etiqueta, pero sin llegar a cerrarla con &gt;, incluye el signo &gt; y el tag de cierre, poniendo el cursor entre las etiquetas facilitando la inserción de texto. Muy útil para la inseción de elementos inline (como <emphasis>para</emphasis>, <emphasis>literal</emphasis>, <emphasis>filename</emphasis>, etc.). </td>
+	</tr>
+	<tr>
+	  <td>C-c-C-b</td>
+	  <td>Igual que la anterior pero para elementos de bloque.</td>
+	</tr>
+      </tbody>
+    </table>
+
+    <note><para>En terminología Emacs, "C-c-C-i" significar pulsar la
+    tecla Control + la tecla 'c' + la tecla 'i'.</para></note>
+
+  </section>
+
+  <section xml:id="snippets">
+    <title>Snippets de código</title>
+    <para>Siempre que se escriban documentos XML, es muy útil acumular un conjunto de plantillas pequeñas que faciliten la escritura. Una plantilla no será más que un pequeño fichero que contiene un esqueleto básico de DocBook ó de XML que permita tareas ritinarias como insertar una tabla en blanco, una figura, una sección, etc.</para>
+
+    <para>Estas plantillas se pueden almacenar en un directorio y se podrán insertar en cualquier momento a través del comando Emacs <literal>insert-file</literal> (C-x-i).</para>
+
+    <para>Para configurar estos snippets basta con:</para>
+    <orderedlist>
+      <listitem>
+	<para>Crear pequeños ficheros, uno para cada snippet, y poner un nombre al fichero identificativo del trozo de código. Por ejemplo, si queremos crear un snippet para poder insertar listas ordenadas, crearíamos el fichero <filename>./.snippetsXML/orderedlist</filename> con el siguiente contenido:</para>
+	<programlisting>
+<![CDATA[
+    <orderedlist>
+      <listitem>
+	<para></para>
+      </listitem>
+    </orderedlist>
+]]>	  
+	</programlisting>
+	<para>A la hora de insertar el snippet anterior bastaría con pulsar C-c-i más el principio de la palabra <literal>orderedlist</literal> completando si es necesario con la tecla tabulador. En el caso anterior no vendría mal incluir además un snippet denominado <literal>listitem</literal>.</para>
+      </listitem>
+
+      <listitem>
+	<para>Para mayor comodidad se puede asociar al comando <literal>insert-file</literal> otra combinación de teclas más cómoda, al mismo tiempo que la inserción del snippet incluya una identación automática. Para ello asociaremos la combinación de teclas <command>C-c-C-e nombre_snippet</command> ) a la inserción de snippets de nuestro directorio configurado en el paso anterior. Editamos el fichero de configuración de Emacs incluyendo el siguiente fragmento:</para>
+	<programlisting>
+	  
+	</programlisting>
+
+      </listitem>
+
+      <listitem>
+	<para>Este es el paso 3 y dos comandos asociados (separados, pero se pueden asociar con un solo screen):</para>
+
+	<screen><prompt>$ </prompt><userinput>apt-get update</userinput></screen>
+	<screen><prompt>$ </prompt><userinput>apt-get upgrade</userinput></screen>
+      </listitem>
+    </orderedlist>
+
+<!-- <<<<<<<<<<<<<<<<<<<<<<<<<<AQUI
+<<<<<<<<<<<<<<<<<<<<<<<<<<AQUI
+<<<<<<<<<<<<<<<<<<<<<<<<<<AQUI -->
+
+    <para>Las plantillas más usuales son las siguientes, estas plantillas se pueden almacenar el directorio <filename>./snippetsXML</filename>:</para>
+
+    <section>
+      <title>section</title>
+      <para>Permitirá incluir de manera fácil </para>
+      
+    </section>
+
+  </section>
+
+
+</chapter>

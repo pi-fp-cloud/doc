@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="ch_prerrequisitos">
+  <title>Prerrequisitos</title>
+
+  <para>Para seguir esta guía se necesita:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>Muchas ganas de aprender, DocBook se hace muy duro al principio y solo se ven las increíbles ventajas cuando se empieza a tomar cierta soltura después de trabajar con él unas cuantas horas.</para>
+    </listitem>
+    <listitem>
+      <para>Conocimientos básicos sobre XML.</para>
+    </listitem>
+    <listitem>
+      <para>Una distribución GNU/Linux como Ubuntu (11.10 ó 12.04 LTS), Debian ó Fedora.</para>
+    </listitem>
+    <listitem>
+      <para>Acceso a los repositorios GIT del proyecto OpenStack.</para>
+    </listitem>
+  </itemizedlist>
+
+</chapter>

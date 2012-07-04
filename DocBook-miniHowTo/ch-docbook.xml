@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="ch-docbook">
+  <title>Docbook</title>
+  <para>Párrafo de introducción del capítulo.</para>
+
+  <section xml:id="docbook-intro">
+    <title>Introduccion</title>
+    <para>Introducción a Docbook</para>
+
+  </section>
+
+  <section xml:id="docbook-creando">
+    <title>Creando un libro</title>
+    <para>Introducción a Docbook</para>
+
+  </section>
+
+  <section xml:id="docbook-generando-pdfs">
+    <title>Generado ficheros PDFs</title>
+    <para>Introducción a Docbook</para>
+
+  </section>
+
+  <section xml:id="docbook-dividiendo">
+    <title>Cómo dividir documentos grandes</title>
+    <para>Introducción a Docbook</para>
+
+  </section>
+
+  <section xml:id="docbook-convenciones">
+    <title>Convenciones a utilizar</title>
+    <para>Docbook es bastante grande y hay muchas formas de hacer lo mismo, por lo que siempre puede resultar interesante definir ciertas reglas a seguir en la escritura de documentos, así como tener siempre a mano un pequeño recetarios sobre cómo hacer ciertas cosas: insertar listas, insertar listas ordenadas, insertar una lista de definiciones, cómo insertar una imagen, etc.</para>
+
+    <para>A continuación se muestran un conjunto de recetas para el trabajo diario con DocBook:</para>
+
+    <section>
+      <title>Convenciones generales</title>
+      <para>Como convenciones simples y genéricas se recomiendan utilizar las siguientes:</para>
+      <itemizedlist>
+	<listitem>
+	  <para>Utilizar líneas de 80 caracteres máximo.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Identar con dos espacios, no usar tabuladores o configurarlos para que sean equivalentes a dos espacios.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Utilizar el tag <literal>para</literal> en su forma inline. Así:</para>
+	  <programlisting language="xml">
+<![CDATA[
+<para>Esto es un párrafo.</para>
+]]>
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para></para>	  
+	</listitem>
+
+      </itemizedlist>
+    </section>
+
+    <simplesect>
+      <title>Listas de elementos</title>
+      <para>Listas utilizadas para enumerar cosas, son las clásicas viñetas. El código que las crea es el siguiente:</para>
+      <programlisting language="xml">
+<![CDATA[
+<itemizedlist>
+  <listitem>
+    <para>Este es el elemento 1 de la lista.</para>
+  </listitem>
+
+  <listitem>
+    <para>Este es el elemento 2 de la lista.</para>
+  </listitem>
+
+  <listitem>
+    <para>Este es el elemento 3 de la lista.</para>
+  </listitem>
+
+  <listitem>
+    <para>Y con esto terminamos nuestra lista.</para>
+  </listitem>
+
+</itemizedlist>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Listas ordenadas de elementos</title>
+      <para>Listas utilizadas para enumerar cosas, pero en orden, como por ejemplo una serie de pasos para hacer algo o un procedimiento breve. El código que las crea es el siguiente:</para>
+      <programlisting language="xml">
+<![CDATA[
+<orderedlist>
+  <listitem>
+    <para>Este es el paso 1</para>
+  </listitem>
+
+  <listitem>
+    <para>Este es el paso 2</para>
+  </listitem>
+
+  <listitem>
+    <para>Este es el paso 3 y dos comandos asociados (separados, pero se pueden asociar con un solo screen):</para>
+
+    <screen><prompt>$ </prompt><userinput>apt-get update</userinput></screen>
+    <screen><prompt>$ </prompt><userinput>apt-get upgrade</userinput></screen>
+  </listitem>
+
+</orderedlist>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Listas de definiciones</title>
+      <para>Una forma sencilla de mostrar una lista de términos a definir sería con el siguiente código:</para>
+      <programlisting language="xml">
+<![CDATA[
+<para><emphasis role="bold">Concepto 1</emphasis>: definición.</para>
+
+<para><emphasis role="bold">Otro concepto</emphasis>: otra definición.</para>
+
+<para><emphasis role="bold">Último concepto</emphasis>: última definición.</para>
+]]>
+      </programlisting>
+
+      <para>Otra forma de mostrar una lista de términos a definir sería ésta:</para>
+      <programlisting language="xml">
+<![CDATA[
+<variablelist>
+  <title>Conceptos importantes</title>
+  <varlistentry>
+    <term>Concepto 1</term>
+    <listitem>
+      <para>Definición.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>Otro concepto</term>
+    <listitem>
+      <para>Otra definición.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>Último concepto</term>
+    <listitem>
+      <para>Última definición.</para>
+    </listitem>
+  </varlistentry>
+
+</variablelist>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Figuras e imágenes</title>
+      <para>Se puede insertar una figura de forma simple (sin título y sin indexar en la tabla de figuras) así:</para>
+      <programlisting language="xml">
+<![CDATA[
+<informalfigure>
+  <mediaobject>
+    <imageobject>
+      <imagedata scale="20" fileref="figures/arquitectura.jpg"/>
+    </imageobject>
+  </mediaobject>
+</informalfigure>
+]]>
+      </programlisting>
+
+      <para>Si queremos que la figura esté indexada y tenga un título, entonces el código es el siguiente:</para>
+
+      <programlisting language="xml">
+<![CDATA[
+<figure xml:id="id_de_la_figura">
+  <title>Título de la figura</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata scale="60" fileref="figures/arquitectura.jpg" />
+    </imageobject>
+  </mediaobject>
+</figure>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Código fuente</title>
+      <para>Podemos insertar un fichero externo con código fuente así:</para>
+      <programlisting language="xml">
+<![CDATA[
+<programlisting language="c">
+  <xi:include parse="text" href="src/main.c"/>
+</programlisting>
+]]>
+      </programlisting>
+
+      <para>También se puede directamente incrustar código, por ejemplo un script de Bash:</para>
+      <programlisting language="xml">
+<![CDATA[
+  <programlisting language="bash">
+#!/bin/bash
+
+echo "Hola a todos"
+  </programlisting>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Comandos, literales, nombres de fichero...</title>
+      <para>Se pueden utilizar etiquetas inline para remarcar comandos, nombres de ficheros, literales, ó simplemente poner algo en negrita de esta forma:</para>
+      <programlisting language="xml">
+<![CDATA[
+<para>Mientras se escribe, se puede nombrar un comando como <command>apt-get install</command> ó un nombre de fichero como <filename>/etc/passwd</filename> ó un literal como <literal>#</literal> o como una palabra reservada de un lenguaje como <literal>int</literal> ó un propietario de un fichero como <literal>root.root</literal> y sus permisos asociados <literal>0640</literal>, etc.</para>
+
+<para>Cuando se escribe algo importante también se puede utilizar negrita <emphasis role="bold">así</emphasis>.</para>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Tablas</title>
+      <para>Podemos insertar una tabla así:</para>
+      <programlisting language="xml">
+<![CDATA[
+<table rules="all">
+  <caption>Tabla de ejemplo:</caption>
+  <col width="20%"/>
+  <col width="20%"/>
+  <col width="60%"/>
+
+  <thead>
+    <tr>
+      <td>Encabezado 1</td>
+      <td>Encabezado 2</td>
+      <td>Encabezado 3</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fila 1 - columna 1</td>
+      <td>
+        <para>Una linea</para>
+        <para>Otra linea (esto es optativo)</para>
+      </td>
+      <td>Fila 1 - columna 3</td>
+    </tr>
+    <tr>
+      <td>Fila 2 - columna 1</td>
+      <td>Fila 2 - columna 2</td>
+      <td>Fila 2 - columna 3</td>
+    </tr>
+  </tbody>
+</table>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Notas</title>
+      <para>Es muy usual que al documentar queramos aclarar algún aspecto o remarcar algo importante, para eso se puede utilizar una nota así:</para>
+      <programlisting language="xml">
+<![CDATA[
+<para>Párrafo en el que se comenta algo.</para>
+
+<note><para>Esto es una nota aclaratoria sobre algún aspecto a documentar</para></note>
+
+<para>Seguimos nuestro documento.</para>
+]]>
+      </programlisting>
+    </simplesect>
+
+    <simplesect>
+      <title>Comandos, ficheros de configuración y salida de terminal</title>
+      <para>En documentos técnicos es muy común que se inserten ficheros de configuración o salida de terminal.</para>
+
+      <para>Podemos utilizar las siguientes etiquetas para eso: <literal>screen</literal>, <literal>prompt</literal> y <literal>command</literal>. Des esta forma</para>
+      <programlisting language="xml">
+<![CDATA[
+<para>Esto es un párrafo en el que se nombra al comando <command>apt-get</command>.</para>
+
+<para>O también así:</para>
+
+<screen><prompt>$ </prompt><userinput>apt-get update</userinput></screen>
+<screen><prompt>$ </prompt><userinput>apt-get upgrade</userinput></screen>
+
+<para>O así:</para>
+<screen>
+  <prompt>$ </prompt><userinput>apt-get update</userinput>
+  <prompt>$ </prompt><userinput>apt-get upgrade</userinput>
+</screen>
+
+<para>Se puede poner un fragmento de un fichero de configuración así:</para>
+
+<programlisting><xi:include parse="text" href="src/main.c"/></programlisting>
+]]>
+      </programlisting>
+    </simplesect>
+
+
+  </section>
+
+
+</chapter>
