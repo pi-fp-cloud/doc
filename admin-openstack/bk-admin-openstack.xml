@@ -9,13 +9,49 @@
     <?rax pdf.url="../AdminOpenStack.pdf"?>
     <title>Administración de OpenStack</title>
     <info>
-        <author>
+      <author>
+             <personname>
+                <firstname>Carlos</firstname>
+                <surname>Álvarez Barba</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+	<author>
             <personname>
                 <firstname>Miguel Ángel</firstname>
                 <surname>Ibáñez Mompeán</surname>
             </personname>
             <affiliation>
                 <orgname>IES Ingeniero de la Cierva</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>Alberto</firstname>
+                <surname>Molina Coballes</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>Jesús</firstname>
+                <surname>Moreno León</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>José Domingo</firstname>
+                <surname>Muñoz Rodríguez</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
             </affiliation>
         </author>
         <author>
@@ -116,6 +152,12 @@ Título: Administración de OpenStack
 -->
 
     <xi:include href="ch-prerrequisitos.xml" />
+    <xi:include href="../infraestructura/ch_servidores.xml"/>
+    <xi:include href="../instalacion_debian_wheezy/ch_pasos_previos.xml"/>
+    <xi:include href="../instalacion_debian_wheezy/ch_keystone.xml"/> 
+    <xi:include href="../instalacion_debian_wheezy/ch_glance.xml"/> 
+    <xi:include href="../instalacion_debian_wheezy/ch_nova_en_controlador.xml"/>
+    <xi:include href="../instalacion_debian_wheezy/ch_nova_en_nodos.xml"/> 
     <xi:include href="ch-instalacion.xml" />
     <xi:include href="ch-gest-identidad.xml" />
     <xi:include href="ch-gest-imagenes.xml" />

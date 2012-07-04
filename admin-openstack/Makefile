@@ -1,6 +1,7 @@
 # Makefile para la generación automática en PDF y XHTML de documentos XML DocBook
 
 STYLESHEETS_DIR=/usr/share/xml/docbook/stylesheet/docbook-xsl-ns
+OBJDIR=www
 SOURCE=bk-admin-openstack
 XSLTPROC=/usr/bin/xsltproc
 OPTS=--xinclude --stringparam paper.type A4
@@ -18,3 +19,7 @@ pdf: fo
 
 clean:
 	rm $(SOURCE).fo $(SOURCE).pdf $(SOURCE).html
+
+multi-html:
+	mkdir -p $(OBJDIR)
+	xsltproc --nonet --stringparam chunker.output.encoding UTF-8 --xinclude -o $(OBJDIR)/ $(STYLESHEETS_DIR)/xhtml-1_1/chunk.xsl $(SOURCE).xml

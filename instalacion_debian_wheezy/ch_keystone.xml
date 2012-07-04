@@ -113,7 +113,7 @@
       servicios, etc.</para>      
     </section>
   </section>
-  <section xml:id="configuración">
+  <section xml:id="configuración_keystone">
     <title>Configuración de keystone</title>
     <para>El fichero de configuración de keystone lo encontramos en
     <filename>/etc/keystone/keystone.conf</filename>. La primera
