@@ -66,6 +66,26 @@
     <para>Veamos detalladamente algunos de los parámetros que hemos
     indicado en el fichero de configuración:</para>
      <itemizedlist>
+      <listitem><para>En la sección LOGS/STATE configuramos algunos
+      directorios de trabajo: donde guardamos los logs del sistema
+      (logdir), el directorio base donde podemos encontrado el
+      contenido del cloud (state_path) y el directorio donde podemos
+      encontrar los ficheros de bloqueo (lock_path). Los logs que
+      generan cada uno de los distintos subcomponentes de nova se
+      guardan en ficheros separados dentro del directorio donde hemos
+      indicado en la configuración, además el nivel de explicación de
+      los logs se indica con el parámetro verbose. </para></listitem>
+      <listitem><para>En la sección AUTHENTICATION con el parámetro
+      auth_strategy indicamos el módulo que vamos a usar para el
+      servicio de autentificación y autorización, en nuestro caso
+      vamos a usar Keystone.</para></listitem>
+      <listitem><para>En la sección SCHEDULER con el parámetro
+      scheduler_driver indicamos el mecanismo de planificación que
+      vamos a seguir para instanciar las máuinas virtuales en nuestro
+      caso vamos a utilizar el simple.</para></listitem>
+      <listitem><para>En la sección DATABASE con el parámetro
+      sql_connection configuramos la cadena de conección para acceder
+      a la base de datos nova.</para></listitem>
       <listitem><para></para></listitem>
      </itemizedlist>
     <para><filename>/etc/nova/api-paste.ini</filename></para>
