@@ -15,10 +15,8 @@
     <para>El dashboard Horizon lo vamos a instalar en el nodo
     controlador Jupiter, para ello instalamos desde el repositorio de
     Debian:</para>
-    <screen>
-      <prompt>#</prompt><userinput>aptitude install apache2
-      openstack-dashboard openstack-dashboard-apache</userinput>
-    </screen> 
+      <programlisting># aptitude install apache2
+      openstack-dashboard openstack-dashboard-apache</programlisting>
     <para>Como podemos observar utilizamos el servidor web Apache2, en
     el cual se configura un virtual host que podemos configurar en el
     fichero
