@@ -12,7 +12,7 @@
   alguno de los nodos de computación.</para>
   <para>Inicialmente las imágenes de glance se almacenan en el directorio
   <filename>/var/lib/glance/images</filename>, aunque es posible utilizar
-  también un componente de almacenamiento de objetos como swift.</para>
+  también un componente de almacenamiento de objetos como OpenStack Swift.</para>
   <section xml:id="sec_glance_formato">
     <title>Formato de Disco y Contenido</title>
     <para>Cuando añadimos una imagen a Glance, necesitamos especificar el
@@ -21,7 +21,8 @@
       <title>Formato del disco</title>
       <para>Tendremos que dar un formato a nuestra imagen para cuando creemos
       una máquina virtual. Existen muchos tipos de formatos de imagen,
-      actualmente podemos utilizar los siguientes en OpenStack (<link xlink:href="http://docs.openstack.org/developer/glance/formats.html">http://docs.openstack.org/developer/glance/formats.html</link>):</para>
+      actualmente podemos utilizar los siguientes en OpenStack (<link
+      xlink:href="http://docs.openstack.org/developer/glance/formats.html">http://docs.openstack.org/developer/glance/formats.html</link>):</para> 
       <variablelist>
 	<varlistentry>
 	  <term><filename>raw</filename></term>
@@ -154,67 +155,71 @@
 	<para>Arrancar la máquina virtual con KVM incluyendo la iso con el
 	instalador del SO. Esto desplegará una conexión VNC a las que nos
 	tendremos que conectar para hacer la instalación. Por ejemplo:</para>
-	<para><code>kvm -m 512 -cdrom instalador-SO.iso -drive file=Nombre-imagen.img,if=scsi,index=0 -boot d -net nic -net user -nographic  -vnc</code></para>
+	<para><code>kvm -m 512 -cdrom instalador-SO.iso -drive
+	file=Nombre-imagen.img,if=scsi,index=0 -boot d -net nic -net user
+	-nographic  -vnc</code></para>
       </listitem>
       <listitem><para>Conectamos mediante VNC a la máquina virtual y terminar la
       instalación</para></listitem>
       <listitem><para>Copiar la imagen al nodo de glance y añadirla a la base de
       datos, especificando si la imagen será pública o no y el formato del
       contenedor:</para>
-      <para><code>glance add name="Debian Squeeze 6.0.5" is_public=true container_format=ovf disk_format=qcow2 &lt; Nombre-imagen.img</code></para>
+      <para><code>glance add name="Debian Squeeze 6.0.5" is_public=true
+      container_format=ovf disk_format=qcow2 &lt;
+      Nombre-imagen.img</code></para>
       </listitem>
     </orderedlist>
   </section>
-<!-- Linux -->
-
-<!-- Creamos la imagen -->
-
-<!-- kvm-img create -f raw Debian6.0.5.img 1G -->
-
-<!-- Iniciamos una instancia con KVM con la ISO de instalación descargada anteriormente. De esta manera iniciaremos el proceso de instalación y estableceremos una conexión VNC para ello. -->
-
-<!-- kvm -m 512 -cdrom debian-6.0.5-amd64-netinst.iso -drive   file=debian6.0.5.img,if=scsi,index=0 -boot d -net nic -net user -nographic  -vnc :0 -->
-
-<!-- vncviewer :0 -->
-
-<!-- Nota: -->
-<!-- *Sera necesario hacer la instalación en una partición formateada con ext4 y situada en / -->
-<!-- *En ubuntu o debian no es necesario crear una partición de swap -->
-
-<!-- Para poder realizar cualquier configuración después de la instalación del sistema necesitaremos arrancarlo de la siguiente manera. Es exactamente igual sin indicarle un CD de instalación. -->
-
-<!-- kvm -m 512 -drive file=debian6.0.5.img,if=scsi,index=0,boot=on -boot c -net nic -net user -nographic -vnc :1 -->
-
-<!-- vncviewer :1 -->
-
-<!-- Desde aquí podremos hacer la instalación de todos los paquetes, actualizaciones, configuraciones... que creamos necesarias para nuestra imagen. -->
-
-<!-- Como mínimo deberemos de actualizar los paquetes e instalar ssh (este paso es posible que se haya realizado en la misma instalación del sistema) -->
-
-<!-- apt-get update -->
-
-<!-- apt-get upgrade -->
-
-<!-- aptitude install openssh-server -->
-
-<!-- Necesitaremos copiar la imagen a Jupiter para posteriormente subirla a Glance -->
-
-<!-- scp Debian6.0.5.img root@jupiter:/mnt/imagenes/ -->
-
-<!-- Añadimos a Glance -->
-
-<!-- glance add name="Debian Squeeze 6.0.5" is_public=true container_format=ovf disk_format=raw < Debian6.0.5.img -->
-
-<!-- Windows -->
-
-<!-- Creamos la imagen -->
-
-<!-- kvm-img create -f raw win7.img 10G -->
-
-<!-- Nota: -->
-<!-- *El tamaño mínimo de la imagen de una máquina Windows 7 debe ser de 7 GB para poder hacer la instalación, aunque es recomendable al menos 10. -->
-
-<!-- Procedemos a hacer la instalación, en el caso de Windows es necesario que añadamos una disquetera con los drivers de virtio con: * -fda /Directorio/de/virtio-win.vfd -->
+  <section>
+    <title>Creación de imágenes GNU/Linux</title>
+    <para>En primer lugar creamos un fichero para la imagen del sistema (en este
+    caso se ha optado por formato raw):</para>
+    <para><code>kvm-img create -f raw Debian6.0.5.img 1G</code></para>
+    <para>Iniciamos una máquina virtual con KVM con la ISO de instalación
+    descargada anteriormente (en este caso la versión netinst de Debian
+    stable), para comenzar instalación y conectarnos por VNC:</para>
+    <para><code>kvm -m 512 -cdrom debian-6.0.5-amd64-netinst.iso -drive
+    file=debian6.0.5.img,if=scsi,index=0 -boot d -net nic -net user -nographic
+    -vnc :0</code></para>
+    <para>Durante la instalación creamos una sola partición que ocupe todo el
+    disco virtual y la asociamos a /. No creamos partición de swap.</para>
+    <para>Si fuera necesario volver a iniciar el sistema, pero en este caso,
+    desde el fichero con el disco duro virtual, ejecutaríamos la siguiente
+    instrucción:</para>
+    <para><code>kvm -m 512 -drive file=debian6.0.5.img,if=scsi,index=0,boot=on
+    -boot c -net nic -net user -nographic -vnc :0</code></para>
+    <para>Durante la instalación del sistema, es imprescindible instalar el
+    servidor ssh, ya que será el método utilizado por defecto para acceder a las
+    instancias del cloud una vez que estén iniciadas.</para>
+    <para>Una vez terminada la instalación del sistema, se copia el fichero con
+    la imagen del nuevo sistema al equipo en el que se ejecuta glance y se
+    agrega a las imágenes disponibles de la siguiente manera:</para>
+    <para><code>glance add name="Debian Squeeze 6.0.5" is_public=true
+    container_format=ovf disk_format=raw &lt; Debian6.0.5.img</code></para>
+  </section>
+  <section>
+    <title>Creación de imágenes Windows</title>
+    <para>Como en cualquier otro caso, creamos un fichero para la imagen del
+    sistema (en este caso se ha optado por formato qcow2):</para>
+    <para><code>kvm-img create -f qcow2 win7.qcow2 10G</code></para>
+    <para>En el caso de instalar un sistema Windows 7 el tamaño mínimo del disco
+    debe ser de 7 GB para poder hacer la instalación, aunque es recomendable al
+    menos 10.</para>
+    <para>Las instancias de OpenStack con KVM se inician utilizando
+    controladores virtio para el disco duro y las interfaces de red, los
+    sistemas GNU/Linux los reconocen sin problemas, pero los sistemas Windows no
+    incluyen soporte nativo para esos controladores, por lo que debemos crear la
+    imagen con los controladores virtio incorporados. Para ello, nos descargamos
+    previamente los controladores virtio:</para>
+    <para><code>wget
+    http://alt.fedoraproject.org/pub/alt/virtio-win/latest/images/bin/virtio-win-0.1-22.iso</code></para>
+    <para>Ahora arrancamos la máquina virtual con la imagen de disco duro, la
+    iso del instalador del sistema windows y la iso con los controladores
+    virtio:</para>
+  </section>
+<!-- añadimos una -->
+<!--     disquetera con los drivers de virtio con: * -fda -->
+<!--     /Directorio/de/virtio-win.vfd  -->
 
 <!-- kvm -m 1024 -cdrom ../Isos/Windows7.iso -drive file=win7.img,if=virtio,boot=on -fda /home/usuario/Descargas/virtio-win-1.1.16.vfd -boot d -nographic -vnc :0 -->
 
