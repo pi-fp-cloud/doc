@@ -117,7 +117,7 @@
       cuotas generales del sistema, aunque posteriormente se podrán
       sobreescribir para cada uno de los proyectos.Veamos que
       significan algunos de estos parámetros:</para></listitem>
-      <para>
+     </itemizedlist>
       <orderedlist>
 	<listitem><para>
 	  quota_gigabytes: Tamaño máximo del disco por proyecto.
@@ -139,8 +139,9 @@
 	<listitem><para>
 	  quota_volumes: Número máximo de volúmenes asociables a un proyecto.
 	</para></listitem>
-      </orderedlist>>
-      </para>
+      </orderedlist>
+      
+      <itemizedlist>
       <listitem><para>En la sección NETWORK se indica la configuración
       de red, que será explicada con detalle posteriormente. Veamos
       los parámetros que se deben indicar: el tipo de configuración de
