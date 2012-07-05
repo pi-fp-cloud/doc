@@ -81,10 +81,10 @@
       vamos a usar Keystone.</para></listitem>
       <listitem><para>En la sección SCHEDULER con el parámetro
       scheduler_driver indicamos el mecanismo de planificación que
-      vamos a seguir para instanciar las máuinas virtuales en nuestro
+      vamos a seguir para instanciar las máquinas virtuales en nuestro
       caso vamos a utilizar el simple.</para></listitem>
       <listitem><para>En la sección DATABASE con el parámetro
-      sql_connection configuramos la cadena de conección para acceder
+      sql_connection configuramos la cadena de conexión para acceder
       a la base de datos nova.</para></listitem>
       <listitem><para></para></listitem>
      </itemizedlist>
@@ -209,8 +209,7 @@
 	en las distintas instancias.</para>
       </section>
     </section>
-   
-
+   </section>
 </chapter>
 
     
