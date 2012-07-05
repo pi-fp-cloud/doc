@@ -117,6 +117,7 @@
       cuotas generales del sistema, aunque posteriormente se podrán
       sobreescribir para cada uno de los proyectos.Veamos que
       significan algunos de estos parámetros:</para></listitem>
+      <para>
       <itemizedlist>
 	<listitem><para>
 	  quota_gigabytes: Tamaño máximo del disco por proyecto.
@@ -139,6 +140,7 @@
 	  quota_volumes: Número máximo de volúmenes asociables a un proyecto.
 	</para></listitem>
       </itemizedlist>
+      </para>
       <listitem><para>En la sección NETWORK se indica la configuración
       de red, que será explicada con detalle posteriormente. Veamos
       los parámetros que se deben indicar: el tipo de configuración de
@@ -179,7 +181,7 @@
   <para>Para ver que los servicios están activos podemos ejecutar el
   comando siguiente:</para>
   <programlisting>
-    nova-manage service list
+    >jupiter:~#nova-manage service list
   </programlisting>
   <para>Que nos debe ofrecer una salida parecida a la
   siguiente:</para>
