@@ -17,7 +17,8 @@
     <title>Instalación</title>
     <para>Instalamos desde el repositorio de Debian:</para>
     <screen>
-      <prompt>#</prompt><userinput>aptitude install nova-api nova-scheduler nova-cert nova-console</userinput>
+      <prompt>#</prompt><userinput>aptitude install nova-api
+      nova-scheduler nova-cert nova-console</userinput>
     </screen> 
     <para>Durante la configuración de los paquetes se nos pregunta si queremos
     configurar la base de datos con <command>dbconfig-common</command>, a lo que
@@ -39,61 +40,49 @@
   </section>
   <section xml:id="configuración_nova">
     <title>Configuración</title>
-    <para>Veamos la configuración necesaria para que funcione
-    adecuadamente el componente nova:</para>
+    
+    <para>El fichero de configuración lo encontramos en el fichero 
+    <filename>/etc/nova/nova.conf</filename> cuyo
+    contenido inicial es el siguiente:</para>
+    <programlisting>
+      [DEFAULT]
+      logdir=/var/log/nova
+      state_path=/var/lib/nova
+      lock_path=/var/lock/nova
+      connection_type=libvirt
+      root_helper=sudo nova-rootwrap
+      auth_strategy=keystone
+      dhcpbridge_flagfile=/etc/nova/nova.conf
+      dhcpbridge=/usr/bin/nova-dhcpbridge
+      iscsi_helper=tgtadm
+      sql_connection=mysql://usuario:pass@127.0.0.1/nova
+    </programlisting>
+    <para>Veamos las modificaciones necesarias en la configuración de
+    nova para que funcione nuestro sistema adecuadamente:</para>
     <para><filename>/etc/nova/nova.conf</filename></para>
     <programlisting>
       <xi:include href="nova.conf.controlador"  parse="text"/> 
     </programlisting>
+    <para>Veamos detalladamente algunos de los parámetros que hemos
+    indicado en el fichero de configuración:</para>
+     <itemizedlist>
+      <listitem><para></para></listitem>
+     </itemizedlist>
     <para><filename>/etc/nova/api-paste.ini</filename></para>
-    <para>En este fichero se añaden las mismas líneas que ne la
+    <para>En este fichero se añaden las mismas líneas que pusimos en la
     configuración de glance, donde se indica el usuario, la contraseña y
     el tenant con el que nos vamos a autentificar.</para>
     <programlisting>
-admin_tenant_name = service
-admin_user = "usuario jefe"
-admin_password = "password de usuario jefe"
+      admin_tenant_name = service
+      admin_user = "usuario jefe"
+      admin_password = "password de usuario jefe"
     </programlisting>
   <para>Para finalizar el proceso de configuración y después de
   habernos autentificado, debemos crear la tablas necesarias en la
   base de datos, para ello ejecutamos el siguiente comando:</para>
   <programlisting>jupiter:~#nova-manage db sync</programlisting>
-  <para>Veamos detalladamente cada una de los grupos de
-  directivas:</para>
-  <section xml:id="conf_nova_1">
-   <title>Configuración de los logs</title>
-   <para></para>
-  </section>
-  <section xml:id="conf_nova_2">
-   <title>Configuración del hypervisor</title>
-   <para></para>
-  </section>
-  <section xml:id="conf_nova_3">
-   <title>Configuración de la autentificación y la autorización</title>
-   <para></para>
-  </section>
-  <section xml:id="conf_nova_4">
-   <title>Configuración de la base de datos</title>
-   <para></para>
-  </section>
-  <section xml:id="conf_nova_5">
-   <title>Configuración del servicio de imágenes (glance)</title>
-   <para></para>
-  </section>
-  <section xml:id="conf_nova_6">
-   <title>Configuración de las migraciones en vivo</title>
-   <para></para>
-  </section>
-  <section xml:id="conf_nova_7">
-   <title>Configuración del sistema de mensajería interna
-   (RabbitMQ)</title>
-   <para></para>
-   </section>
-   <section xml:id="conf_nova_8">
-   <title>Configuración del esquema de red</title>
-   <para></para>
-  </section>
-  </section>
+  
+
   <section xml:id="configuracion_red_nova">
     <title>Tipos de configuración de red</title>
     <para>Como hemos vistos en puntos anteriores, los usuarios
