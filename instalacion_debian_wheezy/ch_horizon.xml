@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Horizon (dashboard)</title>
+  <para>Este capítulo describe la instalación y configuración de la
+  aplicación web Horizon, que nos permite realizar distintas funciones
+  en nuestro cloud. Desde ella se pueden editar casi todo lo relativo
+  a la gestión de proyectos (creación, eliminación, gestión de cuotas
+  y usuarios, ...), usuarios, gestión de instancias, imágenes,
+  volúmenes, ...</para>
+
+  <section xml:id="instalacion_horizon">
+    <title>Instalación</title>
+    <para>El dashboard Horizon lo vamos a instalar en el nodo
+    controlador Jupiter, para ello instalamos desde el repositorio de
+    Debian:</para>
+    <screen>
+      <prompt>#</prompt><userinput>aptitude install apache2
+      openstack-dashboard openstack-dashboard-apache</userinput>
+    </screen> 
+    <para>Como podemos observar utilizamos el servidor web Apache2, en
+    el cual se configura un virtual host que podemos configurar en el
+    fichero
+    <emphasis>/etc/apache2/sites-availables/openstack-dashboard</emphasis>. Para
+    acceder a la aplicación web podemos acceder desde una navegador a
+    la URL: <uri>http://direccion_ip_jupiter:8080/</uri>.</para>
+    <para>Como observamos por defecto utiliza el puerto 8080 para el
+    acceso, si queremos utilizar el puerto 80, simplemente debemos
+    modificar el fichero
+    <emphasis>/etc/apache2/sites-availables/openstack-dashboard</emphasis>
+    y realizar las siguientes modificaciones en las dos primeras líneas:</para>
+    <programlisting>
+      Listen 80
+      VirtualHost *:80>
+    </programlisting>
+    <para>Y a continuación desactivamos el virtual host por defecto e
+    reiniciamos el servidor web.</para>
+    <programlisting>
+      # a2dissite default
+      # service apache2 restart
+    </programlisting>
+  </section>
+</chapter>
