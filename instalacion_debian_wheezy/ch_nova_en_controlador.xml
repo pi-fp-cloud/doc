@@ -86,8 +86,73 @@
       <listitem><para>En la sección DATABASE con el parámetro
       sql_connection configuramos la cadena de conexión para acceder
       a la base de datos nova.</para></listitem>
-      <listitem><para></para></listitem>
-     </itemizedlist>
+      <listitem><para>En la sección COMPUTE configuramos el sistema de
+      virtualización que vamos a utilizar con el parámetro
+      libvirt_type, en nuestro caso kvm, vamos a utilizar libvirt
+      (parámetro connection_type), la plantilla que vamos a usar para
+      crear el nombre de las instancias (parámetro
+      instance_name_template) y por último indicamos donde se
+      encuentra el fichero de configuración api-paste.ini
+      (api_paste_config). </para></listitem>
+      <listitem><para>En la sección RABBITMQ indicamos, en el
+      parámetro  rabbit_host donde se encuentra el servidor Rabbit
+      responsable de la mensajería interna de los distintos
+      componentes.</para></listitem>
+      <listitem><para>En la sección GLANCE se indica que aplicación va
+      a gestionar las imágenes, en nuestro caso será Glance y el
+      parámetro donde se indica es image_service, además se indica
+      donde se encuentra el servicio glance
+      (glance_api_servers).</para></listitem>
+      <listitem><para>En la sección NOVNC CONSOLE se configura el
+      acceso por la consola vnc, para ello indicamos la URL donde se
+      encuentra el servicio novnc (novncproxy_base_url) y la dirreción
+      del cliente vnc (vncserver_proxyclient_address y
+      vncserver_listen).</para></listitem>
+      <listitem><para>Con el parámetro root_helper indicamos un
+      comando que internamente va a usar el sistema para ejecutar
+      ciertas instrucciones con privilegio de superusuario. Por
+      defecto es <command>sudo nova-rootwrap</command>
+      </para></listitem>
+      <listitem><para>En la sección QUOTAS podemos configurar las
+      cuotas generales del sistema, aunque posteriormente se podrán
+      sobreescribir para cada uno de los proyectos.Veamos que
+      significan algunos de estos parámetros:</para></listitem>
+      <itemizedlist>
+	<listitem><para>
+	  quota_gigabytes: Tamaño máximo del disco por proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_instances: Número máximo de instancias por proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_ram: Memoria RAM máxima utilizable por proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_security_group_rules: Número máximo de reglas por grupo de
+	  seguridad.
+	</para></listitem>
+	<listitem><para>
+	  quota_security_group: Número máximo de grupos de seguridad por
+	  proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_volumes: Número máximo de volúmenes asociables a un proyecto.
+	</para></listitem>
+      </itemizedlist>
+      <listitem><para>En la sección NETWORK se indica la configuración
+      de red, que será explicada con detalle posteriormente. Veamos
+      los parámetros que se deben indicar: el tipo de configuración de
+      red (network_manager) en nuestro caso VLAN, la interfaz de red
+      por la que se va a gestionar la vlna (vlan_interface) en nuestro
+      caso es la privada eth1, la interfaz de red pública
+      (public_interface), la dirección ip privada del nodo (my_ip), la
+      dirección ip pública del nodo (routing_source_ip), utilización
+      de varios nodos (multi_host) e información sobre el bridge
+      (dhcpbridge_flagfile y dhcpbridge).</para></listitem>
+      <listitem><para>Queda por configurar el uso de las APIS y el
+      componente nova-volumen.</para></listitem>
+    </itemizedlist>
+    <para>Veamos otro fichero de configuración.</para>
     <para><filename>/etc/nova/api-paste.ini</filename></para>
     <para>En este fichero se añaden las mismas líneas que pusimos en la
     configuración de glance, donde se indica el usuario, la contraseña y
@@ -104,7 +169,7 @@
   
 
   <section xml:id="configuracion_red_nova">
-    <title>Tipos de configuración de red</title>
+    <title>Configuración de red: VLAN</title>
     <para>Como hemos vistos en puntos anteriores, los usuarios
     organizan sus recursos en el cloud en proyectos. Un royecto es un
     conjunto de instancias o máquinas virtuales creadas por el
