@@ -162,12 +162,34 @@
       admin_user = "usuario jefe"
       admin_password = "password de usuario jefe"
     </programlisting>
+  <para>Una vez definida la configuración es momento de reiniciar los
+  servicios:</para>
+  <programlisting>
+    service nova-api restart
+    service nova-cert restart
+    service nova-console restart
+    service nova-consoleauth restart
+    service nova-scheduler restart
+  </programlisting>
+
   <para>Para finalizar el proceso de configuración y después de
   habernos autentificado, debemos crear la tablas necesarias en la
   base de datos, para ello ejecutamos el siguiente comando:</para>
   <programlisting>jupiter:~#nova-manage db sync</programlisting>
-  
-
+  <para>Para ver que los servicios están activos podemos ejecutar el
+  comando siguiente:</para>
+  <programlisting>
+    nova-manage service list
+  </programlisting>
+  <para>Que nos debe ofrecer una salida parecida a la
+  siguiente:</para>
+  <programlisting>
+    Binary           Host                                 Zone             Status     State Updated_At
+nova-scheduler   jupiter                              nova             enabled    :-)   2012-06-20 18:10:24
+nova-console     jupiter                              nova             enabled    :-)   2012-06-20 18:10:24
+nova-cert        jupiter                              nova             enabled    :-)   2012-06-20 18:10:25
+nova-consoleauth jupiter                              nova             enabled    :-)   2012-06-20 18:10:22
+  </programlisting>
   <section xml:id="configuracion_red_nova">
     <title>Configuración de red: VLAN</title>
     <para>Como hemos vistos en puntos anteriores, los usuarios
