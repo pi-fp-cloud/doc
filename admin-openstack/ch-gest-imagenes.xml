@@ -10,7 +10,8 @@
   limpios o muy configurados y pueden ser incluso instantáneas
   (<emphasis>snapshots</emphasis>) de instancias que se están ejecutando en
   alguno de los nodos de computación.</para>
-  <para>Inicialmente las imágenes de glance se almacenan en el directorio
+  <para>El componente de OpenStack encargado de la gestión de instancias es
+  Glanca que inicialmente almacena las imágenes en el directorio
   <filename>/var/lib/glance/images</filename>, aunque es posible utilizar
   también un componente de almacenamiento de objetos como OpenStack Swift.</para>
   <section xml:id="sec_glance_formato">
@@ -20,8 +21,8 @@
     <section>
       <title>Formato del disco</title>
       <para>Tendremos que dar un formato a nuestra imagen para cuando creemos
-      una máquina virtual. Existen muchos tipos de formatos de imagen,
-      actualmente podemos utilizar los siguientes en OpenStack (<link
+      una máquina virtual. Existen muchos tipos de formatos de imagen de disco,
+      actualmente podemos utilizar los siguientes en OpenStack (<link 
       xlink:href="http://docs.openstack.org/developer/glance/formats.html">http://docs.openstack.org/developer/glance/formats.html</link>):</para> 
       <variablelist>
 	<varlistentry>
@@ -134,15 +135,52 @@
       </variablelist>
     </section>
   </section>
+  <section xml:id="glance_imagenes_internet">
+    <title>Imágenes disponibles en Internet</title>
+    <para>La forma más sencilla de añadir imágenes a OpenStack es utilizar
+    algunas de las imágenes que tenemos a nuestra disposición en Internet y que
+    posiblemente será una tendencia que aumente con el tiempo. Algunos
+    sistemas operativos, sobre todo distintas distribuciones GNU/Linux, además
+    de proporcionar las imágenes ISO con el instalador del sistema, proporcionan
+    imágenes de disco preparadas para arrancar directamente sobre el cloud,
+    siendo fundamental verificar que el formato de disco y contenido son de los
+    soportados por OpenStack.</para>
+    <para>Dentro de <link xlink:href="http://www.launchpad.net">Launchpad</link>
+    existe el proyecto CirrOS que se dedica a desarrollar una distribución
+    GNU/Linux muy ligera orientada a su utilización en la nube y que es ideal
+    para pruebas y situaciones en las que se requieran muchas instancias
+    sencillas. Para instalar la última imagen de CirrOS en el equipo en el que
+    se ejecute glance, basta con descargar la imagen adecuada de <link
+    xlink:href="https://launchpad.net/cirros/+download">https://launchpad.net/cirros/+download</link>,
+    por ejemplo, podemos descargar una imagen en formato de disco qcow para
+    x86_64:</para>
+    <para><code>wget
+    https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img</code></para>
+    <para>y posteriormente agregarla a glance:</para>
+    <para><code>glance add name="CirrOS x86_65" is_public=true
+    container_format=raw disk_format=qcow2 &lt; cirros-0.3.0-x86_64-disk.img
+    </code></para>
+    <para>Dentro de las distribuciones GNU/Linux "convencionales", Ubuntu es la
+    que ha hecho un esfuerzo mayor y ha creado un repositorio completo de sus
+    sistemas en varios formatos adecuados para utilizar en la nube y que se
+    pueden descargar de <link
+    xlink:href="http://uec-images.ubuntu.com">http://uec-images.ubuntu.com</link>,
+    basta con elegir una imagen para descargar adecuada e instalarla con glance
+    de forma análoga a lo que se ha hecho con CirrOS.</para>
+    <para>En cualquier caso, por muchas imágenes que tengamos a nuestra
+    disposición en Internet, nunca se pueden cubrir todas nuestras necesidades y
+    antes o después tendremos la necesidad de crear una instancia a medida, que
+    es lo que explicamos en las próximas secciones.</para>
+  </section>
   <section xml:id="glance_instalacion_maquinas">
     <title>Procedimiento general de provisión de imágenes</title>
-    <para>Las imagenes las deberemos de crear en nuestra máquina física para
-    posteriormente subirlas al nodo donde se encuentra glance.</para>
-    <para>Para conectarnos y hacer la instalación utilizaremos el cliente vnc
-    xvnc4viewer, por lo que habrá que instalarlo en el equipo si no se encuentra
-    instalado<footnote><para>Podría hacerse sin vnc directamente con sdl, pero
-    VNC es más versátil y nos perimte por ejemplo trabajar en
-    remoto</para></footnote>.</para>
+    <para>En secciones posteriores se explicará la forma específica de crear
+    imágenes del cloud para una distribución GNU/Linux y Windows, pero vamos a
+    resumir los pasos generales.</para>
+    <para>La instalación debemos hacerla en un equipo con KVM instalado y
+    configurado y con un cliente VNC disponible<footnote><para>Podría hacerse
+    sin vnc directamente con sdl, pero VNC es más versátil y nos permite por
+    ejemplo trabajar en remoto</para></footnote>.</para>
     <para>Los pasos principales para crear una imagen con un sistema son:</para>
     <orderedlist>
       <listitem>
