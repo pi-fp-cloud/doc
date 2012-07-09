@@ -3,14 +3,14 @@
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es">
   <title>Glance</title>
-  <para>Este cápitulo describe la instalación y configuración del
+  <para>Este capítulo describe la instalación y configuración del
   módulo de OpenStack, Glance. Este módulo es el encargado de la
   gestión y registro de las imágenes que posteriormente se van a poder
   instanciar. </para>
   <section xml:id="introduccion_glance">
     <title>Introducción al módulo glance</title>
     <para>El componente Glance de OpenStack es el responsable de la
-    localización, registro y gestión de las imágenes de máuinas
+    localización, registro y gestión de las imágenes de máquinas
     virtuales que vamos a poder instanciar.</para>
     <para>Las imágenes gestionadas por Glance se pueden almacenar en
     gran variedad de ubicaciones desde un simple sistema de ficheros
@@ -18,35 +18,35 @@
     proyecto OpenStack Swift.</para>
     <para>El componente Glance posee una API REST que nos permite
     hacer consultas sobre los metadatos de las imágenes, así como la
-    recuperación de la imágen real.</para>
+    recuperación de la imagen real.</para>
   </section>
   <section xml:id="instlación">
-    <title>Instlación de glance</title>
-    <para>Antes de realizar la instalación de glance, vamos a repasar
-    la configuración de keystone para que podemos usarlo para realizar
+    <title>Instalación de Glance</title>
+    <para>Antes de realizar la instalación de Glance, vamos a repasar
+    la configuración de Keystone para que podemos usarlo para realizar
     la autentificación:</para>
     <itemizedlist>
-     <listitem><para>El usario que va a adminitrar glance será el
-     usuario jefe, al que se le asignó el rol "admin" en el tenat
+     <listitem><para>El usuario que va a administrar Glance será el
+     usuario jefe, al que se le asignó el rol "admin" en el tenant
      "service".</para></listitem>
-     <listitem><para>El servicio glnce ya fur creado en
-     keystone.</para></listitem>
-     <listitem><para>Los endpoints de glance también fueron definidos
-     durante la intalación de heystone.</para></listitem>
+     <listitem><para>El servicio Glance ya fue creado en
+     Keystone.</para></listitem>
+     <listitem><para>Los endpoints de Glance también fueron definidos
+     durante la instalación de Keystone.</para></listitem>
    
     </itemizedlist>
-    <para>Por lo tanto ya tenemos todo prepara para la instlación de
-    glance:</para>
+    <para>Por lo tanto ya tenemos todo preparado para la instalación de
+    Glance:</para>
     <para><code>root@jupiter:~#aptitude install glance</code></para>
-    <para>Seleccionamos keystone como servicio de autenticación,
-    introducimos la dirección del servicio de keystone (esto se puede
+    <para>Seleccionamos Keystone como servicio de autenticación,
+    introducimos la dirección del servicio de Keystone (esto se puede
     cambiar más adelante, de momento dejaremos localhost), definimos
-    el admin_token (glance) y esperamos a que finalice la
+    el admin_token (Glance) y esperamos a que finalice la
     instalación.</para>
   </section>
   <section xml:id="configuración">
-    <title>Configuración de glance</title>
-    <para>Una vez terminada la intalación de glance realizamos los
+    <title>Configuración de Glance</title>
+    <para>Una vez terminada la instalación de Glance realizamos los
     siguientes cambios en los ficheros de configuración:</para>
     <para><emphasis>etc/glance/glance-api-paste.ini</emphasis></para>
     <programlisting>
@@ -73,7 +73,7 @@
       flavor = keystone
     </programlisting>
     <para>A continuación creamos el modelo de datos de glance e
-    reinciamos los servicios, para ello:</para>
+    reiniciamos los servicios, para ello:</para>
      <programlisting>
        root@jupiter:~#glance-manage version_control 0
        root@jupiter:~#glance-manage db_sync
@@ -84,8 +84,8 @@
   <section xml:id="autentificaicon">
     <title>Método de autentificación y prueba de
     funcionamiento</title>
-    <para>Para que el usuariuo jefe administre el servicio glance
-    vamos a utilizar las variable que habíamos definido en el fichero
+    <para>Para que el usuario jefe administre el servicio Glance
+    vamos a utilizar las variables que habíamos definido en el fichero
     /root/.jefe:</para>
     <programlisting>
       export OS_USERNAME="usuario jefe"
