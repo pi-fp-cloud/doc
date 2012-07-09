@@ -30,7 +30,7 @@
     y realizar las siguientes modificaciones en las dos primeras líneas:</para>
     <programlisting>
       Listen 80
-      VirtualHost *:80>
+      &lt;VirtualHost *:80>
     </programlisting>
     <para>Y a continuación desactivamos el virtual host por defecto e
     reiniciamos el servidor web.</para>

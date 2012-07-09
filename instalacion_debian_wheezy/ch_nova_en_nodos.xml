@@ -9,9 +9,31 @@
   <section xml:id="instalacion_nova_nodos">
     <title>Instalación</title>
     <para>Instalamos desde el repositorio de Debian:</para>
-    <screen>
-      <prompt>#</prompt><userinput>aptitude install nova-api nova-cert
-      nova-network nova-compute</userinput>
-    </screen> 
+    <programlisting>
+      # aptitude install nova-api nova-cert nova-network
+    nova-compute</programlisting>
+    <para>De la misma manera que encontramos descrito en la sección de "Nova
+    en el nodo controlador" instalamos en cada nodo de computación los
+    paquetes python-novnc y novnc.</para>
+    <para>Para continuar la instalación podemos copiar del nodo
+    controlador el fichero <filename>/etc/nova/nova.conf</filename>
+    haciendo las siguiente modificaciones:</para>
+    <itemizedlist>
+      <listitem><para>En el parámetro my_ip tenemos que indicar la ip
+      privada del nodo.</para></listitem>
+      <listitem><para>En el parámetro routing_source_ip tenemos que
+      indicar la ip pública del nodo.</para></listitem>
+      <listitem><para>Por último para configurar el acceso por vnc,
+      tenemos que indicar en los parámetros
+      vncserver_proxyclient_address y vncserver_listen la dirección ip
+      pública del servidor.</para></listitem>
+    </itemizedlist>
+    <para>El siguiente paso es sincronizar la base de datos:</para>
+    <programlisting>nova-manage db sync</programlisting>
+    <para>Y por último reiniciamos los servicios. Realizando un
+    nova-manage service list deberían aparecer los nuevos
+    servicios.</para>
+
+   
   </section>
 </chapter>
