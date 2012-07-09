@@ -326,54 +326,59 @@
     otras imágenes:</para>
     <para><code>glance add name="Windows 7 Profesional 64bits" is_public=true
     container_format=bare disk_format=raw <  win7.img</code></para>
+  </section>
+  <section>
+    <title>Amazon Machine Images</title>
+    <para>Amazon desarrolló para su sistema EC2 un formato propio de imágenes,
+    del que existen un gran número de imágenes ya realizadas y que puede
+    interesarnos utilizar en algunos casos concretos. Amazon EC2 utiliza Xen
+    como sistema de virtualización, que tiene la peculiaridad de que la
+    máquina virtual que se levanta no tiene kérnel (ni initrd), sino que es el
+    dominio principal (el equipo anfitrión) el que debe seleccionar un kérnel
+    (y en su caso un initrd) y lanzar una máquina virtual pasándole el núcleo,
+    esto hace que las imágenes de Amazon EC2 se compongan realmente de 3
+    imágenes: Una imagen para el kérnel, una imagen para el initrd y una
+    imagen de disco con el sistema.</para>
+    <para>Los pasos que hay que realizar para agregar una Imagen de Amazon a
+    OpenStack son los siguientes:</para>
+    <itemizedlist>
+      <listitem><para>Descargaremos el archivo que incluye las images ami, ari
+      y aki y procederemos a subirlas a glance.</para>
+      <para><code>wget
+      https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-uec.tar.gz</code></para></listitem>
+      <listitem><para>Descomprimimos el archivo que contiene 3
+      ficheros:</para>
+      <para><code>tar xvzf cirros-0.3.0-x86_64-uec.tar.gz</code></para>
+      <para>cirros-0.3.0-x86_64-blank.img, cirros-0.3.0-x86_64-initrd,
+      cirros-0.3.0-x86_64-vmlinuz</para>
+      </listitem>
+      <listitem><para>Subimos las imágenes a glance, teniendo en cuenta que la
+      imagen con el sistema debe ser la última en subirse, ya que requiere que
+      estén previamente disponibles en glance la imagen con el kérnel y la
+      imagen con el initrd.</para>
+      <para><code>glance add disk_format=aki container_format=aki
+      name="cirros-0.3.0-x86_64-vmlinuz" &lt;
+      cirros-0.3.0-x86_64-vmlinuz</code></para>
+      <para><code>glance add disk_format=ari container_format=ari
+      name="cirros-0.3.0-x86_64-initrd" &lt;
+      cirros-0.3.0-x86_64-initrd</code></para>
+      <para><code>glance add disk_format=ami container_format=ami
+      name="cirros-ami-img 64bits - javi"
+      kernel_id=cdbd8865-a088-4bb6-ada2-f3bca6b13820
+      ramdisk_id=48fadc60-97a2-4250-bbd2-69ca298a94b9 &lt;
+      cirros-0.3.0-x86_64-blank.img
+      </code></para>
+      <para>Donde los identificadores del kérnel y el initrd son los que ha
+      asociado en los pasos anteriores el propio Glance.</para>
+      </listitem>
+    </itemizedlist>
+    <para>Obviamente, las imágenes del kérnel e initrd pueden utilizarse
+    para diferentes imágenes de disco, siempre y cuando sean versiones
+    adecuadas para el sistema que se va a utilizar posteriormente.</para>
+  </section>
 
-<!-- Imagenes AMI -->
 
-<!-- Estos pasos los realizaremos directamente en la máquina Jupiter -->
-
-<!-- Descargaremos el fichero tar.gz que incluye las images ami, ari y aki y procederemos a subirlas a glance. -->
-
-<!-- wget http://informatica.gonzalonazareno.org/openstack/cirros-0.3.0-x86_64-uec.tar.gz -->
-
-<!-- El primer paso será descomprimirlo -->
-
-<!-- tar -xvf cirros-0.3.0-x86_64-uec.tar.gz -->
-
-<!-- Una vez descomprimido, comprobamos los directorios y podemos observar que existen 3 ficheros -->
-
-<!-- ls  -->
-<!--  cirros-0.3.0-x86_64-blank.img  cirros-0.3.0-x86_64-initrd    cirros-0.3.0-x86_64-vmlinuz -->
-
-<!-- Necesitaremos subir las imagenes a glance, conociendo cual es el kernel y el ramdisk podremos empezar a subirlas, para luego asignarselo a la imagen ami. -->
-
-<!--     Kernel = -vmlinuz -->
-<!--     Ramdisk = -initrd -->
-<!--     Machine image files = .img -->
-
-<!-- Una forma de diferencia el disk_format y el container_format (*K*ernel = a*K*i) -->
-<!-- glance add disk_format=aki container_format=aki name="cirros-0.3.0-x86_64-vmlinuz" < cirros-0.3.0-x86_64-vmlinuz -->
-
-<!-- Uploading image 'cirros-0.3.0-x86_64-vmlinuz'  -->
-<!--  ========================================================================================================================================[100%] 5.77M/s, ETA  0h    0m  0s  -->
-<!--  Added new image with ID: cdbd8865-a088-4bb6-ada2-f3bca6b13820 -->
-
-<!-- Una forma de diferencia el disk_format y el container_format (*R*amdisk = a*R*i) -->
-<!-- glance add disk_format=ari container_format=ari name="cirros-0.3.0-x86_64-initrd" < cirros-0.3.0-x86_64-initrd -->
-
-<!-- Uploading image 'cirros-0.3.0-x86_64-initrd'  -->
-<!--  ========================================================================================================================================[100%] 10.7M/s, ETA  0h  0m  0s  -->
-<!--  Added new image with ID: 48fadc60-97a2-4250-bbd2-69ca298a94b9 -->
-
-<!-- Una vez hemos subido las imagenes ARI y AKI nos tendremos que fijar en la ID (Added new image with ID: < ID >) -->
-<!-- Estas ID las necesitaremos a la hora de subir la imagen, porque tendremos que indicarle la ID del kernel y del ramdisk que nos ha dado para asignarselos a la imagen el Kernel y el Ramdisk. -->
-
-<!-- glance add disk_format=ami container_format=ami name="cirros-ami-img 64bits - javi"  kernel_id=cdbd8865-a088-4bb6-ada2-f3bca6b13820 ramdisk_id=48fadc60-97a2-4250-bbd2-69ca298a94b9 < cirros-0.3.0-x86_64-blank.img -->
-
-<!-- Uploading image 'cirros-ami-img 64bits - javi'  -->
-<!--  ========================================================================================================================================[100%] 59.8M/s, ETA  0h  0m  0s  -->
-<!--  Added new image with ID: 0df9e245-3bbe-474d-add9-0f50a70f23dc -->
-
-<!-- Imagen de Snapshot -->
+      <!-- Imagen de Snapshot -->
 
 <!-- Crear una imagen de una instancia corriendo. -->
 
