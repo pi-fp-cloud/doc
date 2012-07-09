@@ -325,7 +325,7 @@
     equipo en el que se encuentra Glance y la añadimos de la misma forma que las
     otras imágenes:</para>
     <para><code>glance add name="Windows 7 Profesional 64bits" is_public=true
-    container_format=bare disk_format=raw <  win7.img</code></para>
+    container_format=bare disk_format=raw &lt;  win7.img</code></para>
   </section>
   <section>
     <title>Amazon Machine Images</title>
