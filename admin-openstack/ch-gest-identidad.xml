@@ -6,5 +6,68 @@
   <title>Gestión de la identidad</title>
 
   <para></para>
-
+  <section xml:id="keystone_ldap">
+    <title>Autenticación con LDAP</title>
+    <para>Cuando existen muchas aplicaciones que requieren autenticación de los
+    mismos usuarios, dentro de las organizaciones es habitual optar por alguna
+    solución que permita unificar el mecanismo de autenticación. Una de las
+    opciones más extendidas es la utilización de un servidor LDAP para almacenar
+    la información de los usuarios de la organización, incluyendo el nombre de
+    usuario y la contraseña para las diferentes aplicaciones. En esta sección
+    vamos a explicar los pasos que son necesarios para conseguir que keystone
+    utilice LDAP como <emphasis>backend</emphasis> y así todos los usuarios de
+    la organización puedan utilizar directamente el cloud de OpenStack.</para>
+    <section xml:id="keystone_ldap_conf_previa">
+      <title>Configuración del directorio</title>
+      <para>El directorio debe almacenar información de los usuarios, proyectos
+      y roles del cloud, por lo que habrá que definir claramente las clases de
+      objetos (<emphasis>ObjectClass</emphasis>) que los definirán y las ramas
+      en las que se ubicarán.</para>
+      <itemizedlist>
+	<listitem>
+	  <para>Configuración de usuarios</para>
+	  <para>Para definir los usuarios se utiliza el
+	  <emphasis>objectClass</emphasis> estándar
+	  <screen>inetOrgPerson</screen>, que debe contener al menos los
+	  atributos  ...</para>
+	</listitem>
+      </itemizedlist>
+      <para>Suponemos que en el directorio LDAP ya existe una rama para
+      definir los usuarios y otra para los grupos (que utilizaremos para
+      definir los roles), pero vamos a crear una nueva rama para definir los
+      proyectos:</para>
+      <programlisting>
+	dn: ou=Tenant,dc=gonzalonazareno,dc=org
+	ou: Tenant
+	objectClass: top
+	objectClass: organizationalUnit
+      </programlisting>
+      <para>Para definir cada proyecto, utilizaremos un objeto con los
+      siguientes atributos:</para>
+      <programlisting>
+	dn: cn=prueba,ou=Tenant,dc=gonzalonazareno,dc=org
+	objectclass: groupOfNames
+	cn: prueba
+	description: Proyecto de prueba
+	member: uid=alberto.molina,ou=People,dc=gonzalonazareno,dc=org
+      </programlisting>
+      <para>Y por último, para definir el rol del usuario, utilizamos un
+      objeto como el siguiente:</para>
+      <programlisting>
+	dn:
+      </programlisting>
+      <para>Nota: No está nada claro la configuración con LDAP. En principio yo
+      pensaba que se utilizaba LDAP sólo para la autenticación de los usuarios,
+      mientras que el resto de la información (roles, tenants, etc) seguía
+      estando en las bases de datos, pero parece ser que no es así, que ldap es
+      un backend completo alternativo a las bases de datos, por lo que la
+      configuración es bastante más compleja.</para>
+    </section>
+    <section>
+      <title>Referencias</title>
+      <para><link
+		xlink:href="http://adam.younglogic.com/2012/02/openstack-keystone-ldap-redux/">Adam
+      Young. Openstack Keystone LDAP Redux</link></para>
+    </section>
+  </section>
 </chapter>
