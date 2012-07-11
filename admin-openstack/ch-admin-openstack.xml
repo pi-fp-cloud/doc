@@ -7,10 +7,12 @@
 
   <para>Para seguir esta guía se necesita:</para>
 
-  <section>Gestión de volúmenes</section>
+  <section>
+    <title>Gestión de volúmenes</title>
   <!-- Aunque esta sección no está empezada, incluyo un enlace que me ha
   parecido interesante sobre la destrucción de volúmenes en nova: -->
   <para><link
 	    xlink:href="https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/">https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/</link>
   </para>
+  </section>
 </chapter>
