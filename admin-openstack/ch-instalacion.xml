@@ -262,7 +262,7 @@ COMPLETAR
 	  instalado.</para>
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>dpkg --list | grep
 	  ntpdate</userinput></screen>
-	  <para>Si no lo estuviera lo instalamos:
+	  <para>Si no lo estuviera lo instalamos:</para>
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install ntpdate</userinput></screen>
 
 	</listitem>
@@ -299,8 +299,8 @@ COMPLETAR
 	<listitem>
 	  <para>Instalamos los paquetes necesarios, básicamente el servidor
 	  MySQL, y la interfaz (DB-API) de Python para MySQL:</para>
-	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install
-	  mysql-server python-mysqldb</userinput></screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install mysql-server python-mysqldb</userinput>
+	  </screen>
 	</listitem>
 
 	<listitem>
@@ -344,10 +344,314 @@ bind-address        = 0.0.0.0
 
   <section xml:id="id_instUbuntu_keystone">
     <title>Instalación de KeyStone</title>
-    <para>AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIII</para>
-    
+    <para>En este apartado describiremos la instalación y configuración de unos
+    de los servicios básicos de OpenStack, el servicio de autenticación y
+    gestión de la identidad (Identity Service): Keystone</para>
+
+    <section>
+      <title>¿Qué es Keystone?</title>
+      <para>Keystone, es el componente de OpenStack encargado de la
+      autentificación y la autorización de los distintos componentes que
+      conforman OpenStack. Se incluyó desde la versión Essex y es el encargado
+      de dos tareas principales:</para>
+
+      <para>REVISARRRRRRRRRRRRRRRRRRRRRRRRRRRRR</para>
+      <itemizedlist>
+	<listitem>
+	  <para>Gestión de usuarios: Keystone es el encargado de
+	  mantener un registro de usuarios y los permisos que tiene cada 
+	  uno de ellos.</para>
+	</listitem>
+	<listitem>
+	  <para>Registro los servicios ofrecidos: Keystone ofrece un catálogo de
+	  los servicios ofrecidos, así como información sobre cómo acceder a sus
+	  APIs.</para>
+	</listitem>
+      </itemizedlist>
+
+      <para>Los componentes básicos de los servicios de identidad son:</para>
+      <itemizedlist>
+	<listitem>
+	  <para>Usuario: Podemos guardar su nombre, 
+	  correo electrónico y contraseña.</para>
+	</listitem>
+	<listitem>
+	  <para>Proyecto (<emphasis>tenant</emphasis> en la jerga de
+	  OpenStack): En un proyecto podemos ejecutar un conjunto de
+	  instancias con características en común, por ejemplo pueden estar
+	  todas las instancias en el misma red, pueden utilizar una serie de
+	  imágenes de sistemas o tener limitado el uso de recursos del
+	  cloud.</para>
+	</listitem>
+	<listitem>
+	  <para>Rol: Nos indica qué operaciones puede realizar
+	  cada usuario. A un usuario se le pueden asignar diferentes roles
+	  en cada proyecto.</para>
+	</listitem>
+      </itemizedlist>
+
+      <para>Los conceptos fundamentales del <emphasis>registro de
+      servicio</emphasis> son:</para>
+      <itemizedlist>
+	<listitem><para>Servicio: Corresponde a un componente de
+	OpenStack que puede utilizar el módulo de
+	autentificación.</para></listitem>
+	<listitem><para>Endpoints: Representa las URL que nos permiten
+	acceder a las API de cada uno de los servicios o componentes de
+	OpenStack</para></listitem>
+      </itemizedlist>
+      
+    </section>
+
+    <section>
+      <title>Instalación y configuración</title>
+      <para>Una infraestructura OpenStack solo necesita un servidor que ejecute
+      el servicio KeyStone, en nuestra instalación el servicio se ejecutará en
+      el controlador, es decir, en la máquina <literal>jupiter</literal>.</para>
+
+      <para>Para la instalación de Keystone, como para la instalación del resto
+      de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
+      con que sigamos los siguientes pasos:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Creamos la base de datos que el servicio necesita en
+	  MySQL. Para ello iniciamos el cliente MySQLs:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
+	  </screen>
+	  <para>Desde el prompt de MySQL ejecutamos las siguientes
+	  sentencias:</para>
+	  <screen>
+	    <prompt>mysql> </prompt><userinput>CREATE DATABASE keystone;</userinput>
+	    <prompt>mysql> </prompt><userinput>GRANT ALL ON keystone.* to 'keystone'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
+	    <prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Instalamos todo el software necesario:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install keystone python-keystone python-keystoneclient</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Keystone utiliza por defecto una base de datos <literal>SQLite</literal>,
+	  por lo que no tendremos que borrar la base de datos que va con la
+	  instalación por defecto:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>rm /var/lib/keystone/keystone.db</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Editamos el fichero de configuración principal de Keystone para
+	  realizar los siguientes cambios:</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para>La cadena de conexión a la base de datos
+	      <literal>keystone</literal> de MySQL.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>El token administrativo (admin_token).</para>
+	    </listitem>   
+	  </itemizedlist>
+
+	  <para>Para ello editamos el fichero
+	  <filename>/etc/keystone/keystone.conf</filename> haciendo las
+	  siguientes modificaciones:</para>
+	  <programlisting>
+admin_token = CALEX2010!!
+connection = mysql://keystone:calex2010!!@172.20.254.190/keystone
+	  </programlisting>
+	  <para>Ver nota posterior sobre <literal>admin_token</literal>)</para>
+	</listitem>
+
+	<listitem>
+	  <para>Reiniciamos el servicio:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>service keystone restart</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Creamos la base de datos inicial:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>keystone-manage db_sync</userinput></screen>
+	</listitem>
+
+	<listitem>
+	  <para>Exportamos las siguientes variables de entorno en el fichero
+	  .bashrc del usuario que ejecute el cliente, en principio el usuario
+	  <literal>root</literal> de la máquina
+	  <literal>jupiter</literal>:</para>
+	  <programlisting language="Bash">
+export SERVICE_ENDPOINT="http://172.20.254.190:35357/v2.0"
+export SERVICE_TOKEN=CALEX2010!!
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Creamos los usuarios, proyectos (tenants) y roles.</para>
+
+	  <para>Crearemos ciertos usuarios a los que daremos ciertos roles en
+	  ciertos proyectos, tal como se muestra en la siguiente tabla:</para>
+
+	  <table rules="all">
+	    <caption>Usuarios, proyectos y roles</caption>
+	    <col width="34%"/>
+	    <col width="33%"/>
+	    <col width="33%"/>
+	    <thead>
+	      <tr>
+		<td>Usuarios</td>
+		<td>Proyectos (tenants)</td>
+		<td>Roles</td>
+	      </tr>
+	    </thead>
+	    <tbody>
+	      <tr>
+		<td>admin</td>
+		<td>admin</td>
+		<td>admin</td>
+	      </tr>
+	      <tr>
+		<td>
+		  <para>nova</para>
+		  <para>glance</para>
+		  <para>swift</para>
+		</td>
+		<td>service</td>
+		<td>admin</td>
+	      </tr>
+	      <tr>
+		<td>admin</td>
+		<td>admin</td>
+		<td>Member</td>
+	      </tr>
+	    </tbody>
+	  </table>
+
+	  <para>En la tabla podemos leer que al usuario <literal>admin</literal>
+	  le daremos el rol <literal>admin</literal> en el proyecto
+	  <literal>admin</literal>, o que a los usuarios <literal>nova</literal>,
+	  <literal>glance</literal> y <literal>swift</literal> les daremos el
+	  rol <literal>admin</literal> en el proyecto <literal>service</literal>.</para>
+
+	  <para>La creación de usuarios, proyectos y roles es un proceso
+	  tedioso, muy repetitivo y propenso a errores, por lo que ejecutaremos
+	  el siguiente script que nos simplificará mucho este proceso:</para>
+
+	  <programlisting language="Bash">
+	    <xi:include parse="text" href="src/roles.sh"/>
+	  </programlisting>
+
+	  <para>Para la correcta ejecución de script hay que configurar las
+	  siguientes variables de entorno en el inicio del script:</para>
+
+	  <para>COMPLETARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR</para>
+
+	  <para>El script se limita a:</para>
+
+	  <itemizedlist>
+	    <listitem>
+	      <para>Crear los proyectos necesarios.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Crear todos los usuarios y asignarles contraseña y
+	      dirección de correo electrónico.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Crear los roles necesarios.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Asignar roles a los usuarios en los proyectos.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Crear los servicios y asignar a éstos los endpoints.</para>
+	    </listitem>
+	    
+	  </itemizedlist>
+
+	</listitem>
+
+	<listitem>
+	  <para>Verificamos que todo se ha creado correctamente a través de los
+	  siguientes comandos (los identificadores no serán los mismos):</para>
+	  <programlisting>
+root@jupiter:~# keystone tenant-list
++----------------------------------+---------+---------+
+|                id                |   name  | enabled |
++----------------------------------+---------+---------+
+| 634675c752634b53879656c81da70a83 | service | True    |
+| e7b1868b24a742318f1d73f612ecfe1d | admin   | True    |
++----------------------------------+---------+---------+
+root@jupiter:~# keystone user-list
++----------------------------------+---------+--------------------+--------+
+|                id                | enabled |       email        |  name  |
++----------------------------------+---------+--------------------+--------+
+| 05743001bbf14700bcdf2ecc43edbf9b | True    | alex@iescierva.net | admin  |
+| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | alex@iescierva.net | swift  |
+| 291c58f7258747758d109ecee2eb4a69 | True    | alex@iescierva.net | glance |
+| 404dafc53b364a7e9f1476aa98082966 | True    | alex@iescierva.net | nova   |
++----------------------------------+---------+--------------------+--------+
+root@jupiter:~# keystone role-list
++----------------------------------+--------+
+|                id                |  name  |
++----------------------------------+--------+
+| 2a716d669ce349eb88e44049723e0cb7 | admin  |
+| 622c78f77bbe4a298452783f25cb4635 | Member |
++----------------------------------+--------+
+root@jupiter:~# keystone endpoint-list
++----------------------------------+----------+--------------------------------------------------+--------------------------------------------------+---------------------------------------------+
+|                id                |  region  |                    publicurl                     |                   internalurl                    |                   adminurl                  |
++----------------------------------+----------+--------------------------------------------------+--------------------------------------------------+---------------------------------------------+
+| 0dd9427a0a624b38abf1876651ac3b69 | myregion | http://172.20.254.190:8776/v1/$(tenant_id)s      | http://172.20.253.190:8776/v1/$(tenant_id)s      | http://172.20.253.190:8776/v1/$(tenant_id)s |
+| 2d471f9b23c84bac91c17615e157bb9f | myregion | http://172.20.254.190:5000/v2.0                  | http://172.20.253.190:5000/v2.0                  | http://172.20.253.190:35357/v2.0            |
+| c9f799e2c6444bbda40dbc059207de09 | myregion | http://172.20.254.190:8773/services/Cloud        | http://172.20.253.190:8773/services/Cloud        | http://172.20.253.190:8773/services/Admin   |
+| e72307edc9b84c2d9403b019c3a2e5a7 | myregion | http://172.20.254.190:9292/v1                    | http://172.20.253.190:9292/v1                    | http://172.20.253.190:9292/v1               |
+| ec8b9d8d41ea496492730b20e1c34380 | myregion | http://172.20.254.190:8080/v1/AUTH_$(tenant_id)s | http://172.20.253.190:8080/v1/AUTH_$(tenant_id)s | http://172.20.253.190:8080/v1               |
+| edf05355fc274c02a13f900605c56769 | myregion | http://172.20.254.190:8774/v2/$(tenant_id)s      | http://172.20.253.190:8774/v2/$(tenant_id)s      | http://172.20.253.190:8774/v2/$(tenant_id)s |
++----------------------------------+----------+--------------------------------------------------+--------------------------------------------------+---------------------------------------------+
+root@jupiter:~# keystone service-list
++----------------------------------+----------+--------------+----------------------------+
+|                id                |   name   |     type     |        description         |
++----------------------------------+----------+--------------+----------------------------+
+| 04b121f16e6045a79a4601c5171998d3 | glance   | image        | OpenStack Image Service    |
+| 298de2e4a0f04b42b54818fd57d1bf2e | keystone | identity     | OpenStack Identity Service |
+| 368b238c02734ee4ac1a6ac6bf440ffa | nova     | compute      | OpenStack Compute Service  |
+| a075b6add5564f729253dd0339b1d5d9 | volume   | volume       | OpenStack Volume Service   |
+| c23937017a7e4baa8811a24ff9c8086c | swift    | object-store | OpenStack Storage Service  |
+| e998168d3d264e3aab37d4b8413fe736 | ec2      | ec2          | OpenStack EC2 Service      |
++----------------------------------+----------+--------------+----------------------------+
+root@jupiter:~# 
+	  </programlisting>
+	</listitem>
+      </orderedlist>
+    </section>
   </section>
 
+  <section xml:id="id_instUbuntu_glance">
+    <title>Instalación de Glance</title>
+    <para></para>
 
+    <section>
+      <title>¿Qué es Glance?</title>
+      <para></para>
+      
+    </section>
+
+    <section>
+      <title>Instalación y configuración</title>
+      <para></para>
+      
+    </section>    
+  </section>
+
+<!-- Falta Nova y Horizon -->
 
 </chapter>
