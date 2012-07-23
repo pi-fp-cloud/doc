@@ -5,6 +5,349 @@
          xml:id="ch-instalacion">
   <title>Instalación de OpenStack en GNU/Linux Ubuntu 12.04</title>
 
-  <para>Para seguir esta guía se necesita:</para>
+  <section xml:id="id_instUbuntu_intro">
+    <title>Introducción</title>
+    <para>Esta sección muestra el proceso detallado de instalación y
+    configuración de OpenStack basado en la plataforma Ubuntu 12.04 (Precise
+    Pangolin) usando 5 servidores (nodos). Se usará uno de los servidores como
+    nodo controlador, ejecutando los componentes Nova, Glance, Swift, Keystone y
+    Horizon y  el resto de nodos como nodos de computación, ejecutando
+    únicamente Nova Compute.</para>
+
+    <para>En los siguientes pasos se resume una visión global de todo el proceso:</para>
+
+    <orderedlist>
+      <listitem>
+	<para>Instalación de servicios básicos (NTP, MySQL, ...).</para>
+      </listitem>
+
+      <listitem>
+	<para>Instalación y configuración de Keystone (servicio de autenticación).</para>
+      </listitem>
+
+      <listitem>
+	<para>Instalación y configuración de Glance (servicio de gestión de imágenes).(</para>
+      </listitem>
+
+      <listitem>
+	<para>Instalación y configuración de Nova (servicios de computación).</para>
+      </listitem>
+
+      <listitem>
+	<para>Configuración de la red del Cloud.</para>
+      </listitem>
+
+      <listitem>
+	<para>Añadir imágenes para la creación de máquinas virtuales.</para>
+      </listitem>
+
+      <listitem>
+	<para>Iniciar una máquina virtual de prueba.</para>
+      </listitem>
+
+      <listitem>
+	<para>Instalación y configuración del Dashboard (Horizon).</para>
+      </listitem>
+
+    </orderedlist>
+
+    <para>El proceso de instalación y configuración de OpenStack es un proceso
+    complejo y muy propenso a errores, ya que se trata de un proyecto muy joven
+    y bajo un desarrollo muy activo. Para obtener más información más allá de
+    este documento se ruega visitar las páginas oficiales:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para><link xlink:href="http://www.openstack.org">OpenStack Site.</link></para>
+      </listitem>
+      
+      <listitem>
+	<para><link xlink:href="http://docs.openstack.org">OpenStack Docs site.</link></para>
+      </listitem>
+      
+    </itemizedlist>
+
+  </section>
+
+  <section xml:id="id_instUbuntu_prerrequisitos">
+    <title>Prerrequisitos</title>
+    <para>Para el seguimiento del proceso de instalación y configuración de
+    OpenStack, es necesario cumplir ciertos requisitos y partir de algunas
+    suposiciones. Son las siguientes:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>Se necesitan, al menos tres nodos con Ubuntu 12.04 LTS instalado.</para>
+      </listitem>
+
+      <listitem>
+	<para>Uno de los nodos será el nodo controlador, que ejecutará todos los
+	servicios excepto <literal>nova-compute</literal>.</para>
+      </listitem>
+
+      <listitem>
+	<para>El esquema de particiones deberá usar LVM, se detalla la
+	configuración en la siguiente sección.</para>
+      </listitem>
+
+      <listitem>
+	<para>La resolución de nombres DNS para todas las máquinas debe ser
+	perfecta.</para>
+	<para>Nuestra red cuenta con un nombre de dominio, concretamente
+	<literal>iescierva.net</literal>, este será el dominio utilizado durante
+	todo el documento.</para>
+      </listitem>
+
+      <listitem>
+	<para>Todos los nodos que participen en el Cloud deben tener fecha y
+	hora sincronizada a través del servicio NTP.</para>
+      </listitem>
+
+      <listitem>
+	<para>Se utilizará KVM como hipervisor.</para>
+      </listitem>
+
+      <listitem>
+	<para>La contraseña para todos los usuarios y para todos los servicios
+	será la misma: <literal>calex2010!!</literal></para>
+      </listitem>
+
+
+      <listitem>
+	<para>El sistema deberá estar actualizado antes de empezar con el
+	proceso de instalación/configuración:</para>
+	<para><command>apt-get update</command></para>
+	<para><command>apt-get upgrade</command></para>
+      </listitem>
+ 
+    </itemizedlist>
+    
+  </section>
+
+  <section xml:id="id_instUbuntu_servBasicos">
+    <title>Servicios y configuración básica</title>
+    <para>A continuación se detallan los aspectos clave en la instalación de
+    Ubuntu y lo servicios básicos a instalar.</para>
+
+    <section>
+      <title>Nombres de los equipos y configuración de la red</title>
+      <para>Se han elegido los siguientes nombres para los equipos en los que se
+      va a realizar la instalación de la infraestructura del Cloud:</para>
+      <itemizedlist>
+	<listitem>
+	  <para><emphasis role="bold">jupiter</emphasis>: para el nodo controlador, que será el encargado
+	  de gestionar todos los recursos del cloud, interaccionar con los clientes
+	  y ordenar a los nodos de virtualización que ejecuten las instancias, pero
+	  en el que no se ejecutarán máquinas virtuales. La mayor parte de
+	  componentes del Cloud y configuración se realizará en este
+	  equipo, pero comparado con los <emphasis>nodos de
+	  computación</emphasis> la carga de trabajo será pequeña, por lo
+	  que no es necesario un equipo con mucha memoria RAM o gran
+	  capacidad de procesamiento.</para>
+	</listitem>
+	<listitem>
+	  <para><emphasis role="bold">io, europa, ganimedes y calisto</emphasis> (las 4 lunas
+	  principales de júpiter): para los 4 nodos de virtualización o
+	  nodos de computación, como se les denomina habitualmente en la
+	  jerga propia de OpenStack. En estos equipos se instalarán
+	  sólo los componentes necesarios para que se ejecuten las
+	  instancias (máquinas virtuales) en ellos y estarán esperando las órdenes de
+	  jupiter.</para>
+	</listitem>
+	<listitem>
+	  <para><emphasis role="bold">saturno</emphasis>: para el nodo de almacenamiento, ya que es tan
+	  importante como júpiter y a la vez independiente. En este equipo todavía
+	  no está definido el software que se instalará, pero lo más  probable es
+	  que sea una distribución especializada en infraestructuras SAN/NAS como
+	  <literal>OpenFiler</literal> ó <literal>FreeNAS</literal>.</para>
+	</listitem>
+	<listitem>
+	  <para><emphasis role="bold">venus</emphasis>: un equipo convencional en el que se instalarán los
+	  paquetes necesarios para usar el cliente <literal>nova</literal> con el que podemos
+	  gestionar el cloud desde línea de comandos sin la necesidad de
+	  realizar las operaciones desde jupiter.</para>
+	</listitem>
+      </itemizedlist>
+
+      <para>Para la configuración de la red se ha optado por configurar bonding
+      y redes VLAN tal como se describe en la siguiente figura:</para>
+
+      <para>FIGURA BONDING y RED HACERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR</para>
+      
+    </section>
+
+
+    <section>
+      <title>Instalación de Ubuntu 12.04.</title>
+      <para>La máquina <literal>jupiter</literal> incluye dos discos duros
+      SATAII de 500 GiB y una controladora de disco 3ware 9650SE. Se ha optado
+      por configurar esta controladora de disco en modo RAID 1, para incluir un
+      nivel elemental de seguridad y consistencia de datos, aunque obviamente
+      esto no descarta la utilización adicional de otros mecanismos de copias de
+      seguridad que se configurarán posteriormente. Al tratarse de una
+      controladora RAID hardware y estar configurada previamente, el sistema
+      operativo que arranque en el equipo sólo verá un disco duro en
+      <literal>/dev/sda</literal> de 500GB aproximadamente.</para>
+
+      <para>Para prevenir corrupción de datos es muy importante que la
+      controladora RAID se configure con una política de escritura
+      <literal>Write Through</literal>. En esta configuración, el rendimiento
+      del RAID se resiente un poco, pero lo hace más inmune a una posible pérdida de datos
+      en caso de cortes en el suministro eléctrico.</para>
+
+      <para>El sistema operativo elegido para los equipos del cloud
+      es la distribución de GNU/Linux Ubuntu 12.04 LTS, que actualmente se
+      conoce con el nombre de código <emphasis>Precise
+      Pangolin</emphasis>. Pensamos que es la mejor opción entre todas las
+      distribuciones de GNU/Linux ya que es la descrita en toda la documentación
+      de OpenStack y la mejor soportada.</para>
+
+      <para>Durante la instalación realizamos el siguiente esquema de
+      particionamiento:</para>
+      <programlisting>
+Disposit.   Tamaño    Id    Sistema     SF
+/dev/sda1    32GiB    83    Linux       ext4
+/dev/sda2     4GiB    82    Linux swap  intercambio
+/dev/sda3  -resto-    8e    Linux LVM   volúmenes físicos
+      </programlisting>
+
+      <para>Crearemos tres particiones, una partición de unos 32 GiB para el
+      sistema (directorio <literal>/</literal>), una partición de 4 GiB como
+      área de intercambio, y el resto configurado para su uso a través de
+      volúmenes lógicos con LVM.</para>
+
+      <para>Tras la instalación del sistema, configuraremos el subsistema LVM
+      pero sin llegar a crear ningún volumen:</para>
+      <programlisting>
+COMPLETAR
+      </programlisting>
+
+      <para>Aunque la controladora RAID es hardware y el sistema
+        operativo no la gestiona, es importante que se pueda controlar
+        su estado a través de alǵun módulo del kernel. En este caso el
+        módulo 3w-9xxx que se carga automáticamente y nos envía estos
+        mensajes al log del sistema:</para>
+        <programlisting>
+[    2.799824] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
+[    2.799867] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
+[    2.799880] 3w-9xxx 0000:01:00.0: setting latency timer to 64
+[    3.080257] 3w-9xxx: scsi6: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
+[    3.416117] 3w-9xxx: scsi6: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
+[   12.307881] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
+[   12.308300] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
+[   12.308695] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
+[127301.671991] 3w-9xxx: scsi6: AEN: INFO (0x04:0x0029): Verify started:unit=0.
+[131817.864145] 3w-9xxx: scsi6: AEN: INFO (0x04:0x002B): Verify completed:unit=0.
+        </programlisting>           
+        <para>Pendiente de hacer:</para>
+        <para>http;//jonas.genannt.name/  Hay repositorio, con
+        aplicaciones para manejar el RAID 3ware 9650SE</para>
+    </section>
+
+    <section>
+      <title>NTP</title>
+      <para>Para mantener todos los servicios sincronizados (a nivel de fecha y
+      hora) es necesario instalar un cliente NTP (Network Time Protocol). En el
+      caso de instalaciones multinodo hay que configurar uno de los nodos como
+      servidor NTP, o confiar en otro servidor de nuestra red o de
+      Internet.</para>
+
+      <para>La red <literal>iescierva.net</literal> ya cuenta con un servidor
+      NTP, por lo que únicamente hay que configurar correctamente el cliente,
+      para ello basta con que sigamos los siguientes pasos:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Nos aseguramos que el paquete <literal>ntpdate</literal> esté
+	  instalado.</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>dpkg --list | grep
+	  ntpdate</userinput></screen>
+	  <para>Si no lo estuviera lo instalamos:
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install ntpdate</userinput></screen>
+
+	</listitem>
+	
+	<listitem>
+	  <para>Configuramos crontab para que se ejecute el comando ntpdate de
+	  forma periódica. Para ello ejecutamos (como root) el comando
+	  <command>crontab -e</command> y editamos el fichero que nos sugiere
+	  con el siguiente contenido:</para>
+	  <programlisting>
+0 4 * * * ntpdate ntp.iescierva.net ; hwclock --systohc
+	  </programlisting>
+	  <para>Podemos sustituir el servidor <literal>ntp.iescierva.net</literal> por uno en
+	  Internet como <literal>ntp.ubuntu.com</literal>.</para>
+
+	  <para>Podemos comprobar la configuración a través del comando
+	  <command>crontab -l</command></para>
+
+	</listitem>
+
+      </orderedlist>
+      
+    </section>
+
+    <section>
+      <title>MySQL</title>
+      <para>Vamos a configurar todos los servicios para que utilicen como base
+      de datos MySQL, en vez de la base de datos SQLite que usan por
+      defecto. Para ello será necesario instalar MySQL y fijar una contraseña
+      para el usuario root. Para ello basta que sigamos los siguientes
+      pasos:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Instalamos los paquetes necesarios, básicamente el servidor
+	  MySQL, y la interfaz (DB-API) de Python para MySQL:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install
+	  mysql-server python-mysqldb</userinput></screen>
+	</listitem>
+
+	<listitem>
+	  <para>Durante la instalación del servidor se nos pedirá que
+	  introduzcamos la contraseña para el usuario root de
+	  MySQL.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Modificamos la interfaz de escucha de MySQL, aunque inicialmente
+	  la fijamos a 0.0.0.0 para que el servidor escuche en todas las
+	  interfaces, posteriormente fijaremos la interfaz con la IP de la red
+	  privada.</para>
+
+	  <para>Configuramos el fichero <filename>/etc/mysql/my.cnf</filename>
+	  modificando la siguiente línea:</para>
+	  <programlisting>
+bind-address        = 127.0.0.1
+	  </programlisting>
+
+	  <para>Por esta otra:</para>
+	  <programlisting>
+bind-address        = 0.0.0.0
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Reiniciamos el demonio de MySQL:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>service mysql restart</userinput></screen>
+	</listitem>
+	
+	<listitem>
+	  <para>Probamos el cliente MySQL con la contraseña fijada:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput></screen>
+	</listitem>
+      </orderedlist>
+     
+    </section>
+
+  </section>
+
+  <section xml:id="id_instUbuntu_keystone">
+    <title>Instalación de KeyStone</title>
+    <para>AQUIIIIIIIIIIIIIIIIIIIIIIIIIIIIII</para>
+    
+  </section>
+
+
 
 </chapter>
