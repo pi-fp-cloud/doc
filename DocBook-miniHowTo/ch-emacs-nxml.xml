@@ -37,23 +37,23 @@
 
   <section xml:id="emacs-instalacion">
     <title>Instalación y configuración</title>
-    <para>Para el uso de Emacs+DocBook vamos a utilizar <emphasis role="bold">nxml-mode</emphasis>, nxml-mode es un plugin para GNU Emacs que lo convierte en un poderoso editor XML. Todos los comandos de emacs se pueden utilizar sin restricción alguna en este nuevo modo. El modo nXML permite asociar cualquier esquema al documento XML que se está editando, incluso sin que el documento XMl sea en todo momento ni válido ni bien formado.</para>
+    <para>Para el uso de Emacs+DocBook vamos a utilizar <emphasis role="bold">nxml-mode</emphasis>, nxml-mode es un plugin para GNU Emacs que lo convierte en un poderoso editor XML. Todos los comandos de emacs se pueden utilizar sin restricción alguna en este nuevo modo. El modo nXML permite asociar cualquier esquema al documento XML que se está editando, y permite editar el documento incluso sin que éste sea válido ni bien formado.</para>
 
-    <para>nXML permite asociar un esquema al documento que se está editando, el esquema utilizado proporciona dos características básicas para la edición:</para>
+    <para>nXML permite asociar un esquema al documento que se está editando, esto proporciona dos características básicas para la edición:</para>
     <itemizedlist>
       <listitem>
-        <para>Validación continua. nXML valida el documento conforme se va editando, resaltando en todo momento cualquier parte errónea.</para>
+        <para><emphasis role="bold">Validación continua.</emphasis> nXML valida el documento conforme se va editando, resaltando en todo momento cualquier parte errónea.</para>
       </listitem>
       <listitem>
-        <para>Completado automático. nXML puede ayudar a la hora de insertar etiquetas, nombres de elemento, nombres de atributos o valores  según la información que obtiene del esquema y del contexto.</para>
+        <para><emphasis role="bold">Completado automático.</emphasis> nXML puede ayudar a la hora de insertar etiquetas, nombres de elemento, nombres de atributos o valores  según la información que obtiene del esquema y del contexto.</para>
       </listitem>
     </itemizedlist>
 
-    <para>El modo nXML utiliza RelaxNG como lenguaje de definición de esquemas, RelaxNG utiliza dos sintaxis: una basada en XML y otra más legible y compacta pero que no está basada en XML. nXML soporta la sintaxis compacta. Aunque existen herramientas para convertir tanto DTDs copo otros lenguajes de esquema a la sintaxis de RelaxNG, no van a ser necesarias ya que el paque de software de nXML incluye los esquemas para Docbook, XHTML, RDF y RelaxNG.</para>
+    <para>El modo nXML utiliza <literal>RelaxNG</literal> como lenguaje de definición de esquemas, RelaxNG utiliza dos sintaxis: una basada en XML y otra más legible y compacta pero que no está basada en XML, nXML soporta la primera. Aunque existen herramientas para convertir tanto DTDs como otros lenguajes de esquema a la sintaxis de RelaxNG, no van a ser necesarias ya que el paquete de software de nXML incluye los esquemas para Docbook, XHTML, RDF y RelaxNG.</para>
 
     <para>También se puede utiliza nXML sin utilizar ningún esquema, no están disponibles todas las características, pero por ejemplo, nXML sigue autocompletando cerrando de forma automática los tags.</para>
 
-    <para>nXML está escrito completamente en Lisp, por lo que está disponible para cualquier plataforma en la que Emacs esté disponible.</para>
+    <para>nXML está disponible para cualquier plataforma en la que Emacs esté disponible, ya que esta escrito en <literal>Lisp</literal>.</para>
 
     <para>Para instalar tanto emacs como nXML basta seguir los siguientes pasos:</para>
 
@@ -138,7 +138,7 @@
 	</tr>
 	<tr>
 	  <td>C-ENTER</td>
-	  <td>Completa el nombre de la etiqueta o el nombre del atributo que estemos escribiendo en ese momento, si hay varios mostraŕa una lista de posibilidades.</td>
+	  <td>Completa el nombre de la etiqueta o el nombre del atributo que estemos escribiendo en ese momento, si hay varios mostrará una lista de posibilidades.</td>
 	</tr>
 	<tr>
 	  <td>C-c-C-f</td>
@@ -155,26 +155,28 @@
       </tbody>
     </table>
 
-    <note><para>En terminología Emacs, "C-c-C-i" significar pulsar la
-    tecla Control + la tecla 'c' + la tecla 'i'.</para></note>
+    <note>
+      <para>En terminología Emacs, "C-c-C-i" significar pulsar la tecla Control + la tecla 'c' + la tecla 'i' (sin soltar la tecla Control).</para>
+      <para>"C-c-i" significar pulsar la tecla Control + la tecla 'c' + soltar ambas + pulsar la tecla 'i'.</para>
+    </note>
 
   </section>
 
   <section xml:id="snippets">
     <title>Snippets de código</title>
-    <para>Siempre que se escriban documentos XML, es muy útil acumular un conjunto de plantillas pequeñas que faciliten la escritura. Una plantilla no será más que un pequeño fichero que contiene un esqueleto básico de DocBook ó de XML que permita tareas ritinarias como insertar una tabla en blanco, una figura, una sección, etc.</para>
+    <para>Siempre que se escriban documentos XML, es muy útil acumular un conjunto de plantillas pequeñas que faciliten la escritura. Una plantilla no será más que un pequeño fichero que contiene un esqueleto básico de DocBook ó de XML que permita tareas rutinarias como insertar una tabla en blanco, una figura, una sección, etc.</para>
 
     <para>Estas plantillas se pueden almacenar en un directorio y se podrán insertar en cualquier momento a través del comando Emacs <literal>insert-file</literal> (C-x-i).</para>
 
     <para>Para configurar estos snippets basta con:</para>
     <orderedlist>
       <listitem>
-	<para>Crear pequeños ficheros, uno para cada snippet, y poner un nombre al fichero identificativo del trozo de código. Por ejemplo, si queremos crear un snippet para poder insertar listas ordenadas, crearíamos el fichero <filename>./.snippetsXML/orderedlist</filename> con el siguiente contenido:</para>
+	<para>Crear pequeños ficheros, uno para cada snippet, y poner un nombre al fichero identificativo del trozo de código. Por ejemplo, si queremos crear un snippet para poder insertar listas ordenadas, crearíamos el fichero <filename>~/snippetsXML/orderedlist</filename> con el siguiente contenido:</para>
 	<programlisting>
 <![CDATA[
     <orderedlist>
       <listitem>
-	<para></para>
+        <para></para>
       </listitem>
     </orderedlist>
 ]]>	  
@@ -184,18 +186,23 @@
 
       <listitem>
 	<para>Para mayor comodidad se puede asociar al comando <literal>insert-file</literal> otra combinación de teclas más cómoda, al mismo tiempo que la inserción del snippet incluya una identación automática. Para ello asociaremos la combinación de teclas <command>C-c-C-e nombre_snippet</command> ) a la inserción de snippets de nuestro directorio configurado en el paso anterior. Editamos el fichero de configuración de Emacs incluyendo el siguiente fragmento:</para>
-	<programlisting>
+	<programlisting language="lisp">
+;; Define a command to insert a fragment from the snippetsXML subdirectory.
+;;
+(defun insert-frag (name)
+    "Like insert-file but prepends 'snippetsXML/' to the path given."
+    (interactive "MTemplate: ")
+    (insert-file (concat "snippetsXML/" name)))
+
+;;
+;; Bind the above command to C-c C-e.
+;;
+(global-set-key "\C-c\C-e" 'insert-frag)
 	  
 	</programlisting>
 
       </listitem>
 
-      <listitem>
-	<para>Este es el paso 3 y dos comandos asociados (separados, pero se pueden asociar con un solo screen):</para>
-
-	<screen><prompt>$ </prompt><userinput>apt-get update</userinput></screen>
-	<screen><prompt>$ </prompt><userinput>apt-get upgrade</userinput></screen>
-      </listitem>
     </orderedlist>
 
 <!-- <<<<<<<<<<<<<<<<<<<<<<<<<<AQUI

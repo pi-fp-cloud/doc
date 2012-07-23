@@ -19,6 +19,10 @@
     </listitem>
     <listitem>
       <para>Acceso a los repositorios GIT del proyecto OpenStack.</para>
+
+      <para>Podemos clonar el repositorio del proyecto <literal>openstack-manual</literal> a través del comando:</para>
+      <screen><prompt>$ </prompt><userinput>git clone https://github.com/openstack/openstack-manuals</userinput></screen>
+
     </listitem>
   </itemizedlist>
 

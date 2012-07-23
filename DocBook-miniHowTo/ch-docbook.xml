@@ -36,7 +36,7 @@
 
     <para>A continuación se muestran un conjunto de recetas para el trabajo diario con DocBook:</para>
 
-    <section>
+    <simplesect>
       <title>Convenciones generales</title>
       <para>Como convenciones simples y genéricas se recomiendan utilizar las siguientes:</para>
       <itemizedlist>
@@ -58,11 +58,11 @@
 	</listitem>
 
 	<listitem>
-	  <para></para>	  
+	  <para>Prestar mucha atención a los editories WYSIWYG, ya que tienden a formatear el documento completo aunque solo se esté modificando una pequeña parte, esto es un inconveniente a la hora de trabajar con un sistema de control de versiones como GIT ó Subversion.</para>
 	</listitem>
 
       </itemizedlist>
-    </section>
+    </simplesect>
 
     <simplesect>
       <title>Listas de elementos</title>
@@ -225,6 +225,13 @@ echo "Hola a todos"
 <para>Cuando se escribe algo importante también se puede utilizar negrita <emphasis role="bold">así</emphasis>.</para>
 ]]>
       </programlisting>
+
+      <para>El resultado del anterior código es el siguiente:</para>
+
+      <para>Mientras se escribe, se puede nombrar un comando como <command>apt-get install</command> ó un nombre de fichero como <filename>/etc/passwd</filename> ó un literal como <literal>#</literal> o como una palabra reservada de un lenguaje como <literal>int</literal> ó un propietario de un fichero como <literal>root.root</literal> y sus permisos asociados <literal>0640</literal>, etc.</para>
+
+      <para>Cuando se escribe algo importante también se puede utilizar negrita <emphasis role="bold">así</emphasis>.</para>
+
     </simplesect>
 
     <simplesect>
@@ -277,13 +284,18 @@ echo "Hola a todos"
 <para>Seguimos nuestro documento.</para>
 ]]>
       </programlisting>
+
+      <para>Estas notas aclaratorias tienen este aspecto: </para>
+
+      <note><para>Esto es una nota aclaratoria sobre algún aspecto a documentar</para></note>
+
     </simplesect>
 
     <simplesect>
       <title>Comandos, ficheros de configuración y salida de terminal</title>
       <para>En documentos técnicos es muy común que se inserten ficheros de configuración o salida de terminal.</para>
 
-      <para>Podemos utilizar las siguientes etiquetas para eso: <literal>screen</literal>, <literal>prompt</literal> y <literal>command</literal>. Des esta forma</para>
+      <para>Podemos utilizar las siguientes etiquetas para eso: <literal>screen</literal>, <literal>prompt</literal> y <literal>command</literal>. De esta forma</para>
       <programlisting language="xml">
 <![CDATA[
 <para>Esto es un párrafo en el que se nombra al comando <command>apt-get</command>.</para>
@@ -306,6 +318,15 @@ echo "Hola a todos"
       </programlisting>
     </simplesect>
 
+    <simplesect>
+      <title>Enlaces</title>
+      <para>Se pueden poner enlaces a través de un texto y una URL asociada con
+      el siguiente código XML:</para>
+<![CDATA[
+<link xlink:href="http://www.google.es">Google site</link>
+]]>
+
+    </simplesect>
 
   </section>
 
