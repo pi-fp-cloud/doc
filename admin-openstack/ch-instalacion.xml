@@ -416,7 +416,7 @@ bind-address        = 0.0.0.0
       <orderedlist>
 	<listitem>
 	  <para>Creamos la base de datos que el servicio necesita en
-	  MySQL. Para ello iniciamos el cliente MySQLs:</para>
+	  MySQL. Para ello iniciamos el cliente MySQL:</para>
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
 	  </screen>
 	  <para>Desde el prompt de MySQL ejecutamos las siguientes
@@ -637,7 +637,13 @@ root@jupiter:~#
 
   <section xml:id="id_instUbuntu_glance">
     <title>Instalación de Glance</title>
-    <para></para>
+    <para>En este apartado describiremos la instalación y configuración de unos
+    de los servicios básicos de OpenStack, el servicio de autenticación y
+    gestión de la identidad (Identity Service): Keystone</para>
+    <para>Este capítulo describe la instalación y configuración del
+    módulo de OpenStack, Glance. Este servicio es el encargado de la
+    gestión y registro de las imágenes que posteriormente se van a poder
+    instanciar en máquinas virtuales. </para>
 
     <section>
       <title>¿Qué es Glance?</title>
@@ -647,11 +653,367 @@ root@jupiter:~#
 
     <section>
       <title>Instalación y configuración</title>
-      <para></para>
-      
+      <para>Una infraestructura OpenStack solo necesita un servidor que ejecute
+      el servicio Glance, en nuestra instalación el servicio se ejecutará en el
+      controlador, es decir, en la máquina <literal>jupiter</literal>.</para>
+
+      <para>Para la instalación de Glance, como para la instalación del resto
+      de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
+      con que sigamos los siguientes pasos:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Creamos la base de datos que el servicio necesita en MySQL. Para
+	  ello iniciamos el cliente MySQL:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
+	  </screen>
+	  <para>Desde el prompt de MySQL ejecutamos las siguientes
+	  sentencias:</para>
+	  <screen>
+	    <prompt>mysql> </prompt><userinput>CREATE DATABASE glance;</userinput>
+	    <prompt>mysql> </prompt><userinput>GRANT ALL ON glance.* to 'glance'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
+	    <prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Instalamos todo el software necesario:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install glance glance-api glance-client glance-common glance-registry python-glance</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Modificamos las siguientes líneas del fichero de configuración
+	  <filename>/etc/glance/glance-api-paste.ini</filename>, modificando
+	  estas líneas:</para>
+	  <programlisting>
+admin_tenant_name = %SERVICE_TENANT_NAME%
+admin_user = %SERVICE_USER%
+admin_password = %SERVICE_PASSWORD%
+	  </programlisting>
+
+	  <para>Por estas otras:</para>
+	  <programlisting>
+admin_tenant_name = service
+admin_user = glance
+admin_password = calex2010!!
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>El mismo cambio anterior hay que hacerlo también en el fichero
+	  <filename>/etc/glance/glance-registry-paste.ini</filename>, dejando
+	  las últimas líneas así:</para>
+	  <programlisting>
+admin_tenant_name = service
+admin_user = glance
+admin_password = calex2010!!
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Editamos el fichero
+	  <filename>/etc/glance/glance-registry.conf</filename> y modificamos la
+	  cadena de conexión a la base de datos MySQL recién creada:</para>
+	  <programlisting>
+sql_connection = mysql://glance:calex2010!!@172.20.254.190/glance
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Añadimos la siguiente configuración al fichero
+	  <filename>/etc/glance/glance-registry.conf</filename>:</para>
+	  <programlisting>
+[paste_deploy]
+flavor = keystone
+	  </programlisting>
+
+	  <para>Y también al fichero
+	  <filename>/etc/glance/glance-api.conf:</filename></para>
+	  <programlisting>
+[paste_deploy]
+flavor = keystone
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Creamos el esquema de la base de datos:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>glance-manage version_control 0</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>glance-manage db_sync</userinput>
+	  </screen>
+	  <para>Podemos ignorar los warnings de Python.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Reiniciamos los demonios del servicio Glance:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>service glance-api restart</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service glance-registry restart</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Añadimos las siguientes variables de entorno en el fichero
+	  .bashrc del usuario que ejecute el cliente glance, en principio al
+	  usuario <literal>root</literal> de la máquina <literal>jupiter</literal>:</para>
+	  <programlisting language="Bash">
+export SERVICE_TOKEN=CALEX2010!!
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=calex2010!!
+export OS_AUTH_URL="http://172.20.254.190:5000/v2.0/"
+export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Probamos el servicio.</para>
+
+	  <para>Nada más instalar, no hay ninguna imagen dada de alta, pero el
+	  siguiente comando, que muestra la lista de imágenes disponible, nos
+	  debería dar una lista vacía:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
+	  </screen>
+	</listitem>
+
+      </orderedlist>
+
+      <para>Podemos probar el servicio Glance a través de una imagen de prueba
+      siguiendo estos pasos:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Descargamos la imagen Cirros desde la siguiente URL:</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para><link xlink:href="https://launchpad.net/cirros/+download">https://launchpad.net/cirros/+download</link></para>
+	    </listitem>
+	  </itemizedlist>
+	</listitem>
+
+	<listitem>
+	  <para>Damos la imagen de alta en Glance a través del siguiente comando:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>glance add name="Cirros (test) 0.3.0 64 bits" is_public=true container_format=bare disk_format=qcow2 &lt; cirros-0.3.0-x86_64-disk.img</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Si todo es correcto, podremos ver ahora la imagen recién subida
+	  en la lista de imágenes que proporciona el servicios Glance:</para>
+	  <programlisting language="Python">
+PONER RESULTADO glance index con la imagen recién subida.
+	  </programlisting>
+	</listitem>	
+      </orderedlist>
     </section>    
   </section>
 
-<!-- Falta Nova y Horizon -->
+  <section xml:id="id_instUbuntu_nova">
+    <title>Instalación de Nova</title>
+    <para>Este capítulo describe la instalación y configuración del
+    módulo de OpenStack, Nova. Este servicio es el encargado de gestionar las
+    instancias (máquinas virtuales) del cloud, por lo que lo convierte en el
+    servicion central de toda la infraestructura de Openstack.</para>
+
+    <section>
+      <title>¿Qué es Nova?</title>
+      <para>COMPLETAR POSTERIORMENTE</para>
+      
+    </section>
+
+    <section>
+      <title>Instalación y configuración</title>
+      <para>Una infraestructura OpenStack puede ejecutar tantos nodos nova como
+      desee, como mínimo uno, pero el máximo depende de factores como la carga a
+      soportar como la disponibilidad de servidores. En nuestra instalación el
+      servicio se ejecutará en cuatro nodos, en las máquinas
+      <literal>io</literal>, <literal>europa</literal>, <literal>ganimedes</literal> y
+      <literal>calisto</literal>, pero excluyendo al controlador, a la máquina
+      <literal>jupiter</literal>.</para>
+
+      <para>Para la instalación de Nova, como para la instalación del resto
+      de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
+      con que sigamos los siguientes pasos en la máquina
+      <literal>jupiter</literal>:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Creamos la base de datos que el servicio necesita en MySQL. Para
+	  ello iniciamos el cliente MySQL:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
+	  </screen>
+	  <para>Desde el prompt de MySQL ejecutamos las siguientes
+	  sentencias:</para>
+	  <screen>
+	    <prompt>mysql> </prompt><userinput>CREATE DATABASE nova;</userinput>
+	    <prompt>mysql> </prompt><userinput>GRANT ALL ON nova.* to 'nova'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
+	    <prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Instalamos todo el software necesario:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install nova-api nova-cert nova-compute nova-compute-kvm nova-doc nova-network nova-objectstore nova-scheduler nova-volume rabbitmq-server novnc nova-consoleauth</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Editamos el fichero <filename>/etc/nova/nova.conf</filename> con
+	  el siguiente contenido: </para>
+	  <programlisting>
+	    <xi:include parse="text" href="samples/nova.conf.jupiter"/>
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>El mismo cambio anterior hay que hacerlo también en el fichero
+	  <filename>/etc/glance/glance-registry-paste.ini</filename>, dejando
+	  las últimas líneas así:</para>
+	  <programlisting>
+admin_tenant_name = service
+admin_user = glance
+admin_password = calex2010!!
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Creamos el esquema de la base de datos que Nova necesita:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>nova-manage db sync</userinput>
+	  </screen>
+	  <para>Podemos ignorar los warnings de Python.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Reiniciamos todos los demonios del servicio Nova:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>service novnc stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-consoleauth stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-volume stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-schedule  stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-objectstore stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-api stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-compute stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-network stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-cert stop</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service libvirt-bin stop</userinput>
+
+	    <prompt>root@jupiter:~# </prompt><userinput>service libvirt-bin start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-cert start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-network start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-compute start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-api start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-objectstore start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-schedule  start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-volume start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service nova-consoleauth start</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>service novnc start</userinput>
+	  </screen>
+
+	  <para>Mientras que se instalan, se configura el servicio y se hacen
+	  todas las pruebas, va a ser muy frecuente tener que reiniciar los
+	  servicios de Nova, podemos facilitar esta tarea a través del siguiente
+	  script:</para>
+
+	  <programlisting language="Bash">
+	    <xi:include parse="text" href="src/nova.sh"/>
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Proporcionamos una red (rango de IPs) que asociaremos a las
+	  instancias, lo podemos hacer a través del siguiente comando:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>nova-manage network create private --fixed_range_v4=10.0.0.0/24 --num_networks=1 --bridge=br100 --bridge_interface=bond0.62 --network_size=256 --dns1=172.20.254.235</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Nos aseguramos de tener definidas las siguientes variables de
+	  entorno en la máquina que haga de cliente Nova:</para>
+	  <programlisting language="Bash">
+export SERVICE_TOKEN=CALEX2010!!
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=calex2010!!
+export OS_AUTH_URL="http://172.20.254.190:5000/v2.0/"
+export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Volvemos a reiniciar todos los servicios.</para>
+	</listitem>
+
+
+	<listitem>
+	  <para>Comprobamos que todos los servicios estén iniciados, lo podemos
+	  hacer a través del comando:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>nova-manage service list</userinput>
+	  </screen>
+	  <para>...que nos debería proporcionar una salida similar a la
+	  siguiente:</para>
+	  <programlisting>
+SALIDA COMANDO nova-manage service list
+	  </programlisting>
+	</listitem>
+
+	<listitem>
+	  <para>Arrancamos una imagen de prueba, a través de cualquiera de los
+	  siguientes comandos podemos comprobar las imágenes que podemos iniciar
+	  proporcionadas por el servicio Glance:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>glance index</userinput>
+	  </screen>
+
+	  <screen>
+	    <prompt>$ </prompt><userinput>nova image-list</userinput>
+	  </screen>
+
+	  <para>Generamos las claves SSH necesarias para conectarnos a través
+	  del protocolo SSH a los servidores:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>nova keypair-add test > /root/test.pem</userinput>
+	  </screen>
+
+	  <para>Para iniciar una instancia necesitamos el nombre de ésta,
+	  ejecutamos el siguiente comando para iniciar una instancia:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>nova boot --image "Cirros (test) 0.3.0 64 bits" --flavor m1.small --key_name test my-first-server</userinput>
+	  </screen>
+
+	  <para>Podemos comprobar el estado de la instancia a través del
+	  comando:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>nova list</userinput>
+	  </screen>
+
+	  <para>Y obtener más información a través del UID de la instancia con
+	  el comando:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>nova show &lt;id&gt;</userinput>
+	  </screen>
+
+	  <para>Nos podemos conectar a través de SSH a la instancia con el comando:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>ssh -i test.pem cirros@10.0.0.2</userinput>
+	  </screen>
+	</listitem>
+
+      </orderedlist>
+
+    </section>
+    
+  </section>
+
+
+<!-- Falta completar algunos apuntes más que tengo de Nova
+y el servicio Horizon -->
 
 </chapter>
