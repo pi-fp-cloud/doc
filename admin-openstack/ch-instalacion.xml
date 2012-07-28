@@ -14,9 +14,14 @@
     Horizon y  el resto de nodos como nodos de computación, ejecutando
     únicamente Nova Compute.</para>
 
-    <para>En los siguientes pasos se resume una visión global de todo el proceso:</para>
+    <para>Podemos resumir el proceso global de instalación en los siguientes
+    pasos:</para>
 
     <orderedlist>
+      <listitem>
+	<para>Configuración de la red del Cloud.</para>
+      </listitem>
+
       <listitem>
 	<para>Instalación de servicios básicos (NTP, MySQL, ...).</para>
       </listitem>
@@ -31,10 +36,6 @@
 
       <listitem>
 	<para>Instalación y configuración de Nova (servicios de computación).</para>
-      </listitem>
-
-      <listitem>
-	<para>Configuración de la red del Cloud.</para>
       </listitem>
 
       <listitem>
@@ -58,11 +59,16 @@
 
     <itemizedlist>
       <listitem>
-	<para><link xlink:href="http://www.openstack.org">OpenStack Site.</link></para>
+	<para><link xlink:href="http://www.openstack.org">OpenStack Open Source
+	Cloud Computing Software.</link></para>
       </listitem>
       
       <listitem>
-	<para><link xlink:href="http://docs.openstack.org">OpenStack Docs site.</link></para>
+	<para><link xlink:href="http://docs.openstack.org">OpenStack Docs: Essex.</link></para>
+      </listitem>
+
+      <listitem>
+	<para><link xlink:href="https://launchpad.net/openstack/">OpenStack in Launchpad.</link></para>
       </listitem>
       
     </itemizedlist>
@@ -72,8 +78,8 @@
   <section xml:id="id_instUbuntu_prerrequisitos">
     <title>Prerrequisitos</title>
     <para>Para el seguimiento del proceso de instalación y configuración de
-    OpenStack, es necesario cumplir ciertos requisitos y partir de algunas
-    suposiciones. Son las siguientes:</para>
+    OpenStack que se detalla posteriormente, es necesario partir de algunas suposiciones y de cumplir ciertos
+    requisitos. Como los siguientes:</para>
 
     <itemizedlist>
       <listitem>
@@ -86,8 +92,10 @@
       </listitem>
 
       <listitem>
-	<para>El esquema de particiones deberá usar LVM, se detalla la
-	configuración en la siguiente sección.</para>
+	<para>Se recomienda el uso de LVM (el gestor de volúmenes lógicos de
+	Linux), la configuración de LVM y el listado del esquema de
+	particionamiento a seguir, se detalla en las siguientes
+	secciones.</para>
       </listitem>
 
       <listitem>
@@ -96,22 +104,26 @@
 	<para>Nuestra red cuenta con un nombre de dominio, concretamente
 	<literal>iescierva.net</literal>, este será el dominio utilizado durante
 	todo el documento.</para>
+	<para>Si no se cuenta con un servidor DNS en la red, todas las máquinas
+	deberán contar con el fichero <filename>/etc/hosts</filename> con todas
+	las máquinas correctamente registradas.</para>
       </listitem>
 
       <listitem>
-	<para>Todos los nodos que participen en el Cloud deben tener fecha y
-	hora sincronizada a través del servicio NTP.</para>
+	<para>Todos los nodos que participen en el Cloud deben tener la fecha y
+	hora sincronizada a través del servicio NTP (Network Time Protocol). Se
+	recomienda que la red cuente con uno varios servidores NTP.</para>
       </listitem>
 
       <listitem>
-	<para>Se utilizará KVM como hipervisor.</para>
+	<para>Entre todos los hipervisores disponibles en la comunidad FLOSS,
+	hemos optado por KVM.</para>
       </listitem>
 
       <listitem>
 	<para>La contraseña para todos los usuarios y para todos los servicios
 	será la misma: <literal>calex2010!!</literal></para>
       </listitem>
-
 
       <listitem>
 	<para>El sistema deberá estar actualizado antes de empezar con el
@@ -132,18 +144,18 @@
     <section>
       <title>Nombres de los equipos y configuración de la red</title>
       <para>Se han elegido los siguientes nombres para los equipos en los que se
-      va a realizar la instalación de la infraestructura del Cloud:</para>
+      va a realizar la instalación de la infraestructura de OpenStack:</para>
       <itemizedlist>
 	<listitem>
-	  <para><emphasis role="bold">jupiter</emphasis>: para el nodo controlador, que será el encargado
-	  de gestionar todos los recursos del cloud, interaccionar con los clientes
-	  y ordenar a los nodos de virtualización que ejecuten las instancias, pero
-	  en el que no se ejecutarán máquinas virtuales. La mayor parte de
-	  componentes del Cloud y configuración se realizará en este
-	  equipo, pero comparado con los <emphasis>nodos de
-	  computación</emphasis> la carga de trabajo será pequeña, por lo
-	  que no es necesario un equipo con mucha memoria RAM o gran
-	  capacidad de procesamiento.</para>
+	  <para><emphasis role="bold">jupiter</emphasis>: para el nodo
+	  controlador, que será el encargado de gestionar todos los recursos del
+	  cloud, interaccionar con los clientes y ordenar a los nodos de
+	  virtualización que ejecuten las instancias, pero en el que no se
+	  ejecutarán máquinas virtuales. La mayor parte de componentes del Cloud
+	  y configuración se realizará en este equipo, pero comparado con los
+	  <emphasis>nodos de computación</emphasis> la carga de trabajo será
+	  pequeña, por lo que no es necesario un equipo con mucha memoria RAM o
+	  gran capacidad de procesamiento.</para>
 	</listitem>
 	<listitem>
 	  <para><emphasis role="bold">io, europa, ganimedes y calisto</emphasis> (las 4 lunas
@@ -152,20 +164,22 @@
 	  jerga propia de OpenStack. En estos equipos se instalarán
 	  sólo los componentes necesarios para que se ejecuten las
 	  instancias (máquinas virtuales) en ellos y estarán esperando las órdenes de
-	  jupiter.</para>
+	  <literal>jupiter</literal>.</para>
 	</listitem>
 	<listitem>
-	  <para><emphasis role="bold">saturno</emphasis>: para el nodo de almacenamiento, ya que es tan
-	  importante como júpiter y a la vez independiente. En este equipo todavía
-	  no está definido el software que se instalará, pero lo más  probable es
-	  que sea una distribución especializada en infraestructuras SAN/NAS como
+	  <para><emphasis role="bold">saturno</emphasis>: para el nodo de
+	  almacenamiento, ya que es tan importante como júpiter y a la vez
+	  independiente. En este equipo todavía no está definido el software que
+	  se instalará, pero lo más  probable es que sea una distribución
+	  especializada en infraestructuras SAN/NAS como
 	  <literal>OpenFiler</literal> ó <literal>FreeNAS</literal>.</para>
 	</listitem>
 	<listitem>
-	  <para><emphasis role="bold">venus</emphasis>: un equipo convencional en el que se instalarán los
-	  paquetes necesarios para usar el cliente <literal>nova</literal> con el que podemos
-	  gestionar el cloud desde línea de comandos sin la necesidad de
-	  realizar las operaciones desde jupiter.</para>
+	  <para><emphasis role="bold">venus</emphasis>: un equipo convencional
+	  en el que se instalarán los paquetes necesarios para usar el cliente
+	  <literal>nova</literal> con el que podemos gestionar el cloud desde
+	  línea de comandos sin la necesidad de realizar las operaciones desde
+	  <literal>jupiter</literal>.</para> 
 	</listitem>
       </itemizedlist>
 
@@ -180,26 +194,26 @@
     <section>
       <title>Instalación de Ubuntu 12.04.</title>
       <para>La máquina <literal>jupiter</literal> incluye dos discos duros
-      SATAII de 500 GiB y una controladora de disco 3ware 9650SE. Se ha optado
+      SATAII de 500 GiB y una controladora de disco <literal>3ware 9650SE</literal>. Se ha optado
       por configurar esta controladora de disco en modo RAID 1, para incluir un
       nivel elemental de seguridad y consistencia de datos, aunque obviamente
       esto no descarta la utilización adicional de otros mecanismos de copias de
       seguridad que se configurarán posteriormente. Al tratarse de una
       controladora RAID hardware y estar configurada previamente, el sistema
       operativo que arranque en el equipo sólo verá un disco duro en
-      <literal>/dev/sda</literal> de 500GB aproximadamente.</para>
+      <literal>/dev/sda</literal> de aproximadamente 500 GiB.</para>
 
       <para>Para prevenir corrupción de datos es muy importante que la
       controladora RAID se configure con una política de escritura
-      <literal>Write Through</literal>. En esta configuración, el rendimiento
-      del RAID se resiente un poco, pero lo hace más inmune a una posible pérdida de datos
-      en caso de cortes en el suministro eléctrico.</para>
+      <emphasis>Write Through</emphasis>. En esta configuración, el rendimiento
+      del RAID se resiente un poco, pero lo hace más inmune a una posible
+      corrupción de datos en caso de cortes en el suministro eléctrico.</para>
 
       <para>El sistema operativo elegido para los equipos del cloud
       es la distribución de GNU/Linux Ubuntu 12.04 LTS, que actualmente se
       conoce con el nombre de código <emphasis>Precise
       Pangolin</emphasis>. Pensamos que es la mejor opción entre todas las
-      distribuciones de GNU/Linux ya que es la descrita en toda la documentación
+      distribuciones de GNU/Linux ya que es la utilizada en toda la documentación
       de OpenStack y la mejor soportada.</para>
 
       <para>Durante la instalación realizamos el siguiente esquema de
@@ -224,9 +238,9 @@ COMPLETAR
 
       <para>Aunque la controladora RAID es hardware y el sistema
         operativo no la gestiona, es importante que se pueda controlar
-        su estado a través de alǵun módulo del kernel. En este caso el
-        módulo 3w-9xxx que se carga automáticamente y nos envía estos
-        mensajes al log del sistema:</para>
+        su estado a través de algún módulo del kernel. En este caso el
+        módulo <literal>3w-9xxx</literal> que se carga automáticamente y nos
+	envía estos mensajes al log del sistema:</para>
         <programlisting>
 [    2.799824] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
 [    2.799867] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
@@ -260,27 +274,32 @@ COMPLETAR
 	<listitem>
 	  <para>Nos aseguramos que el paquete <literal>ntpdate</literal> esté
 	  instalado.</para>
-	  <screen><prompt>root@jupiter:~# </prompt><userinput>dpkg --list | grep
-	  ntpdate</userinput></screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>dpkg --list | grep ntpdate</userinput></screen>
 	  <para>Si no lo estuviera lo instalamos:</para>
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install ntpdate</userinput></screen>
 
 	</listitem>
 	
 	<listitem>
-	  <para>Configuramos crontab para que se ejecute el comando ntpdate de
-	  forma periódica. Para ello ejecutamos (como root) el comando
-	  <command>crontab -e</command> y editamos el fichero que nos sugiere
-	  con el siguiente contenido:</para>
+	  <para>Configuramos crontab para que se ejecute el comando
+	  <command>ntpdate</command> de forma periódica. Para ello ejecutamos
+	  (como root) el comando <command>crontab -e</command> y editamos el
+	  fichero que nos sugiere con el siguiente contenido:</para>
 	  <programlisting>
 0 4 * * * ntpdate ntp.iescierva.net ; hwclock --systohc
 	  </programlisting>
 	  <para>Podemos sustituir el servidor <literal>ntp.iescierva.net</literal> por uno en
-	  Internet como <literal>ntp.ubuntu.com</literal>.</para>
+	  Internet como <literal>ntp.ubuntu.com</literal> o como
+	  <literal>hora.rediris.es</literal>.</para>
 
-	  <para>Podemos comprobar la configuración a través del comando
-	  <command>crontab -l</command></para>
-
+	  <para>Podemos comprobar que la configuración es correcta a través del
+	  comando <command>crontab -l</command></para>
+	  <programlisting>
+root@jupiter:~# crontab -l
+# m h  dom mon dow   command
+0 4 * * * ntpdate ntp.iescierva.net ; hwclock -w
+root@jupiter:~#
+	  </programlisting>
 	</listitem>
 
       </orderedlist>
@@ -289,11 +308,11 @@ COMPLETAR
 
     <section>
       <title>MySQL</title>
-      <para>Vamos a configurar todos los servicios para que utilicen como base
-      de datos MySQL, en vez de la base de datos SQLite que usan por
-      defecto. Para ello será necesario instalar MySQL y fijar una contraseña
-      para el usuario root. Para ello basta que sigamos los siguientes
-      pasos:</para>
+      <para>Vamos a configurar todos los servicios del Cloud para que utilicen
+      como base de datos <literal>MySQL</literal>, en vez de la base de datos
+      <literal>SQLite</literal> que usan en la configuración por defecto. Para
+      ello será necesario instalar MySQL y fijar una contraseña para el usuario
+      root. Para ello seguimos los siguientes pasos:</para>
 
       <orderedlist>
 	<listitem>
@@ -306,14 +325,14 @@ COMPLETAR
 	<listitem>
 	  <para>Durante la instalación del servidor se nos pedirá que
 	  introduzcamos la contraseña para el usuario root de
-	  MySQL.</para>
+	  MySQL, en nuestro caso <literal>calex2010!!</literal></para>
 	</listitem>
 
 	<listitem>
 	  <para>Modificamos la interfaz de escucha de MySQL, aunque inicialmente
 	  la fijamos a 0.0.0.0 para que el servidor escuche en todas las
 	  interfaces, posteriormente fijaremos la interfaz con la IP de la red
-	  privada.</para>
+	  privada del Cloud.</para>
 
 	  <para>Configuramos el fichero <filename>/etc/mysql/my.cnf</filename>
 	  modificando la siguiente línea:</para>
@@ -334,8 +353,25 @@ bind-address        = 0.0.0.0
 	
 	<listitem>
 	  <para>Probamos el cliente MySQL con la contraseña fijada:</para>
-	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput></screen>
+	  <programlisting>
+root@jupiter:~# mysql -u root -p
+Enter password: ***********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 414
+Server version: 5.5.24-0ubuntu0.12.04.1 (Ubuntu)
+
+Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql>	    
+	  </programlisting>
 	</listitem>
+
       </orderedlist>
      
     </section>
@@ -437,8 +473,8 @@ bind-address        = 0.0.0.0
 
 	<listitem>
 	  <para>Keystone utiliza por defecto una base de datos <literal>SQLite</literal>,
-	  por lo que no tendremos que borrar la base de datos que va con la
-	  instalación por defecto:</para>
+	  por lo que tendremos que borrar la base de datos que se configura en
+	  la instalación por defecto:</para>
 	  <screen>
 	    <prompt>root@jupiter:~# </prompt><userinput>rm /var/lib/keystone/keystone.db</userinput>
 	  </screen>
@@ -465,7 +501,7 @@ bind-address        = 0.0.0.0
 admin_token = CALEX2010!!
 connection = mysql://keystone:calex2010!!@172.20.254.190/keystone
 	  </programlisting>
-	  <para>Ver nota posterior sobre <literal>admin_token</literal>)</para>
+	  <para>Ver nota posterior sobre <literal>admin_token</literal>.</para>
 	</listitem>
 
 	<listitem>
@@ -543,7 +579,7 @@ export SERVICE_TOKEN=CALEX2010!!
 	  el siguiente script que nos simplificará mucho este proceso:</para>
 
 	  <programlisting language="Bash">
-	    <xi:include parse="text" href="src/roles.sh"/>
+<xi:include parse="text" href="src/roles.sh"/>
 	  </programlisting>
 
 	  <para>Para la correcta ejecución de script hay que configurar las
@@ -637,13 +673,10 @@ root@jupiter:~#
 
   <section xml:id="id_instUbuntu_glance">
     <title>Instalación de Glance</title>
-    <para>En este apartado describiremos la instalación y configuración de unos
-    de los servicios básicos de OpenStack, el servicio de autenticación y
-    gestión de la identidad (Identity Service): Keystone</para>
-    <para>Este capítulo describe la instalación y configuración del
+    <para>Esta sección describe la instalación y configuración del
     módulo de OpenStack, Glance. Este servicio es el encargado de la
     gestión y registro de las imágenes que posteriormente se van a poder
-    instanciar en máquinas virtuales. </para>
+    instanciar en máquinas virtuales.</para>
 
     <section>
       <title>¿Qué es Glance?</title>
@@ -804,8 +837,12 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	<listitem>
 	  <para>Si todo es correcto, podremos ver ahora la imagen recién subida
 	  en la lista de imágenes que proporciona el servicios Glance:</para>
-	  <programlisting language="Python">
-PONER RESULTADO glance index con la imagen recién subida.
+	  <programlisting>
+root@jupiter:~# glance index
+ID                                   Name                           Disk Format          Container Format     Size          
+------------------------------------ ------------------------------ -------------------- -------------------- --------------
+fe22ea9c-ebb2-4bb8-be34-ea7732a8a3d2 Cirros (test) 0.3.0 64 bits    qcow2                bare                        9761280
+root@jupiter:~# 
 	  </programlisting>
 	</listitem>	
       </orderedlist>
@@ -816,8 +853,8 @@ PONER RESULTADO glance index con la imagen recién subida.
     <title>Instalación de Nova</title>
     <para>Este capítulo describe la instalación y configuración del
     módulo de OpenStack, Nova. Este servicio es el encargado de gestionar las
-    instancias (máquinas virtuales) del cloud, por lo que lo convierte en el
-    servicion central de toda la infraestructura de Openstack.</para>
+    instancias (máquinas virtuales) del Cloud, por lo que lo convierte en el
+    servicio central de toda la infraestructura de Openstack.</para>
 
     <section>
       <title>¿Qué es Nova?</title>
@@ -827,11 +864,16 @@ PONER RESULTADO glance index con la imagen recién subida.
 
     <section>
       <title>Instalación y configuración</title>
-      <para>Una infraestructura OpenStack puede ejecutar tantos nodos nova como
-      desee, como mínimo uno, pero el máximo depende de factores como la carga a
-      soportar como la disponibilidad de servidores. En nuestra instalación el
-      servicio se ejecutará en cuatro nodos, en las máquinas
-      <literal>io</literal>, <literal>europa</literal>, <literal>ganimedes</literal> y
+      <para>Una infraestructura OpenStack puede ejecutar tantos nodos
+      <literal>nova</literal> como desee. Como mínimo uno, esto hace que sea posible tener una
+      infraestructura de OpenStack en un solo nodo, pero podemos desplegar
+      tantos nodos de computación como servidores tengamos. El máximo depende de
+      diversos factores como la carga a soportar, la disponibilidad de
+      servidores, factores económicos, ancho de banda de nuestra red, uso del
+      Cloud, y un largo etcétera. En nuestra instalación el servicio
+      <literal>nova-compute</literal> se ejecutará en cuatro nodos,
+      concretamente en las máquinas <literal>io</literal>,
+      <literal>europa</literal>, <literal>ganimedes</literal> y
       <literal>calisto</literal>, pero excluyendo al controlador, a la máquina
       <literal>jupiter</literal>.</para>
 
@@ -866,7 +908,7 @@ PONER RESULTADO glance index con la imagen recién subida.
 	  <para>Editamos el fichero <filename>/etc/nova/nova.conf</filename> con
 	  el siguiente contenido: </para>
 	  <programlisting>
-	    <xi:include parse="text" href="samples/nova.conf.jupiter"/>
+<xi:include parse="text" href="samples/nova.conf.jupiter"/>
 	  </programlisting>
 	</listitem>
 
@@ -915,13 +957,13 @@ admin_password = calex2010!!
 	    <prompt>root@jupiter:~# </prompt><userinput>service novnc start</userinput>
 	  </screen>
 
-	  <para>Mientras que se instalan, se configura el servicio y se hacen
-	  todas las pruebas, va a ser muy frecuente tener que reiniciar los
-	  servicios de Nova, podemos facilitar esta tarea a través del siguiente
-	  script:</para>
+	  <para>Mientras que trabajemos con el servicio Nova (instalación,
+	  configuración, pruebas...), va a ser muy frecuente tener que reiniciar
+	  todos sus servicios asociados, podemos facilitar esta tarea a través
+	  del siguiente script, que podremos guardar en <filename>/root/bin/nova.sh</filename>:</para>
 
 	  <programlisting language="Bash">
-	    <xi:include parse="text" href="src/nova.sh"/>
+<xi:include parse="text" href="src/nova.sh"/>
 	  </programlisting>
 	</listitem>
 
@@ -947,9 +989,12 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	</listitem>
 
 	<listitem>
-	  <para>Volvemos a reiniciar todos los servicios.</para>
-	</listitem>
+	  <para>Volvemos a reiniciar todos los servicios:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>/root/bin/nova.sh restart</userinput>
+	  </screen>
 
+	</listitem>
 
 	<listitem>
 	  <para>Comprobamos que todos los servicios estén iniciados, lo podemos
@@ -960,7 +1005,15 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  <para>...que nos debería proporcionar una salida similar a la
 	  siguiente:</para>
 	  <programlisting>
-SALIDA COMANDO nova-manage service list
+root@jupiter:~# nova-manage service list
+Binary           Host                                 Zone             Status     State Updated_At
+nova-consoleauth jupiter                              nova             enabled    :-)   2012-07-28 10:02:04
+nova-cert        jupiter                              nova             enabled    :-)   2012-07-28 10:02:05
+nova-scheduler   jupiter                              nova             enabled    :-)   2012-07-28 10:02:03
+nova-compute     jupiter                              nova             enabled    :-)   2012-07-28 10:01:57
+nova-volume      jupiter                              nova             enabled    :-)   2012-07-28 10:02:04
+nova-network     jupiter                              nova             enabled    :-)   2012-07-28 10:02:03
+nova-compute     io                                   nova             enabled    :-)   2012-07-28 10:02:03
 	  </programlisting>
 	</listitem>
 
