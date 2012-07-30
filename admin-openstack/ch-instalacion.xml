@@ -35,7 +35,9 @@
       </listitem>
 
       <listitem>
-	<para>Instalación y configuración de Nova (servicios de computación).</para>
+	<para>Instalación y configuración de Nova (servicios de
+	computación).</para>
+	<para>Configuración del tipo de red: FlatDHCPNetwork.</para>
       </listitem>
 
       <listitem>
@@ -131,7 +133,7 @@
 	<para><command>apt-get update</command></para>
 	<para><command>apt-get upgrade</command></para>
       </listitem>
- 
+      
     </itemizedlist>
     
   </section>
@@ -183,13 +185,318 @@
 	</listitem>
       </itemizedlist>
 
-      <para>Para la configuración de la red se ha optado por configurar bonding
-      y redes VLAN tal como se describe en la siguiente figura:</para>
+      <para>Para la configuración de la red se ha optado por la siguiente
+      configuración, tal como se muestra en la figura:</para>
 
-      <para>FIGURA BONDING y RED HACERRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR</para>
-      
+      <figure xml:id="infra_red">
+	<title>Infraestructura de nuestro Cloud Computing (IES Cierva/IES Los Albares)</title>
+	<mediaobject>
+	  <imageobject role="fo">
+	    <imagedata fileref="figures/infra_red_iescierva.svg" format="SVG" scale="60"/>
+	  </imageobject>
+	  <imageobject role="html">
+	    <imagedata fileref="figures/infra_red_iescierva.png" format="PNG" scale="50"/>
+	  </imageobject>
+	</mediaobject>
+      </figure>
+
+      <para>En nuestra infraestructura el controlador del Cloud
+      (<literal>jupiter</literal>) cuenta con dos tarjetas de red Ethernet,
+      mientras que los nodos de computación cuentan con seis, en lugar de
+      asignar de forma estática las tarjetas a las redes se ha optado por una
+      configuración en bonding y con VLANs.</para>
+
+      <para>De esta forma, todos los nodos tienen una sola interfaz de red,
+      <literal>bond0</literal>, unión de todas las interfaces
+      <literal>ethX</literal> del sistema, y en la que se han configurado las
+      siguientes redes locales virtuales (VLAN):</para>
+
+      <table rules="all">
+	<caption>LANs Virtuales del Cloud Computing</caption>
+	<col width="30%"/>
+	<col width="30%"/>
+	<col width="20%"/>
+	<col width="20%"/>
+	<thead>
+	  <tr>
+	    <td>Red Virtual</td>
+	    <td>Rango de direcciones IP</td>
+	    <td>Interfaz virtual</td>
+	    <td>Interfaz física (id. VLAN)</td>
+	  </tr>
+	</thead>
+	<tbody>
+	  <tr>
+	    <td>Red Pública</td>
+	    <td>172.20.254.0/24</td>
+	    <td>----</td>
+	    <td>bond0 (untagged)</td>
+	  </tr>
+	  <tr>
+	    <td>
+	      <para>Red Privada</para>
+	      <para>Red Máquinas Virtuales</para>
+	    </td>
+	    <td>
+	      <para>172.20.253.0/24</para>
+	      <para>10.0.0.0/24</para>
+	    </td>
+	    <td>bond0.60</td>
+	    <td>bond0 (60)</td>
+	  </tr>
+	  <tr>
+	    <td>Red Almacenamiento SAN/NAS</td>
+	    <td>172.20.252.0/24</td>
+	    <td>bond0.62</td>
+	    <td>bond0 (62)</td>
+	  </tr>
+	  <tr>
+	    <td>Direcciones IP flotantes</td>
+	    <td>172.18.0.0/16</td>
+	    <td>bond0.61</td>
+	    <td>bond0 (61)</td>
+	  </tr>
+
+	</tbody>
+      </table>
+
+      <para>De esta forma cada nodo tiene:</para>
+      <itemizedlist>
+	<listitem>
+	  <para>Todas las interfaces desde <literal>eth0</literal> hasta
+	  <literal>eth6</literal> unidas por bonding a través de la interfaz
+	  bond0.</para>
+	</listitem>
+
+	<listitem>
+	  <para>La interfaz bond0, untagged (sin VLAN), asociada a la red
+	  pública.</para>
+	  <para>En el caso del controlador la 172.20.254.190, en el caso del
+	  primer nodo, la 172.20.254.191.</para>
+	</listitem>
+
+	<listitem>
+	  <para>La interfaz bond0.60, unida a la red privada y utilizada para
+	  los servicios del Cloud y para la comunicación de máquinas
+	  virtuales.</para>
+	  <para>En el caso del controlador la 172.20.253.190, en el caso del
+	  primer nodo, la 172.20.253.191.</para>
+	  <para>Esta interfaz también se usa para la comunicación entre las
+	  máquinas virtuales a través de la red 10.0.0.0/24.</para>
+	</listitem>
+
+	<listitem>
+	  <para>La interfaz bond0.62, asociada a la red de almacenamiento,
+	  utilizada para el acceso a los servidores que ofrecen SAN y
+	  NAS.</para>
+	  <para>En el caso del controlador la 172.20.252.190, en el caso del
+	  primer nodo, la 172.20.252.191.</para>
+	</listitem>
+
+	<listitem>
+	  <para>La interfaz bond0.61, utilizada para asignar direcciones IP
+	  flotantes. Una dirección IP flotante es la que asocia a una máquina
+	  virtual de forma temporal para que sea accesible desde fuera del
+	  Cloud. Esta dirección es la que se proporcionará a los clientes del
+	  Cloud.</para>
+	  <para>La red utilizada será la 172.18.0.0/16.</para>
+	</listitem>
+	
+      </itemizedlist>
+
+      <para>A continuación se muestra la figura anterior con los nombres de las
+      interfaces y las direcciones IP:</para>
+
+      <figure xml:id="infra_red2">
+	<title>Infraestructura de nuestro Cloud Computing (IES Cierva/IES Los Albares)</title>
+	<mediaobject>
+	  <imageobject role="fo">
+	    <imagedata fileref="figures/infra_red_iescierva2.svg" format="SVG" scale="60"/>
+	  </imageobject>
+	  <imageobject role="html">
+	    <imagedata fileref="figures/infra_red_iescierva2.png" format="PNG" scale="50"/>
+	  </imageobject>
+	</mediaobject>
+      </figure>
     </section>
+    <section xml:id="id_bonding">
+      <title>Configuración del bonding y de las VLAN</title>
 
+      <section>
+	<title>¿Qué es el bonding?</title>
+	<para><emphasis role="bond">Bonding</emphasis>,
+	es un concepto utilizado en redes de ordenadores, que describe varias
+	formas de combinar (agregar) en paralelo varias interfaces de red
+	creando una sola interfaz lógica. Esta nueva interfaz proporciona
+	redundancia en el enlace y un mayor rendimiento que el proporcionado
+	por las interfaces físicas trabajando de forma individual.</para>
+
+	<para>También se conoce como port trunking, link bundling,
+	Ethernet/network/NIC bonding, o NIC teaming. Los estándares que hay
+	bajo esta tecnología son el IEEE 802.1ax (LACP: Link Aggregation Control
+	Protocol para redes Ethernet) o el protocolo previo IEEE 802.3ad,
+	además de varias soluciones propietarias.</para>
+	
+      </section>
+
+      <section>
+	<title>Configuración de bonding y VLAN</title>
+	<para>Para rendimientos alto, es casi obligatorio el uso de bonding, y
+	altamente recomendable el uso de LACP (802.3ad), por lo que se recomienda un
+	switch con soporte LACP. Si no se cuenta con LACP, se puede optar por
+	otros modos de bonding tal como se detalla en <link
+	xlink:href="http://www.kernel.org/doc/Documentation/networking/bonding.txt">http://www.kernel.org/doc/Documentation/networking/bonding.txt</link>.</para>
+
+	<para>Para la configuración de bonding en Ubuntu seguimos los
+	siguientes pasos:</para>
+
+	<orderedlist>
+	  <listitem>
+	    <para>Instalamos los siguientes paquetes:</para>
+	    <screen>
+	      <prompt>$ </prompt><userinput>apt-get install ifenslave ethtool</userinput>
+	    </screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>Bajamos las interfaces de red:</para>
+	    <screen>
+	      <prompt>$ </prompt><userinput>ifdown eth0</userinput>
+	      <prompt>$ </prompt><userinput>ifdown eth1</userinput>
+	    </screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>Creamos el fichero
+	    <filename>/etc/modprobe.d/bonding.conf</filename> con el siguiente
+	    contenido:</para>
+	    <programlisting>
+	      alias bond0 bonding
+	      # options bonding mode=0 miimon=100
+	    </programlisting>
+	  </listitem>
+
+	  <listitem>
+	    <para>Configuramos las nuevas interfaces a través del fichero
+	    <filename>/etc/network/interfaces</filename>:</para>
+	    <programlisting language="Python">
+	      # This file describes the network interfaces available on your system 
+	      # and how to activate them. For more information, see interfaces(5). 
+
+	      # The loopback network interface 
+	      auto lo 
+	      iface lo inet loopback 
+
+	      auto eth0 
+	      iface eth0 inet manual 
+	      bond-master bond0 
+	      pre-up ethtool -s eth0 wol g 
+	      post-down ethtool -s eth0 wol g 
+
+	      auto eth1 
+	      iface eth1 inet manual 
+	      bond-master bond0 
+	      pre-up ethtool -s eth1 wol g 
+	      post-down ethtool -s eth1 wol g
+
+	      # The primary network interface 
+	      auto bond0 
+	      iface bond0 inet static 
+	      address 172.20.254.192 
+	      netmask 255.255.255.0 
+	      broadcast 172.20.254.255 
+	      network 172.20.254.0 
+	      gateway 172.20.254.254 
+	      bond-mode 802.3ad 
+	      bond-miimon 100 
+	      bond-lacp-rate 1 
+	      bond-slaves none 
+	      dns-nameservers 172.20.254.104 172.20.254.235 
+	      dns-search iescierva.net
+	    </programlisting>
+	  </listitem>
+
+	  <listitem>
+	    <para>Reconfiguramos las interfaces de red, en principio no hace
+	    falta reiniciar, pero podemos hacerlo para comprobar que todo
+	    funciona correctamente tras iniciarse el sistema.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Probamos que tenemos conectividad y que el bonding está
+	    configurado:</para>
+	    <screen>
+	      <prompt>$ </prompt><userinput>cat /proc/net/bonding/bond0</userinput>
+	      Ethernet Channel Bonding Driver: v3.7.1 (April 27, 2011)
+
+	      Bonding Mode: IEEE 802.3ad Dynamic link aggregation
+	      Transmit Hash Policy: layer2 (0)
+	      MII Status: up
+	      MII Polling Interval (ms): 100
+	      Up Delay (ms): 0
+	      Down Delay (ms): 0
+
+	      802.3ad info
+	      LACP rate: fast
+	      Min links: 0
+	      Aggregator selection policy (ad_select): stable
+	      Active Aggregator Info:
+	      Aggregator ID: 1
+	      Number of ports: 2
+	      Actor Key: 17
+	      Partner Key: 58
+	      Partner Mac Address: 00:9c:02:b7:f9:40
+
+	      Slave Interface: eth1
+	      MII Status: up
+	      Speed: 1000 Mbps
+	      Duplex: full
+	      Link Failure Count: 0
+	      Permanent HW addr: 00:25:90:72:2c:47
+	      Aggregator ID: 1
+	      Slave queue ID: 0
+
+	      Slave Interface: eth0
+	      MII Status: up
+	      Speed: 1000 Mbps
+	      Duplex: full
+	      Link Failure Count: 0
+	      Permanent HW addr: 00:25:90:72:2c:46
+	      Aggregator ID: 1
+	      Slave queue ID: 0
+	    </screen>
+	  </listitem>	    
+	</orderedlist>
+	
+      </section>
+
+      <section>
+	<title>Configuración para OpenStack</title>
+	<para>En nuestra configuración, hemos optado por el uso de bonding más
+	el uso de VLAN, tras seguir los pasos anteriores habría que configurar
+	el fichero <filename>/etc/network/interfaces</filename> tal como se
+	muestra a continuación.</para>
+
+	<note>
+	  <para>En los nodos de computación solo se han configurado cuatro
+	  interfaces de las seis disponibles. Básicamente por si hiciesen
+	  falta en un futuro para otro tipo de conectividad.</para>
+	</note>
+
+	<para>En <literal>jupiter</literal>, el nodo controlador:</para>
+	<programlisting>
+<xi:include parse="text" href="samples/interfaces.jupiter"/>
+	</programlisting>
+
+	<para>En <literal>io</literal>, uno de los nodos de computación (en el
+	resto de nodos solo habría que cambiar las direcciones IP):</para>
+	<programlisting>
+<xi:include parse="text" href="samples/interfaces.io"/>
+	</programlisting>
+	
+      </section>
+
+    </section>
 
     <section>
       <title>Instalación de Ubuntu 12.04.</title>
@@ -219,10 +526,10 @@
       <para>Durante la instalación realizamos el siguiente esquema de
       particionamiento:</para>
       <programlisting>
-Disposit.   Tamaño    Id    Sistema     SF
-/dev/sda1    32GiB    83    Linux       ext4
-/dev/sda2     4GiB    82    Linux swap  intercambio
-/dev/sda3  -resto-    8e    Linux LVM   volúmenes físicos
+	Disposit.   Tamaño    Id    Sistema     SF
+	/dev/sda1    32GiB    83    Linux       ext4
+	/dev/sda2     4GiB    82    Linux swap  intercambio
+	/dev/sda3  -resto-    8e    Linux LVM   volúmenes físicos
       </programlisting>
 
       <para>Crearemos tres particiones, una partición de unos 32 GiB para el
@@ -233,29 +540,29 @@ Disposit.   Tamaño    Id    Sistema     SF
       <para>Tras la instalación del sistema, configuraremos el subsistema LVM
       pero sin llegar a crear ningún volumen:</para>
       <programlisting>
-COMPLETAR
+	COMPLETAR
       </programlisting>
 
       <para>Aunque la controladora RAID es hardware y el sistema
-        operativo no la gestiona, es importante que se pueda controlar
-        su estado a través de algún módulo del kernel. En este caso el
-        módulo <literal>3w-9xxx</literal> que se carga automáticamente y nos
-	envía estos mensajes al log del sistema:</para>
-        <programlisting>
-[    2.799824] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
-[    2.799867] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
-[    2.799880] 3w-9xxx 0000:01:00.0: setting latency timer to 64
-[    3.080257] 3w-9xxx: scsi6: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
-[    3.416117] 3w-9xxx: scsi6: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
-[   12.307881] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
-[   12.308300] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
-[   12.308695] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
-[127301.671991] 3w-9xxx: scsi6: AEN: INFO (0x04:0x0029): Verify started:unit=0.
-[131817.864145] 3w-9xxx: scsi6: AEN: INFO (0x04:0x002B): Verify completed:unit=0.
-        </programlisting>           
-        <para>Pendiente de hacer:</para>
-        <para>http;//jonas.genannt.name/  Hay repositorio, con
-        aplicaciones para manejar el RAID 3ware 9650SE</para>
+      operativo no la gestiona, es importante que se pueda controlar
+      su estado a través de algún módulo del kernel. En este caso el
+      módulo <literal>3w-9xxx</literal> que se carga automáticamente y nos
+      envía estos mensajes al log del sistema:</para>
+      <programlisting>
+	[    2.799824] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
+	[    2.799867] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
+	[    2.799880] 3w-9xxx 0000:01:00.0: setting latency timer to 64
+	[    3.080257] 3w-9xxx: scsi6: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
+	[    3.416117] 3w-9xxx: scsi6: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
+	[   12.307881] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
+	[   12.308300] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
+	[   12.308695] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
+	[127301.671991] 3w-9xxx: scsi6: AEN: INFO (0x04:0x0029): Verify started:unit=0.
+	[131817.864145] 3w-9xxx: scsi6: AEN: INFO (0x04:0x002B): Verify completed:unit=0.
+      </programlisting>           
+      <para>Pendiente de hacer:</para>
+      <para>http;//jonas.genannt.name/  Hay repositorio, con
+      aplicaciones para manejar el RAID 3ware 9650SE</para>
     </section>
 
     <section>
@@ -286,7 +593,7 @@ COMPLETAR
 	  (como root) el comando <command>crontab -e</command> y editamos el
 	  fichero que nos sugiere con el siguiente contenido:</para>
 	  <programlisting>
-0 4 * * * ntpdate ntp.iescierva.net ; hwclock --systohc
+	    0 4 * * * ntpdate ntp.iescierva.net ; hwclock --systohc
 	  </programlisting>
 	  <para>Podemos sustituir el servidor <literal>ntp.iescierva.net</literal> por uno en
 	  Internet como <literal>ntp.ubuntu.com</literal> o como
@@ -295,10 +602,10 @@ COMPLETAR
 	  <para>Podemos comprobar que la configuración es correcta a través del
 	  comando <command>crontab -l</command></para>
 	  <programlisting>
-root@jupiter:~# crontab -l
-# m h  dom mon dow   command
-0 4 * * * ntpdate ntp.iescierva.net ; hwclock -w
-root@jupiter:~#
+	    root@jupiter:~# crontab -l
+	    # m h  dom mon dow   command
+	    0 4 * * * ntpdate ntp.iescierva.net ; hwclock -w
+	    root@jupiter:~#
 	  </programlisting>
 	</listitem>
 
@@ -337,12 +644,12 @@ root@jupiter:~#
 	  <para>Configuramos el fichero <filename>/etc/mysql/my.cnf</filename>
 	  modificando la siguiente línea:</para>
 	  <programlisting>
-bind-address        = 127.0.0.1
+	    bind-address        = 127.0.0.1
 	  </programlisting>
 
 	  <para>Por esta otra:</para>
 	  <programlisting>
-bind-address        = 0.0.0.0
+	    bind-address        = 0.0.0.0
 	  </programlisting>
 	</listitem>
 
@@ -354,28 +661,27 @@ bind-address        = 0.0.0.0
 	<listitem>
 	  <para>Probamos el cliente MySQL con la contraseña fijada:</para>
 	  <programlisting>
-root@jupiter:~# mysql -u root -p
-Enter password: ***********
-Welcome to the MySQL monitor.  Commands end with ; or \g.
-Your MySQL connection id is 414
-Server version: 5.5.24-0ubuntu0.12.04.1 (Ubuntu)
+	    root@jupiter:~# mysql -u root -p
+	    Enter password: ***********
+	    Welcome to the MySQL monitor.  Commands end with ; or \g.
+	    Your MySQL connection id is 414
+	    Server version: 5.5.24-0ubuntu0.12.04.1 (Ubuntu)
 
-Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+	    Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
 
-Oracle is a registered trademark of Oracle Corporation and/or its
-affiliates. Other names may be trademarks of their respective
-owners.
+	    Oracle is a registered trademark of Oracle Corporation and/or its
+	    affiliates. Other names may be trademarks of their respective
+	    owners.
 
-Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+	    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-mysql>	    
+	    mysql>	    
 	  </programlisting>
 	</listitem>
 
       </orderedlist>
-     
+      
     </section>
-
   </section>
 
   <section xml:id="id_instUbuntu_keystone">
@@ -445,7 +751,7 @@ mysql>
       el servicio KeyStone, en nuestra instalación el servicio se ejecutará en
       el controlador, es decir, en la máquina <literal>jupiter</literal>.</para>
 
-      <para>Para la instalación de Keystone, como para la instalación del resto
+      <para>Tanto para la instalación de Keystone, como para la instalación del resto
       de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
       con que sigamos los siguientes pasos:</para>
 
@@ -690,7 +996,7 @@ root@jupiter:~#
       el servicio Glance, en nuestra instalación el servicio se ejecutará en el
       controlador, es decir, en la máquina <literal>jupiter</literal>.</para>
 
-      <para>Para la instalación de Glance, como para la instalación del resto
+      <para>Tanto para la instalación de Glance, como para la instalación del resto
       de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
       con que sigamos los siguientes pasos:</para>
 
@@ -825,6 +1131,20 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	      <para><link xlink:href="https://launchpad.net/cirros/+download">https://launchpad.net/cirros/+download</link></para>
 	    </listitem>
 	  </itemizedlist>
+	  <note>
+	    <para>CirrOS es una proyecto FLOSS cuyo objetivo principal es la
+	    construcción de una pequeña distribución GNU/Linux especializada en
+	    su ejecución en infraestructuras de Cloud Computing. Viene
+	    acompañada de herramientas para la depuración, desarrollo y
+	    despliegue en este tipo de infraestructuras.</para>
+	  </note>
+
+	  <para>Tenemos más imágenes prefabricadas en sitios web como: <link
+	  xlink:href="http://uec-images.ubuntu.com/">Ubuntu Cloud
+	  Images.</link></para>
+
+	  <para>Más información sobre la creación de imágenes en la sección:
+	  "Gestión de Imágenes".</para>
 	</listitem>
 
 	<listitem>
@@ -874,19 +1194,28 @@ root@jupiter:~#
       <literal>nova-compute</literal> se ejecutará en cuatro nodos,
       concretamente en las máquinas <literal>io</literal>,
       <literal>europa</literal>, <literal>ganimedes</literal> y
-      <literal>calisto</literal>, pero excluyendo al controlador, a la máquina
-      <literal>jupiter</literal>.</para>
+      <literal>calisto</literal>. Inicialmente configuraremos al controlador
+      (<literal>jupiter</literal>) como nodo de computación, pero lo
+      eliminaremos una vez que vayamos añadiendo a los otros nodos..</para>
 
-      <para>Para la instalación de Nova, como para la instalación del resto
+      <para>Tanto para la instalación de Nova, como para la instalación del resto
       de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
       con que sigamos los siguientes pasos en la máquina
       <literal>jupiter</literal>:</para>
 
       <orderedlist>
 	<listitem>
+	  <para>Instalamos todo el software necesario:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install nova-api nova-cert nova-compute nova-compute-kvm nova-doc nova-network nova-objectstore nova-scheduler nova-volume rabbitmq-server novnc nova-consoleauth</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
 	  <para>Creamos la base de datos que el servicio necesita en MySQL. Para
 	  ello iniciamos el cliente MySQL:</para>
-	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
 	  </screen>
 	  <para>Desde el prompt de MySQL ejecutamos las siguientes
 	  sentencias:</para>
@@ -898,28 +1227,10 @@ root@jupiter:~#
 	</listitem>
 
 	<listitem>
-	  <para>Instalamos todo el software necesario:</para>
-	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install nova-api nova-cert nova-compute nova-compute-kvm nova-doc nova-network nova-objectstore nova-scheduler nova-volume rabbitmq-server novnc nova-consoleauth</userinput>
-	  </screen>
-	</listitem>
-
-	<listitem>
 	  <para>Editamos el fichero <filename>/etc/nova/nova.conf</filename> con
 	  el siguiente contenido: </para>
 	  <programlisting>
 <xi:include parse="text" href="samples/nova.conf.jupiter"/>
-	  </programlisting>
-	</listitem>
-
-	<listitem>
-	  <para>El mismo cambio anterior hay que hacerlo también en el fichero
-	  <filename>/etc/glance/glance-registry-paste.ini</filename>, dejando
-	  las últimas líneas así:</para>
-	  <programlisting>
-admin_tenant_name = service
-admin_user = glance
-admin_password = calex2010!!
 	  </programlisting>
 	</listitem>
 
@@ -971,7 +1282,7 @@ admin_password = calex2010!!
 	  <para>Proporcionamos una red (rango de IPs) que asociaremos a las
 	  instancias, lo podemos hacer a través del siguiente comando:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>nova-manage network create private --fixed_range_v4=10.0.0.0/24 --num_networks=1 --bridge=br100 --bridge_interface=bond0.62 --network_size=256 --dns1=172.20.254.235</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>nova-manage network create private --fixed_range_v4=10.0.0.0/24 --num_networks=1 --bridge=br100 --bridge_interface=bond0.60 --network_size=256 --dns1=172.20.254.235</userinput>
 	  </screen>
 	</listitem>
 
@@ -1013,14 +1324,26 @@ nova-scheduler   jupiter                              nova             enabled  
 nova-compute     jupiter                              nova             enabled    :-)   2012-07-28 10:01:57
 nova-volume      jupiter                              nova             enabled    :-)   2012-07-28 10:02:04
 nova-network     jupiter                              nova             enabled    :-)   2012-07-28 10:02:03
-nova-compute     io                                   nova             enabled    :-)   2012-07-28 10:02:03
 	  </programlisting>
+	  <para>Es posible que algún servicio no arranque de inmediato, y
+	  muestre en el anterior listado la cadena "XXX" en el campo
+	  <literal>State</literal>, en ese caso esperamos pero comprobamos
+	  mientras que el servicio está realmente en ejecución con el comando
+	  (en el caso de <literal>nova-compute</literal>):</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>ps ax | grep nova-compute</userinput>
+	  </screen>
+	  <para>Si el servicio no está en ejecución, algo ha ido mal (o bastante
+	  mal), por lo que tendremos que revisar los logs:</para>
+	  <screen>
+	    <prompt>$ </prompt><userinput>less /var/log/nova/nova-compute.log</userinput>
+	  </screen>
 	</listitem>
 
 	<listitem>
-	  <para>Arrancamos una imagen de prueba, a través de cualquiera de los
-	  siguientes comandos podemos comprobar las imágenes que podemos iniciar
-	  proporcionadas por el servicio Glance:</para>
+	  <para>Arrancamos una imagen de prueba.</para>
+	  <para>Podemos comprobar las imágenes que podemos iniciar a través del
+	  servicio Glance con cualquiera de los siguientes comandos:</para>
 	  <screen>
 	    <prompt>$ </prompt><userinput>glance index</userinput>
 	  </screen>
@@ -1030,13 +1353,14 @@ nova-compute     io                                   nova             enabled  
 	  </screen>
 
 	  <para>Generamos las claves SSH necesarias para conectarnos a través
-	  del protocolo SSH a los servidores:</para>
+	  del protocolo SSH a las máquinas virtuales una vez iniciadas:</para>
 	  <screen>
 	    <prompt>$ </prompt><userinput>nova keypair-add test > /root/test.pem</userinput>
 	  </screen>
 
-	  <para>Para iniciar una instancia necesitamos el nombre de ésta,
-	  ejecutamos el siguiente comando para iniciar una instancia:</para>
+	  <para>Para iniciar una instancia necesitamos el nombre de la imagen,
+	  el flavor (podemos crear más) y las claves SSH anteriormente
+	  generadas, ejecutamos el siguiente comando:</para>
 	  <screen>
 	    <prompt>$ </prompt><userinput>nova boot --image "Cirros (test) 0.3.0 64 bits" --flavor m1.small --key_name test my-first-server</userinput>
 	  </screen>
@@ -1047,11 +1371,56 @@ nova-compute     io                                   nova             enabled  
 	    <prompt>$ </prompt><userinput>nova list</userinput>
 	  </screen>
 
+	  <para>... que debería mostrar una salida como ésta:</para>
+	  <programlisting>
+root@jupiter:~# nova list
++--------------------------------------+-----------------+--------+------------------+
+|                  ID                  |       Name      | Status |     Networks     |
++--------------------------------------+-----------------+--------+------------------+
+| 95db6cb7-6d29-4728-8a57-00f0a16fdf0f | my-first-server | ACTIVE | private=10.0.0.2 |
++--------------------------------------+-----------------+--------+------------------+
+root@jupiter:~#
+	  </programlisting>
+
 	  <para>Y obtener más información a través del UID de la instancia con
 	  el comando:</para>
 	  <screen>
 	    <prompt>$ </prompt><userinput>nova show &lt;id&gt;</userinput>
 	  </screen>
+
+	  <para>... de esta forma:</para>
+	  <programlisting>
+root@jupiter:~# nova show 95db6cb7-6d29-4728-8a57-00f0a16fdf0f
++-------------------------------------+----------------------------------------------------------+
+|               Property              |                          Value                           |
++-------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                   | MANUAL                                                   |
+| OS-EXT-SRV-ATTR:host                | jupiter                                                  |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | None                                                     |
+| OS-EXT-SRV-ATTR:instance_name       | instance-00000001                                        |
+| OS-EXT-STS:power_state              | 1                                                        |
+| OS-EXT-STS:task_state               | None                                                     |
+| OS-EXT-STS:vm_state                 | active                                                   |
+| accessIPv4                          |                                                          |
+| accessIPv6                          |                                                          |
+| config_drive                        |                                                          |
+| created                             | 2012-07-25T09:02:58Z                                     |
+| flavor                              | m1.small                                                 |
+| hostId                              | 3321967f22b94709966c1525bfb8fe73e88019b1a03228af56e8b847 |
+| id                                  | 95db6cb7-6d29-4728-8a57-00f0a16fdf0f                     |
+| image                               | Cirros (test) 0.3.0 64 bits                              |
+| key_name                            | test                                                     |
+| metadata                            | {}                                                       |
+| name                                | my-first-server                                          |
+| private network                     | 10.0.0.2                                                 |
+| progress                            | 0                                                        |
+| status                              | ACTIVE                                                   |
+| tenant_id                           | e7b1868b24a742318f1d73f612ecfe1d                         |
+| updated                             | 2012-07-26T06:49:51Z                                     |
+| user_id                             | 05743001bbf14700bcdf2ecc43edbf9b                         |
++-------------------------------------+----------------------------------------------------------+
+root@jupiter:~#	    
+	  </programlisting>
 
 	  <para>Nos podemos conectar a través de SSH a la instancia con el comando:</para>
 	  <screen>
@@ -1061,8 +1430,345 @@ nova-compute     io                                   nova             enabled  
 
       </orderedlist>
 
+      <para>Al iniciar la primera máquina virtual, en el nodo controlador se
+      creará el bridge <literal>br100</literal> con una IP en el rango dado, en
+      nuestro caso la dirección 10.0.0.1. Es importante destacar el hecho de que
+      la dirección IP de la interfaz asociada al bridge "desaparece" pero se
+      sigue utilizando, tal como muestra la ejecución de los siguientes
+      comandos:</para>
+      <programlisting>
+root@jupiter:~# ifconfig bond0.60
+bond0.60  Link encap:Ethernet  direcciónHW 00:25:90:72:2c:47  
+          Dirección inet6: fe80::225:90ff:fe72:2c47/64 Alcance:Enlace
+          ACTIVO DIFUSIÓN FUNCIONANDO MULTICAST  MTU:1500  Métrica:1
+          Paquetes RX:30800 errores:0 perdidos:0 overruns:0 frame:0
+          Paquetes TX:45655 errores:0 perdidos:0 overruns:0 carrier:0
+          colisiones:0 long.colaTX:0 
+          Bytes RX:4491363 (4.4 MB)  TX bytes:9278130 (9.2 MB)
+
+root@jupiter:~# ifconfig br100
+br100     Link encap:Ethernet  direcciónHW 00:25:90:72:2c:47  
+          Direc. inet:10.0.0.1  Difus.:10.0.0.255  Másc:255.255.255.0
+          Dirección inet6: fe80::c035:49ff:fe37:96e5/64 Alcance:Enlace
+          ACTIVO DIFUSIÓN FUNCIONANDO MULTICAST  MTU:1500  Métrica:1
+          Paquetes RX:77878 errores:0 perdidos:0 overruns:0 frame:0
+          Paquetes TX:53900 errores:0 perdidos:0 overruns:0 carrier:0
+          colisiones:0 long.colaTX:0 
+          Bytes RX:15617344 (15.6 MB)  TX bytes:9926875 (9.9 MB)
+
+root@jupiter:~# ping -c 5 172.20.253.190
+PING 172.20.253.190 (172.20.253.190) 56(84) bytes of data.
+64 bytes from 172.20.253.190: icmp_req=1 ttl=64 time=0.070 ms
+64 bytes from 172.20.253.190: icmp_req=2 ttl=64 time=0.048 ms
+64 bytes from 172.20.253.190: icmp_req=3 ttl=64 time=0.046 ms
+64 bytes from 172.20.253.190: icmp_req=4 ttl=64 time=0.042 ms
+64 bytes from 172.20.253.190: icmp_req=5 ttl=64 time=0.050 ms
+
+--- 172.20.253.190 ping statistics ---
+5 packets transmitted, 5 received, 0% packet loss, time 3996ms
+rtt min/avg/max/mdev = 0.042/0.051/0.070/0.010 ms
+root@jupiter:~#
+      </programlisting>
+
+      <section>
+	<title>Instalación de un segundo nodo</title>
+	<para>Podemos añadir a nuestra infraestructura tantos nodos de
+	computación como deseemos, para ello basta seguir los siguientes
+	pasos:</para>
+
+	<orderedlist>
+	  <listitem>
+	    <para>No instalamos todo el software de nova, solo un
+	    paquete:</para>
+	  <screen>
+	    <prompt>root@io:~# </prompt><userinput>apt-get install nova-compute bridge-utils</userinput>
+	  </screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>El fichero de configuración de Nova,
+	    <filename>/etc/nova/nova.conf</filename>, no es exactamente el mismo
+	    que en el controlador, hay que realizar los siguientes
+	    cambios:</para>
+	    <programlisting>
+my_ip=172.20.254.191
+...
+vncserver_proxyclient_address=172.20.253.191
+vncserver_listen=172.20.253.191
+	    </programlisting>
+
+	    <para>... quedando tal que así:</para>
+	  <programlisting>
+<xi:include parse="text" href="samples/nova.conf.io"/>
+	  </programlisting>
+
+	  </listitem>
+
+	  <listitem>
+	    <para>Si queremos que funcione el cliente nova, al menos para el
+	    usuario <literal>root</literal>, añadimos las siguientes variables
+	    de entorno a su fichero <filename>~/.bashrc</filename>:</para>
+	    <programlisting language="Bash">
+export SERVICE_TOKEN=CALEX2010!!
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=calex2010!!
+export OS_AUTH_URL="http://172.20.254.190:5000/v2.0/"
+export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
+	    </programlisting>
+	  </listitem>
+
+	  <listitem>
+	    <para>Reiniciamos el servicio
+	    <literal>nova-compute</literal>:</para>
+	    <screen>
+	      <prompt>root@io:~# </prompt><userinput>service nova-compute restart</userinput>
+	    </screen>
+	  </listitem>
+
+	</orderedlist>
+
+      </section>
     </section>
-    
+
+    <section>
+      <title>Instalación de Nova: problemas y puntualizaciones</title>
+      <para></para>
+      <orderedlist>
+	<listitem>
+	  <para>Nada más realizar la instalación todo funcionará
+	  perfectamente, incluyendo la configuración automática del bridge
+	  <literal>br100</literal>, pero todo dejará de hacerlo mostrando
+	  diversos errores en los logs de <literal>nova-compute</literal> como
+	  este: "Cannot get interface MTU on 'br100': No such device".</para>
+
+	  <para>Para solucionar este problema hay que:</para>
+	  <orderedlist>
+	    <listitem>
+	      <para>Configurar el bridge manualmente y asociarle la interfaz.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Asociar manualmente la dirección IP de la interfaz al bridge.</para>
+	    </listitem>
+	    
+	  </orderedlist>
+
+	  <para>Basta con modificar el fichero
+	  <filename>/etc/network/interfaces</filename> realizando los
+	  siguientes cambios:</para>
+
+	  <programlisting>
+	    auto br100
+	    iface br100 inet static
+	    address 172.20.253.191
+	    netmask 255.255.255.0
+	    bridge_stp off
+	    bridge_fd 0
+	    bridge_ports bond0.60
+	    bridge_maxwait 0
+	  </programlisting>
+
+	  <programlisting>
+	    auto bond0.60
+	    iface bond0.60 inet manual
+	    #address 172.20.253.191
+	    #netmask 255.255.255.0
+	    #broadcast 172.20.253.255
+	    #network 172.20.253.0
+	    vlan-raw-device bond0
+	  </programlisting>
+
+	  <para>Tras estos cambios todo funcionará como debería, parece ser
+	  que se trata de un bug de OpenStack documentado, pero aún no
+	  solucionado en la versión Essex que acompaña a Ubuntu:</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para><link xlink:href="https://bugs.launchpad.net/nova/+bug/1010927">https://bugs.launchpad.net/nova/+bug/1010927</link></para>
+	    </listitem>
+
+	    <listitem>
+	      <para><link xlink:href="https://review.openstack.org/#/c/8423/">https://review.openstack.org/#/c/8423/</link></para>
+	    </listitem>
+	    
+	  </itemizedlist>
+
+	</listitem>
+
+	<listitem>
+	  <para>Una vez que tengamos máquinas virtuales en ejecución hay un
+	  log muy recurrente en los logs del servicio
+	  <literal>libvirtd</literal>: "Cannot find 'pm-is-supported' in path:
+	  No such file or directory". Este log se elimina instalando el
+	  siguiente paquete:</para>
+	  <screen>
+	    <prompt>root@io:~# </prompt><userinput>apt-get install pm-utils</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Podemos borrar una instancia a través del comando de OpenStack
+	  <command>nova delete</command>, pero en determinadas situaciones
+	  este comando puede fallar. Si queremos eliminar de forma manual una
+	  instancia debemos seguir los siguientes pasos:</para>
+	  <orderedlist>
+	    <listitem>
+	      <para>Eliminamos la máquina virtual a través del comando
+	      <command>virsh destroy &lt;domain&gt;</command>.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Nos hacemos con su identificador a través de la siguiente
+	      consulta en la base de datos <literal>nova</literal>:</para>
+	      <screen>
+		<prompt>mysql> </prompt><userinput>select id, uuid from instances;</userinput>
+	      </screen>
+	      <para>Tomando el id de la instancia que queremos borrar,
+	      supongamos que queremos eliminar la máquina virtual con
+	      <literal>id=99</literal>.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para>Ejecutamos las siguientes consultas SQL en la base de
+	      datos de <literal>nova</literal>:</para>
+	      <screen>
+		<prompt>mysql> </prompt><userinput>delete from instance_info_caches where id=99;</userinput>
+		<prompt>mysql> </prompt><userinput>delete from security_group_instance_association where id=99;</userinput>
+		<prompt>mysql> </prompt><userinput>delete from instances where id=99;</userinput>
+	      </screen>
+	    </listitem>
+
+	    <listitem>
+	      <para>Comprobamos a través del comando <command>nova
+	      list</command> que la instancia ya no está en ejecución.</para>
+	    </listitem>
+	    
+	  </orderedlist>	    
+
+	</listitem>
+
+	<listitem>
+	  <para>Entre pruebas de configuración puede que sea interesante
+	  desinstalar por completo nova y sus servicios asociados, para ello
+	  seguiremos los siguientes pasos:</para>
+	  <orderedlist>
+	    <listitem>
+	      <para>Detenemos todas las máquinas virtuales que estuvieran en
+	      ejecución:</para>
+	      <screen>
+		<prompt>root@io:~# </prompt><userinput>for i in `virsh list | tail -n +2 | awk ' { print $2 }'`; do virsh destroy $i; done</userinput>
+	      </screen>		
+	    </listitem>
+
+	    <listitem>
+	      <para>Paramos todos los servicios:</para>
+	      <screen>
+		<prompt>root@io:~# </prompt><userinput>/root/bin/nova.sh stop</userinput>
+	      </screen>		
+	    </listitem>
+
+	    <listitem>
+	      <para>Matamos todos los procesos <literal>dnsmasq</literal>:</para>
+	      <screen>
+		<prompt>root@io:~# </prompt><userinput>for i in `pgrep dnsmasq` ; do kill $i ; done</userinput>
+	      </screen>
+	    </listitem>
+
+	    <listitem>
+	      <para>Eliminamos el bridge <literal>br100</literal>:</para>
+	      <screen>
+		<prompt>root@io:~# </prompt><userinput>ifconfig br100 down</userinput>
+		<prompt>root@io:~# </prompt><userinput>brctl delbr br100</userinput>
+	      </screen>
+	    </listitem>
+
+	    <listitem>
+	      <para>Eliminamos los siguientes ficheros y directorios:</para>
+	      <screen>
+		<prompt>root@io:~# </prompt><userinput>rm /etc/libvirt/qemu/instance-*xml -f</userinput>
+		<prompt>root@io:~# </prompt><userinput>rm /etc/libvirt/nwfilter/nova-instance-instance-*xml -f</userinput>
+		<prompt>root@io:~# </prompt><userinput>rm /var/lib/nova/buckets/ -rf</userinput>
+		<prompt>root@io:~# </prompt><userinput>rm /var/lib/nova/CA/ -rf</userinput>
+		<prompt>root@io:~# </prompt><userinput>rm /var/lib/nova/instances/* -rf</userinput>
+		<prompt>root@io:~# </prompt><userinput>rm /var/lib/nova/keys/ -rf</userinput>
+		<prompt>root@io:~# </prompt><userinput>rm /var/lib/nova/networks/* -rf</userinput>
+		<prompt>root@io:~# </prompt><userinput>rm /var/lib/rabbitmq/mnesia/* -rf</userinput>
+	      </screen>
+	    </listitem>
+
+	    <listitem>
+	      <para>Borramos la base de datos de
+	      <literal>nova</literal>:</para>
+	      <screen>
+		<prompt>mysql> </prompt><userinput>drop database nova;</userinput>
+	      </screen>		
+	    </listitem>
+
+	  </orderedlist>
+
+	</listitem>
+
+      </orderedlist>
+
+    </section>
+  </section>
+
+  <section xml:id="id_instUbuntu_horizon">
+    <title>Instalación de Horizon</title>
+    <para>Este capítulo describe la instalación y configuración del
+    módulo de OpenStack, Nova. Este servicio es el encargado de gestionar las
+    instancias (máquinas virtuales) del Cloud, por lo que lo convierte en el
+    servicio central de toda la infraestructura de Openstack.</para>
+
+    <section>
+      <title>¿Qué es Horizon?</title>
+      <para>COMPLETAR POSTERIORMENTE</para>
+      
+    </section>
+
+    <section>
+      <title>Instalación y configuración</title>
+      <para>Una infraestructura OpenStack solo necesita un servidor que ejecute
+      el servicio Horizon, en nuestra instalación el servicio se ejecutará en el
+      controlador, es decir, en la máquina <literal>jupiter</literal>.</para>
+
+      <para>Tanto para la instalación de Horizon, como para la instalación del resto
+      de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
+      con que sigamos los siguientes pasos en la máquina
+      <literal>jupiter</literal>:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Instalamos todo el software necesario:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install openstack-dashboard</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Reiniciamos el servicio:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>service apache2 restart</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Probamos el servicio visitando con un navegador web la siguiente
+	  URL: <code>http://127.0.0.1</code> y utilizando como credenciales las
+	  de los usuarios creados anteriormente durante la instalación de
+	  Keystone. Por ejemplo, usuario <literal>admin</literal> y contraseña
+	  <literal>calex2010!!</literal></para>
+	</listitem>
+
+	<listitem>
+	  <para>Acceso desde otra máquina.</para>
+	  <para>Podemos acceder también al dashboard desde otra máquina a través
+	  de la IP asociada desde la red pública. En nuestra infraestructura la
+	  siguiente URL: <code>http:://172.20.254.190</code></para>
+	</listitem>
+
+      </orderedlist>
+    </section>
   </section>
 
 
