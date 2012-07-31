@@ -181,7 +181,10 @@
 	  en el que se instalarán los paquetes necesarios para usar el cliente
 	  <literal>nova</literal> con el que podemos gestionar el cloud desde
 	  línea de comandos sin la necesidad de realizar las operaciones desde
-	  <literal>jupiter</literal>.</para> 
+	  <literal>jupiter</literal>. La administración del Cloud a través de la
+	  interfaz web del dashboard (Horizon) se podrá realizar desde
+	  cualquier máquina que tenga acceso a la red pública del Cloud
+	  (incluyendo máquinas Windows).</para> 
 	</listitem>
       </itemizedlist>
 
@@ -347,6 +350,35 @@
 	otros modos de bonding tal como se detalla en <link
 	xlink:href="http://www.kernel.org/doc/Documentation/networking/bonding.txt">http://www.kernel.org/doc/Documentation/networking/bonding.txt</link>.</para>
 
+	<para>Además de bonding, vamos a configurar varias VLAN, para tener
+	soporte en Ubuntu tenemos que hacer dos cosas:</para>
+
+	<orderedlist>
+	  <listitem>
+	    <para>Instalar el paquete vlan:</para>
+	    <screen><prompt>$ </prompt><userinput>apt-get install vlan</userinput></screen>
+
+	  </listitem>
+
+	  <listitem>
+	    <para>Asegurarnos de tener el módulo del kernel
+	    <literal>8021q</literal> cargado, para ello modificamos el fichero
+	    <filename>/etc/modules</filename> para que quede así:</para>
+	    <programlisting>
+# /etc/modules: kernel modules to load at boot time.
+#
+# This file contains the names of kernel modules that should be loaded
+# at boot time, one per line. Lines beginning with "#" are ignored.
+
+loop
+lp
+rtc
+8021q
+	    </programlisting>
+	  </listitem>
+	  
+	</orderedlist>
+
 	<para>Para la configuración de bonding en Ubuntu seguimos los
 	siguientes pasos:</para>
 
@@ -465,7 +497,23 @@
 	      Aggregator ID: 1
 	      Slave queue ID: 0
 	    </screen>
-	  </listitem>	    
+	  </listitem>
+
+	  <listitem>
+	  <para>Podemos comprobar las VLAN activas a través del siguiente
+	  comando:</para>
+	  <screen>
+            <prompt>$ </prompt><userinput>cat /proc/net/vlan/config</userinput>
+VLAN Dev name	 | VLAN ID
+Name-Type: VLAN_NAME_TYPE_RAW_PLUS_VID_NO_PAD
+bond0.60       | 60  | bond0
+bond0.61       | 61  | bond0
+bond0.62       | 62  | bond0
+bond0.63       | 63  | bond0
+	  </screen>
+
+	</listitem>
+
 	</orderedlist>
 	
       </section>
@@ -517,8 +565,8 @@
       corrupción de datos en caso de cortes en el suministro eléctrico.</para>
 
       <para>El sistema operativo elegido para los equipos del cloud
-      es la distribución de GNU/Linux Ubuntu 12.04 LTS, que actualmente se
-      conoce con el nombre de código <emphasis>Precise
+      es la distribución de GNU/Linux Ubuntu 12.04 LTS 64 bits, que actualmente se
+      conoce con el nombre en código <emphasis>Precise
       Pangolin</emphasis>. Pensamos que es la mejor opción entre todas las
       distribuciones de GNU/Linux ya que es la utilizada en toda la documentación
       de OpenStack y la mejor soportada.</para>
@@ -563,6 +611,23 @@
       <para>Pendiente de hacer:</para>
       <para>http;//jonas.genannt.name/  Hay repositorio, con
       aplicaciones para manejar el RAID 3ware 9650SE</para>
+
+      <para>Como software a instalar solo instalaremos el servidor SSH, a través
+      del comando:</para>
+
+      <screen><prompt>$ </prompt><userinput>apt-get install
+      openssh-server</userinput></screen>
+
+      <para>Tras finalizar la instalación actualizaremos la máquina a través de
+      los comandos:</para>
+      <screen>
+	<prompt>$ </prompt><userinput>apt-get update</userinput>
+	<prompt>$ </prompt><userinput>apt-get upgrade</userinput>
+	<prompt>$ </prompt><userinput>apt-get dist-upgrade</userinput>
+      </screen>
+
+      <para>Tras la instalación, lo más probable es que tengamos que reiniciar.</para>
+
     </section>
 
     <section>
@@ -644,12 +709,12 @@
 	  <para>Configuramos el fichero <filename>/etc/mysql/my.cnf</filename>
 	  modificando la siguiente línea:</para>
 	  <programlisting>
-	    bind-address        = 127.0.0.1
+bind-address        = 127.0.0.1
 	  </programlisting>
 
 	  <para>Por esta otra:</para>
 	  <programlisting>
-	    bind-address        = 0.0.0.0
+bind-address        = 0.0.0.0
 	  </programlisting>
 	</listitem>
 
@@ -661,21 +726,21 @@
 	<listitem>
 	  <para>Probamos el cliente MySQL con la contraseña fijada:</para>
 	  <programlisting>
-	    root@jupiter:~# mysql -u root -p
-	    Enter password: ***********
-	    Welcome to the MySQL monitor.  Commands end with ; or \g.
-	    Your MySQL connection id is 414
-	    Server version: 5.5.24-0ubuntu0.12.04.1 (Ubuntu)
+root@jupiter:~# mysql -u root -p
+Enter password: ***********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 414
+Server version: 5.5.24-0ubuntu0.12.04.1 (Ubuntu)
 
-	    Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
+Copyright (c) 2000, 2011, Oracle and/or its affiliates. All rights reserved.
 
-	    Oracle is a registered trademark of Oracle Corporation and/or its
-	    affiliates. Other names may be trademarks of their respective
-	    owners.
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
 
-	    Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
 
-	    mysql>	    
+mysql>	    
 	  </programlisting>
 	</listitem>
 
@@ -824,8 +889,8 @@ connection = mysql://keystone:calex2010!!@172.20.254.190/keystone
 
 	<listitem>
 	  <para>Exportamos las siguientes variables de entorno en el fichero
-	  .bashrc del usuario que ejecute el cliente, en principio el usuario
-	  <literal>root</literal> de la máquina
+	  <filename>.bashrc</filename> del usuario que ejecute el cliente, en
+	  principio el usuario <literal>root</literal> de la máquina
 	  <literal>jupiter</literal>:</para>
 	  <programlisting language="Bash">
 export SERVICE_ENDPOINT="http://172.20.254.190:35357/v2.0"
@@ -891,30 +956,69 @@ export SERVICE_TOKEN=CALEX2010!!
 	  <para>Para la correcta ejecución de script hay que configurar las
 	  siguientes variables de entorno en el inicio del script:</para>
 
-	  <para>COMPLETARRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para><emphasis role="bold">PASSWORD</emphasis>: contraseña de
+	      acceso a Keystone, como no hay ningún usuario creado hasta hora,
+	      la única forma de autenticarse es a través del token
+	      administrativo definido anteriomente.</para>
+	    </listitem>
+	    
+	    <listitem>
+	      <para><emphasis role="bold">email</emphasis>: al crear los
+	      usuarios hay que asignar una dirección de correo, al tratarse de
+	      usuarios administrativos, podemos utilizar la misma cuenta para
+	      todos.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><emphasis role="bold">PUBLIC_IP</emphasis>: dirección
+	      pública de acceso a los servicios del cloud.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><emphasis role="bold">PRIVATE_IP</emphasis>: dirección
+	      privada de acceso a los servicios del cloud.</para>
+	    </listitem>
+
+	    <listitem>
+	      <para><emphasis role="bold">ADMIN_IP</emphasis>: utilizaremos la
+	      misma dirección que la proporcionada a la red privada.</para>
+	    </listitem>
+
+	  </itemizedlist>
+	  
+
 
 	  <para>El script se limita a:</para>
 
 	  <itemizedlist>
 	    <listitem>
-	      <para>Crear los proyectos necesarios.</para>
+	      <para>Crear los proyectos necesarios: <literal>admin</literal> y
+	      <literal>service</literal>.</para>
 	    </listitem>
 
 	    <listitem>
 	      <para>Crear todos los usuarios y asignarles contraseña y
-	      dirección de correo electrónico.</para>
+	      dirección de correo electrónico. Los usuarios creados son:
+	      <literal>admin</literal>, <literal>nova</literal>,
+	      <literal>glance</literal> y <literal>swift</literal>.</para>
 	    </listitem>
 
 	    <listitem>
-	      <para>Crear los roles necesarios.</para>
+	      <para>Crear los roles necesarios: <literal>admin</literal>y <literal>Member</literal></para>
 	    </listitem>
 
 	    <listitem>
-	      <para>Asignar roles a los usuarios en los proyectos.</para>
+	      <para>Asignar roles a los usuarios en los proyectos tal como se
+	      mostró en la tabla anterior.</para>
 	    </listitem>
 
 	    <listitem>
-	      <para>Crear los servicios y asignar a éstos los endpoints.</para>
+	      <para>Crear los servicios (<literal>nova</literal>,
+	      <literal>volume</literal>, <literal>glance</literal>, <literal>swift</literal>,
+	      <literal>keystone</literal> y <literal>ec2</literal>. Define los
+	      endpoints y los asigna a los servicios.</para>
 	    </listitem>
 	    
 	  </itemizedlist>
@@ -1058,17 +1162,18 @@ admin_password = calex2010!!
 	  <programlisting>
 sql_connection = mysql://glance:calex2010!!@172.20.254.190/glance
 	  </programlisting>
-	</listitem>
 
-	<listitem>
-	  <para>Añadimos la siguiente configuración al fichero
-	  <filename>/etc/glance/glance-registry.conf</filename>:</para>
+	  <para>También añadimos la siguiente configuración para que
+	  <literal>Glance></literal> utilice <literal>Keystone</literal> como
+	  servicio de autenticación.</para>
 	  <programlisting>
 [paste_deploy]
 flavor = keystone
 	  </programlisting>
+	</listitem>
 
-	  <para>Y también al fichero
+	<listitem>
+	  <para>Realizamos también este último cambio al fichero
 	  <filename>/etc/glance/glance-api.conf:</filename></para>
 	  <programlisting>
 [paste_deploy]
@@ -1116,12 +1221,16 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  <screen>
 	    <prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
 	  </screen>
+	  <para>Podemos asegurarnos que todo ha ido bien (incluyendo la
+	  autenticación con Keystone) si tras ejecutar el comando anterior, la
+	  salida del comando <command>echo $?</command> nos devuelve como código
+	  de salida el cero.</para>
 	</listitem>
 
       </orderedlist>
 
-      <para>Podemos probar el servicio Glance a través de una imagen de prueba
-      siguiendo estos pasos:</para>
+      <para>Solo nos queda probar el servicio Glance subiendo alguna imagen de
+      prueba. Para subir una imagen, podemos seguir estos pasos:</para>
 
       <orderedlist>
 	<listitem>
@@ -1156,7 +1265,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 
 	<listitem>
 	  <para>Si todo es correcto, podremos ver ahora la imagen recién subida
-	  en la lista de imágenes que proporciona el servicios Glance:</para>
+	  en la lista de imágenes que proporciona el servicio Glance:</para>
 	  <programlisting>
 root@jupiter:~# glance index
 ID                                   Name                           Disk Format          Container Format     Size          
@@ -1235,6 +1344,51 @@ root@jupiter:~#
 	</listitem>
 
 	<listitem>
+	  <para>Para el trabajo con volúmenes, debemos tener configurado un
+	  grupo de volúmenes LVM denominado <literal>nova-volumes</literal>, tal
+	  como hemos definido a través del parámetro
+	  <literal>volume-group</literal> en el fichero
+	  <filename>nova.conf</filename>. Para crear el volumen ejecutamos los
+	  siguientes comandos, suponiendo una partición <literal>sda4</literal>
+	  libre:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput> pvcreate /dev/sda4</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput> vgcreate nova-volumes /dev/sda4</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Cambiamos los permisos del directorio /etc/nova y del fichero
+	  /etc/nova/nova.conf:</para>
+	  <screen>
+	    <prompt>root@jupiter:~# </prompt><userinput>chown -R nova.nova /etc/nova</userinput>
+	    <prompt>root@jupiter:~# </prompt><userinput>chmod 644 /etc/nova/nova.conf</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Editamos el fichero /etc/nova/</para>
+	</listitem>
+
+	<listitem>
+	  <para>Modificamos las siguientes líneas del fichero de configuración
+	  <filename>/etc/nova/api-paste.ini</filename>, modificando
+	  estas líneas:</para>
+	  <programlisting>
+admin_tenant_name = %SERVICE_TENANT_NAME%
+admin_user = %SERVICE_USER%
+admin_password = %SERVICE_PASSWORD%
+	  </programlisting>
+
+	  <para>Por estas otras:</para>
+	  <programlisting>
+admin_tenant_name = service
+admin_user = nova
+admin_password = calex2010!!
+	  </programlisting>
+	</listitem>
+
+	<listitem>
 	  <para>Creamos el esquema de la base de datos que Nova necesita:</para>
 	  <screen>
 	    <prompt>root@jupiter:~# </prompt><userinput>nova-manage db sync</userinput>
@@ -1304,7 +1458,6 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  <screen>
 	    <prompt>$ </prompt><userinput>/root/bin/nova.sh restart</userinput>
 	  </screen>
-
 	</listitem>
 
 	<listitem>
@@ -1338,6 +1491,13 @@ nova-network     jupiter                              nova             enabled  
 	  <screen>
 	    <prompt>$ </prompt><userinput>less /var/log/nova/nova-compute.log</userinput>
 	  </screen>
+
+	  <note>
+	    <para>El servicio <literal>nova-compute</literal> suele mostrar las
+	    XXX durante bastante tiempo, no mostrará una cara feliz
+	    mientras que haya máquinas virtuales sin iniciar.</para>
+	  </note>
+
 	</listitem>
 
 	<listitem>
@@ -1526,6 +1686,25 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	    </screen>
 	  </listitem>
 
+	  <listitem>
+	    <para>Si todo ha ido bien, ahora desde el controlador se debemos
+	    poder obtener la siguiente salida...</para>
+
+	    <screen>
+	      <prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
+Binary           Host                                 Zone             Status     State Updated_At
+nova-consoleauth jupiter                              nova             enabled    :-)   2012-07-31 15:47:23
+nova-cert        jupiter                              nova             enabled    :-)   2012-07-31 15:47:25
+nova-scheduler   jupiter                              nova             enabled    :-)   2012-07-31 15:47:24
+nova-compute     jupiter                              nova             enabled    :-)   2012-07-31 15:47:21
+nova-volume      jupiter                              nova             enabled    :-)   2012-07-31 15:47:25
+nova-network     jupiter                              nova             enabled    :-)   2012-07-31 15:47:27
+nova-compute     io                                   nova             enabled    :-)   2012-07-31 15:47:29
+	    </screen>
+	    <para>... en la que se puede ver el nuevo nodo de computación,
+	    <literal>io</literal>.</para>
+	  </listitem>
+
 	</orderedlist>
 
       </section>
@@ -1536,11 +1715,12 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
       <para></para>
       <orderedlist>
 	<listitem>
-	  <para>Nada más realizar la instalación todo funcionará
+	  <para>Nada más añadir un nodo de computación, todo funcionará
 	  perfectamente, incluyendo la configuración automática del bridge
 	  <literal>br100</literal>, pero todo dejará de hacerlo mostrando
 	  diversos errores en los logs de <literal>nova-compute</literal> como
-	  este: "Cannot get interface MTU on 'br100': No such device".</para>
+	  este: "Cannot get interface MTU on 'br100': No such device", tras
+	  reiniciar el nuevo nodo.</para>
 
 	  <para>Para solucionar este problema hay que:</para>
 	  <orderedlist>
@@ -1551,7 +1731,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	    <listitem>
 	      <para>Asociar manualmente la dirección IP de la interfaz al bridge.</para>
 	    </listitem>
-	    
+
 	  </orderedlist>
 
 	  <para>Basta con modificar el fichero
@@ -1559,24 +1739,24 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  siguientes cambios:</para>
 
 	  <programlisting>
-	    auto br100
-	    iface br100 inet static
-	    address 172.20.253.191
-	    netmask 255.255.255.0
-	    bridge_stp off
-	    bridge_fd 0
-	    bridge_ports bond0.60
-	    bridge_maxwait 0
+auto br100
+iface br100 inet static
+    address 172.20.253.191
+    netmask 255.255.255.0
+    bridge_stp off
+    bridge_fd 0
+    bridge_ports bond0.60
+    bridge_maxwait 0
 	  </programlisting>
 
 	  <programlisting>
-	    auto bond0.60
-	    iface bond0.60 inet manual
-	    #address 172.20.253.191
-	    #netmask 255.255.255.0
-	    #broadcast 172.20.253.255
-	    #network 172.20.253.0
-	    vlan-raw-device bond0
+auto bond0.60
+iface bond0.60 inet manual
+    #address 172.20.253.191
+    #netmask 255.255.255.0
+    #broadcast 172.20.253.255
+    #network 172.20.253.0
+    vlan-raw-device bond0
 	  </programlisting>
 
 	  <para>Tras estos cambios todo funcionará como debería, parece ser
@@ -1592,7 +1772,10 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	    </listitem>
 	    
 	  </itemizedlist>
-
+	  <para>El nodo controlador no está afectado por este problema, pero de vez
+	  en cuando, el proceso nova-compute no se inicia tras reiniciar el
+	  servidor. Basta volver a iniciar el servicio con el comando
+	  <command>service nova-compute start</command>.</para>
 	</listitem>
 
 	<listitem>
@@ -1600,7 +1783,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  log muy recurrente en los logs del servicio
 	  <literal>libvirtd</literal>: "Cannot find 'pm-is-supported' in path:
 	  No such file or directory". Este log se elimina instalando el
-	  siguiente paquete:</para>
+	  siguiente paquete en todos los nodos de comutación:</para>
 	  <screen>
 	    <prompt>root@io:~# </prompt><userinput>apt-get install pm-utils</userinput>
 	  </screen>
@@ -1772,7 +1955,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
   </section>
 
 
-<!-- Falta completar algunos apuntes más que tengo de Nova
-y el servicio Horizon -->
+<!-- Falta completar con la instalación de swift -->
+<!-- Falta completar con la instalación del cliente -->
 
 </chapter>
