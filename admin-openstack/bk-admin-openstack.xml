@@ -167,7 +167,7 @@ Título: Administración de OpenStack
     <xi:include href="../instalacion_debian_wheezy/ch_nova_en_controlador.xml"/>
     <xi:include href="../instalacion_debian_wheezy/ch_nova_en_nodos.xml"/> 
     <xi:include href="../instalacion_debian_wheezy/ch_horizon.xml"/> 
-    <xi:include href="ch-instalacion.xml" />
+    <xi:include href="ch-instalacion-Ubuntu.xml" />
     <xi:include href="ch-gest-identidad.xml" />
     <xi:include href="ch-gest-imagenes.xml" />
     <xi:include href="ch-networking.xml" />
