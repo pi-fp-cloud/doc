@@ -217,7 +217,7 @@
 	    <para>En terminología SCSI, un LUN (Logical Unit Number) es una dirección lógica. Un LUN
 	    representa un dispositivo SCSI direccionable individualmente, que es
 	    parte de dispositivo físico SCSI (target)
-AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
+AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI
 	  </listitem>
 	</varlistentry>
 
@@ -385,17 +385,75 @@ nova-compute     io                                   nova             enabled  
     <itemizedlist>
       <listitem>
 	<para><emphasis role="bold">nova volume-create</emphasis></para>
-	<para></para>
+	<para>Añade un nuevo volumen.</para>
+	<programlisting>
+<![CDATA[
+nova volume-create [--snapshot_id <snapshot_id>]
+                   [--display_name <display_name>]
+                   [--display_description <display_description>]
+                   [--volume_type <volume_type>]
+                   <size>
+]]>  
+	</programlisting>
+	<para>Normalmente indicaremos un nombre y un tamaño en
+	GiB. Ejemplos:</para>
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen01 5</userinput>
+	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen02 5</userinput>
+	</screen>
+	<para>El nombre no es necesario que sea único ya que internamente
+	OpenStack le asigna otro identificador que sí lo es.</para>
       </listitem>
       
       <listitem>
 	<para><emphasis role="bold">nova volume-attach</emphasis></para>
-	<para></para>
+	<para>Conecta un volumen a una instancia (máquina virtual).</para>
+	<programlisting>
+<![CDATA[
+nova volume-attach <server> <volume> <device>
+]]>
+	</programlisting>
+	<para>Es necesario indicar:</para>
+	<itemizedlist>
+	  <listitem>
+	    <para>La instancia a la que conectaremos el volumen, podemos obtener
+	    su ID a través del comando <command>nova list</command>.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>El volumen a conectar. Hay que indicar su identificador,
+	    podemos obtenerlo a través del comando <command>nova volume-list.</command></para>
+	  </listitem>
+
+	  <listitem>
+	    <para>El dispositivo que verá la máquina virtual. Los volúmenes se
+	    exportan por iSCSI, por lo que el nodo de computación que contiene
+	    la máquina virtual, verá un nuevo disco son su fichero de
+	    dispositivo asociado de la forma <filename>/dev/sdX</filename>,
+	    normalmente <literal>/dev/sdb</literal>. La máquina virtual lo verá
+	    a través de KVM, a través de un fichero de dispositivo  de la forma
+	    /dev/vdX, nomrmalmente <literal>/dev/vdb</literal>. Hay que tener
+	    muy en cuenta a la hora de indicar este parámetro cuál es el
+	    siguiente libre en la máquina virtual. El comando no funcionará si
+	    el dispositivo ya existe, si lo hará aunque asigne otra letra si el
+	    dispositivo que se pasa como parámetro no es el siguiente a asignar
+	    en la máquina virtual.</para>
+	  </listitem>
+	  
+	</itemizedlist>
+
+	<para>Ejemplos:</para>
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-attach de701111-5b42-456a-b3ea-1609d49ebc2f 1 /dev/vdc</userinput>
+	</screen>
+	<para>Este comando conecta el volumen 1 con la instancia indicada por el
+	UUID. En la instancia el volumen aparecerá como /dev/vdc, siempre y
+	cuando vda y vdb estén ocupados y vdc libre.</para>	
       </listitem>
 
       <listitem>
 	<para><emphasis role="bold">nova volume-detach</emphasis></para>
-	<para></para>
+	<para>AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
       </listitem>
 
       <listitem>
