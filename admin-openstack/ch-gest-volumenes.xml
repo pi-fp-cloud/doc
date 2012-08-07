@@ -1,0 +1,695 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="ch-gest-volumenes">
+  <title>Gestión de Volúmenes</title>
+
+  <para><literal>Nova-volume</literal> es el servicio de OpenStack que permite
+  proporcionar almacenamiento extra a las instancias, de forma similar al
+  servicio <emphasis>Elastic Block Storage (EBS)</emphasis> de <emphasis>Amazon
+  EC2</emphasis> pero con una implementación distinta.</para>
+
+  <para>Nova-volume es una solución iSCSI, proporciona almacenamiento a nivel de
+  bloque utilizando el Gestor de Volúmenes Lógico (LVM, Logical Volume Manager)
+  de Linux. Al tratarse de almacenamiento a nivel de bloque, un volumen solo
+  puede conectarse con una instancia en un momento determinado, no se trata de
+  almacenamiento compartido como el proporcionado por sistemas de ficheros como
+  NFS ó GlusterFS.</para>
+
+  <para>El servicio nova-volume presenta volúmenes lógicos LVM a los nodos de
+  computación que ejecutan las instancias a través del protocolo iSCSI (Internet
+  SCSI, SCSI sobre TCP/IP). En esta arquitectura aparecen dos componentes
+  principales:</para>
+
+  <itemizedlist>
+    <listitem>
+      <para>LVM (<literal>lvm2</literal>), que utiliza un grupo de volúmenes
+      denominado <literal>nova-volumes</literal>. El nombre del volumen es
+      configurable a través del fichero de configuración
+      <filename>nova.conf</filename></para>
+    </listitem>
+
+    <listitem>
+      <para><literal>open-iscsi</literal>, la implementación de iSCSI que
+      gestiona las sesiones iSCSI en los nodos de computación.</para>
+    </listitem>
+    
+  </itemizedlist>
+
+  <para>Los pasos que se producen desde la creación de un volumen hasta su
+  conexión son:</para>
+
+  <orderedlist>
+    <listitem>
+      <para>Se crea el volumen a través del comando <command>nova
+      volume-create</command>, el cual crea un volumen lógico (LV) sobre el
+      grupo de volúmenes (VG) "nova-volumes".</para>
+    </listitem>
+
+    <listitem>
+      <para>El volumen se conecta a una instancia a través del comando
+      <command>nova volume-attach</command>, el cual crea un identificador IQN
+      (iSCSI Qualified Name) único que se presentará al nodo de computación.</para>
+    </listitem>
+
+    <listitem>
+      <para>El nodo de computación que ejecuta la instancia a la que queremos
+      conectar el volumen tiene ahora una sesión iSCSI activa y un nuevo
+      dispositivo de almacenamiento local (normalmente un disco accesible a
+      través de <filename>/dev/sdX</filename>).</para>
+    </listitem>
+
+    <listitem>
+      <para><literal>libvirt</literal> utiliza dicho almacenamiento local como
+      almacenamiento para la instancia, la instancia obtiene dicho
+      almacenamiento a través de un nuevo disco, normalmente
+      <filename>/dev/vdX</filename></para>
+    </listitem>
+    
+  </orderedlist>
+  
+  <para>Para configurar este servicio, nuestra infraestructura debe tener un
+  nodo controlador del Cloud ejecutando los servicios
+  <literal>nova-api</literal>, <literal>nova-scheduler</literal>,
+  <literal>nova-objectstore</literal>, <literal>nova-network</literal> y
+  <literal>nova-volume</literal>. También necesitaremos uno o más nodos
+  ejecutando el servicio <literal>nova-compute</literal>.</para>
+
+  <para>El nodo que ejecuta el servicio nova-volume, en nuestro caso el nodo
+  controlador aunque puede ser otro, debe tener una partición de unos 60 GiB o
+  más de espacio de almacenamiento etiquetada del tipo "Linux LVM" (código
+  <literal>0x8e</literal>).</para>
+
+  <para>La topología de red para OpenStack, FlatDHCP en nuestro caso, debe estar
+  configurada, así como la conectividad entre los nodos a través de
+  TCP/IP.</para>
+
+  <section xml:id="id-iscsi">
+    <title>Sobre iSCSI</title>
+    <para><literal>iSCSI, Internet Small Computer System Interface</literal> es
+    un estándar de almacenamiento en red basado en TCP/IP, básicamente describe
+    cómo transportar comandos SCSI sobre redes IP. El protocolo permite que
+    clientes, <emphasis>initiators</emphasis> tal como los denomina la
+    terminología iSCSI, puedan enviar comandos SCSI (CDBs) a dispositivos de
+    almacenamiento de servidores remotos (targets).</para>
+
+    <para>iSCSI es un protocolo de redes de almacenamiento SAN (Storage Area
+    Network), una SAN permite a una organización consolidar el almacenamiento
+    de su centro de datos en arrays o cabinas de discos que más tarde se presentan a
+    los servidores que ofrecen servicios (web, bases de datos, ...). Dichos
+    servidores obtienen el almacenamiento como si fuera local, iSCSI cuenta con
+    las ventajas de ser más económico y de poder reutilizar la infraestructura
+    de red, frente a otros protocolos más rápidos pero que necesitan de un
+    hardware y cableado específico como Fibre Channel o Infiniband.</para>
+
+    <para>iSCSI es un protocolo de nivel de aplicación que trabaja sobre TCP,
+    normalmente los puertos 860 ó 3260. Básicamente, iSCSI simplemente permite a
+    dos hosts negociar ciertos parámetros para poder después intercambiar
+    comandos SCSI utilizando redes IP. De esta forma iSCSI es capaz de tomar un
+    protocolo de alto rendimiento muy utilizado en buses de almacenamiento local
+    y emularlo sobre redes de área extensa creando una red de almacenamiento
+    (SAN). De forma diferente a otros protocolos utilizados en redes de
+    almacenamiento, iSCSI no necesita de cableado especial ya que puede utilizar
+    la infraestructura de red existente (interfaces de red, cableado, switches,
+    etc.), por lo que a menudo se ve como una alternativa más económica a Fibre
+    Channel (exceptuando FCoE, Fibre Channel sover Ethernet) o Infiniband. Sin
+    embargo, el rendimiento de iSCSI en un despliegue SAN se puede verse
+    reducido en gran medida si no se configura en una red o subred separada (LAN
+    ó VLAN).</para>
+
+    <para>Aunque iSCSI permite comunicar cualquier tipo de dispositivo SCSI,
+    casi siempre se utiliza por los administradores de sistemas para permitir
+    que determinados hosts que ofrecen servicios (web, FTP, bases de datos,
+    servicios de virtualización, ...), puedan acceder a volúmenes de discos
+    situados en arrays de almacenamiento. Las SAN iSCSI se diseñan normalmente
+    con dos objetivos en mente:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para><emphasis role="bold">Consolidación de almacenamiento.</emphasis>
+	Consiste en trasladar los diferentes recursos de almacenamiento a un
+	lugar centralizado y más eficiente. Un entorno SAN proporciona un mayor
+	grado de flexibilidad en el almacenamiento ya que es posible localizar
+	nuevos volúmenes de discos para cualquier servidor en cualquier momento
+	sin modificar nada ni en el cableado ni en la configuración hardware.</para>
+      </listitem>
+      
+      <listitem>
+	<para><emphasis role="bold">Recuperación de desastres.</emphasis>En un
+	entorno SAN, los recursos de almacenamiento pueden fácilmente tanto
+	migrarse, como replicarse (mirroring) de una localización a otra.</para>
+      </listitem>
+
+    </itemizedlist>
+
+    <para>iSCSI viene definido en los RFCs 3720 y 3783.</para>
+    
+    <simplesect>
+      <title>Conceptos importantes</title>
+      <para>Entre los conceptos más importantes a la hora de trabajar con iSCSI,
+      destacamos los siguientes:</para>
+
+      <variablelist>
+	<title>Conceptos iSCSI</title>
+	<varlistentry>
+	  <term>Initiator</term>
+	  <listitem>
+	    <para>Un initiator (iniciador) es un cliente iSCSI. Un initiator en
+	    iSCSI cumple el mismo propósito que un adaptador SCSI
+	    hardware,exceptuando el cableado de los dispositivos. Un initiator
+	    SCSI se limita en enviar comandos SCSI a través de la red IP. Los
+	    initiators pueden ser de dos tipos:</para>
+	    <itemizedlist>
+	      <listitem>
+		<para>Los initiators software utilizan código para implementar
+		el protocolo. Normalmente en drivers de dispositivo a nivel de
+		kernel utilizando toda la pila de red del sistema
+		operativo.</para>
+		<para>Estos initiators están disponibles para los sistemas
+		operativos más comunes y es el método más utilizado a la hora de
+		desplegar soluciones iSCSI.</para>
+	      </listitem>
+
+	      <listitem>
+		<para>Hardware. Un initiator hardware utiliza hardware dedicado,
+		combinado normalmente con un determinado sofwtare (firmware)
+		para implementar iSCSI. Este tipo de initiators reducen en gran
+		medida la sobrecarga del procesamiento del protocolo sobre TCP y
+		de las interrupciones Ethernet, por lo que aumentan el
+		rendimiento global de los servidores a la hora de utilizar
+		iSCSI.</para>
+
+		<para>Un HBA (iSCSI Host Bus Adapter) es una tarjeta que
+		implementa un initiator por hardware. Un HBA empaqueta en la
+		misma tarjeta una interfaz Ethernet a Gigabit (o 10 Gigabits),
+		una implementación TCP/IP y un adaptador SCSI, que es como se
+		presenta al sistema operativo. Optativamente pueden incluir una
+		ROM que permita al sistema arrancar desde una SAN.</para>
+	      </listitem>
+	      
+	    </itemizedlist>
+	  </listitem>
+	</varlistentry>
+	
+	<varlistentry>
+	  <term>Target</term>
+	  <listitem>
+	    <para>La especificación iSCSI define target como cada uno de los
+	    recursos de almacenamiento que se localizan en un servidor.</para>
+
+	    <para>Un target iSCSI es un dispositivo de almacenamiento conectado
+	    a la red, pero también pueden serlo los dipositivos de
+	    almacenamiento que un sistema operativo ofrezca a través de
+	    iSCSI. De la misma forma que un sistema operativo puede implementar
+	    un initiator por software, también puede implementar un
+	    target. Estas solución está implementada en los sistemas operativos
+	    más comunes como Linux, BSD, Solaris o Windows Server.</para>
+
+	    <para>También existen ciertas distribuciones como FreeNAS, Openfiler
+	    u OpenMediaVault especializadas en ofrecer soporte iSCSI.</para> 
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>LUN</term>
+	  <listitem>
+	    <para>En terminología SCSI, un LUN (Logical Unit Number) es una dirección lógica. Un LUN
+	    representa un dispositivo SCSI direccionable individualmente, que es
+	    parte de dispositivo físico SCSI (target)
+AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
+	  </listitem>
+	</varlistentry>
+
+	<varlistentry>
+	  <term>IQN</term>
+	  <listitem>
+	    <para>IQN, iSCSI Qualified Name. </para>
+	  </listitem>
+	</varlistentry>
+	
+      </variablelist>
+      
+      
+      
+
+      
+    </simplesect>
+
+    
+  </section>
+
+  <section xml:id="id-vol-instalacion">
+    <title>Instalación y configuración</title>
+    <para>Para la instalación y configuración del servicio seguiremos los
+    siguientes pasos:</para>
+
+    <orderedlist>
+      <listitem>
+	<para>Instalaremos todo el software necesario en el controlador:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install lvm2 nova-volume</userinput></screen>
+      </listitem>
+
+      <listitem>
+	<para>Configuramos LVM con un grupo de volúmenes denominado
+	<literal>nova-volumes</literal>, para ello:</para>
+	<orderedlist>
+	  <listitem>
+	    <para>Creamos una partición (de unos 60 GiB o más) etiquetada del
+	    tipo "Linux LVM" (<literal>0x8e</literal>), supongamos que sea la
+	    partición <filename>/dev/sda4</filename>.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>Creamos el VG:</para>
+	    <screen>
+	      <prompt>root@jupiter:~# </prompt><userinput>pvcreate /dev/sda4</userinput>
+	      <prompt>root@jupiter:~# </prompt><userinput>vgcreate nova-volumes /dev/sda4</userinput>
+	    </screen>
+	  </listitem>
+	  
+	</orderedlist>
+      </listitem>
+
+      <listitem>
+	<para>Instalación y configuración de iSCSI: recordamos que todos los
+	nodos de computación actúan como <emphasis>iSCSI initiators</emphasis>
+	mientras que el controlador actúa como <emphasis>iSCSI
+	target</emphasis>. Esto implica que los nodos de computación deben
+	poder establecer conexiones con el controlador en el puerto TCP
+	<literal>3260</literal>.</para>
+
+	<para>Instalamos el software iSCSI en todos los nodos de
+	computación:</para>
+
+	<screen><prompt>root@io:~# </prompt><userinput>apt-get install open-iscsi</userinput></screen>
+
+	<para>Como paso optativo podemos modificar el nombre del initiator, para
+	ello modificamos el fichero
+	<filename>/etc/iscsi/initiatorname.iscsi</filename> dejando el siguiente
+	contenido:</para>
+	<programlisting>
+## DO NOT EDIT OR REMOVE THIS FILE!
+## If you remove this file, the iSCSI daemon will not start.
+## If you change the InitiatorName, existing access control lists
+## may reject this initiator.  The InitiatorName must be unique
+## for each iSCSI initiator.  Do NOT duplicate iSCSI InitiatorNames.
+InitiatorName=iqn.2012-08.net.iescierva:initiator:io
+	</programlisting>
+	<para>Tan solo hay que cambiar la última parte con el nombre del nodo,
+	tenemos que recordar que el nombre del initiator iSCSI debe ser único en
+	toda nuestra instalación.</para>
+      </listitem>
+
+      <listitem>
+	<para>Instalación y configuración iSCSI: instalamos el target en el
+	controlador, como implementación elegimos STGT (Linux SCSI target
+	framework). La implementación que aparece en la documentación de
+	OpenStack, concretamente en el manual de administración es IET (the iSCSI Enterprise
+	Target), pero el paquete de instalación <literal>nova-volume</literal>
+	lleva a STGT (paquete <literal>tgt</literal>) como dependencia. Así que
+	optamos por ésta última. El paquete se habrá instalado al instalar
+	nova-volume, si no, lo hacemos a través de este comando:</para>
+
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>apt-get install iscsitarget</userinput>
+	</screen>
+
+	<warning>
+	  <para>La documentación oficial de OpenStack instala el paquete
+	  <literal>iscsitarget</literal> y su módulo del kernel correspondiente,
+	  <literal>iscsitarget-dkms</literal>. Esto es un error ya que deja
+	  el sistema con dos implementaciones distintas de targets iSCSI, con el
+	  correspondiente conflicto de configuración, puertos, etc. Solo hay que
+	  instalar uno, por lo que nos decantamos por TGT.</para>
+	  <para><emphasis role="bold">No hay que instalar ni el paquete iscsitarget ni el
+	  paquete iscsitarget-dkms</emphasis></para>
+	</warning>
+
+	<para>Reiniciamos el servicio en el controlador:</para>
+
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>service tgt restart</userinput>
+	</screen>
+
+	<para>Iniciamos también los servicios iSCSI en los nodos de
+	computación:</para>
+
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>service open-iscsi restart</userinput>
+	</screen>
+      </listitem>
+
+      <listitem>
+	<para>Configuramos el servicio nova-volume modificando las siguientes
+	directivas del fichero <filename>/etc/nova/nova.conf</filename> en el
+	<emphasis role="bold">controlador</emphasis>:</para>
+	<programlisting>
+volume_group=nova-volumes
+volume_name_template=volume-%08x
+iscsi_helper=tgtadm
+iscsi_ip_prefix=172.20.251
+iscsi_ip_address=172.20.251.190
+iscsi_target_prefix=iqn.2012-08.net.iescierva:jupiter:
+	</programlisting>
+      </listitem>
+
+      <listitem>
+	<para>Iniciamos el servicio:</para>
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>service nova-volume stop</userinput>
+	  <prompt>root@jupiter:~# </prompt><userinput>service nova-volume start</userinput>
+	</screen>
+
+	<para>Comprobamos que el servicio está activo a través del
+	comando:</para>
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
+Binary           Host                                 Zone             Status     State Updated_At
+nova-scheduler   jupiter                              nova             enabled    :-)   2012-08-06 08:13:10
+nova-consoleauth jupiter                              nova             enabled    :-)   2012-08-06 08:13:09
+nova-cert        jupiter                              nova             enabled    :-)   2012-08-06 08:13:10
+nova-compute     jupiter                              nova             enabled    :-)   2012-08-06 08:13:12
+nova-volume      jupiter                              nova             enabled    :-)   2012-08-06 08:13:11
+nova-network     jupiter                              nova             enabled    :-)   2012-08-06 08:13:13
+nova-compute     io                                   nova             enabled    :-)   2012-08-06 08:13:13
+	</screen>
+
+      </listitem>
+
+    </orderedlist>
+
+    <para>Para la configuración y trabajo con volúmenes tendremos a nuestra
+    disposición los siguientes comandos:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para><emphasis role="bold">nova volume-create</emphasis></para>
+	<para></para>
+      </listitem>
+      
+      <listitem>
+	<para><emphasis role="bold">nova volume-attach</emphasis></para>
+	<para></para>
+      </listitem>
+
+      <listitem>
+	<para><emphasis role="bold">nova volume-detach</emphasis></para>
+	<para></para>
+      </listitem>
+
+      <listitem>
+	<para><emphasis role="bold">nova volume-delete</emphasis></para>
+	<para></para>
+      </listitem>
+
+      <listitem>
+	<para><emphasis role="bold">nova volume-list</emphasis></para>
+	<para></para>
+      </listitem>
+
+    </itemizedlist>
+    
+    <para>Para crear un volumen necesitamos asignarle un nombre y un tamaño en
+    GiB, podemos hacerlo a través del siguiente comando:</para>
+
+    <screen>
+      <prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen00 5</userinput>
+    </screen>
+
+    <para>Podemos ver el volumen recién creado y su estado a través del
+    comando:</para>
+
+    <screen>
+      <prompt>root@jupiter:~# </prompt><userinput>nova volume-list</userinput>
++----+-----------+--------------+------+-------------+-------------+
+| ID |   Status  | Display Name | Size | Volume Type | Attached to |
++----+-----------+--------------+------+-------------+-------------+
+| 1  | available | volumen00    | 5    | None        |             |
++----+-----------+--------------+------+-------------+-------------+
+    </screen>
+
+    <para>Una vez que el estado es 'disponible' (available), el volumen ya puede
+    conectarse a una instancia. Al crear el volumen, podemos ver que se ha
+    creado un nuevo volumen lógico:</para>
+    <screen>
+      <prompt>root@jupiter:~# </prompt><userinput>lvs</userinput>
+  LV              VG           Attr   LSize   Origin Snap%  Move Log Copy%  Convert
+  volume-00000001 nova-volumes -wi-ao   5,00g
+      <prompt>root@jupiter:~# </prompt><userinput>lvdisplay</userinput>
+  --- Logical volume ---
+  LV Name                /dev/nova-volumes/volume-00000001
+  VG Name                nova-volumes
+  LV UUID                MHDJ7R-eeZP-dfCm-Tt81-gacq-4EV7-ZddL8s
+  LV Write Access        read/write
+  LV Status              available
+  # open                 1
+  LV Size                5,00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           252:0
+    </screen>
+
+    <para> Y que a nivel de iSCSI, el volumen también está disponible:</para> 
+    <screen>
+      <prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
+Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Readonly: No
+            Backing store type: null
+            Backing store path: None
+            Backing store flags: 
+        LUN: 1
+            Type: disk
+            SCSI ID: IET     00010001
+            SCSI SN: beaf11
+            Size: 5369 MB, Block size: 512
+            Online: Yes
+            Removable media: No
+            Readonly: No
+            Backing store type: rdwr
+            Backing store path: /dev/nova-volumes/volume-00000001
+            Backing store flags: 
+    Account information:
+    ACL information:
+        ALL
+    </screen>
+
+    <para>Podemos conectar el volumen a una instancia a través del siguiente
+    comando, para ello necesitamos:</para>
+    <itemizedlist>
+      <listitem>
+	<para>El UID de la instancia, lo obtenemos a partir de los comandos
+	<command>nova list</command> y <command>nova show</command>, este
+	últimos solo si queremos obtener más detalles de la instancia y asegurarnos
+	de ella.</para>
+      </listitem>
+
+      <listitem>
+	<para>El identificador del volumen, lo obtenemos a través del comando
+	<command>nova volume-list</command>.</para>
+      </listitem>
+
+      <listitem>
+	<para>El dispositivo que verá la instancia que se ejecuta en el nodo de
+	computación. Normalmente un dispositivo de la forma
+	<filename>/dev/vdX</filename>. KVM nombra a los dispositivos de otra
+	forma, distinguiendo los discos de las máquinas virtuales (invitados),
+	<literal>/dev/vdX</literal>, de los dispositivos del anfitrión,
+	<literal>/dev/sdX</literal>.</para>
+      </listitem>
+      
+    </itemizedlist>
+
+    <para>El comando queda así:</para>
+
+    <screen>
+      <prompt>root@jupiter:~# </prompt><userinput>nova volume-attach de701111-5b42-456a-b3ea-1609d49ebc2f 1 /dev/vdb</userinput>
+    </screen>
+
+    <para>Tras la ejecución podemos ver comprobar varias cosas:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>El estado del volumen ha cambiado:</para>
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-list</userinput>
++----+--------+--------------+------+-------------+--------------------------------------+
+| ID | Status | Display Name | Size | Volume Type |             Attached to              |
++----+--------+--------------+------+-------------+--------------------------------------+
+| 1  | in-use | volumen00    | 5    | None        | de701111-5b42-456a-b3ea-1609d49ebc2f |
++----+--------+--------------+------+-------------+--------------------------------------+
+	</screen>
+      </listitem>
+
+      <listitem>
+	<para>Hay una sesión iSCSI iniciada:</para>
+	<screen>
+	  <prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
+Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+        I_T nexus: 1
+            Initiator: iqn.2012-08.net.iescierva:initiator:io
+            Connection: 0
+                IP Address: 172.20.251.191
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Readonly: No
+            Backing store type: null
+            Backing store path: None
+            Backing store flags: 
+        LUN: 1
+            Type: disk
+            SCSI ID: IET     00010001
+            SCSI SN: beaf11
+            Size: 5369 MB, Block size: 512
+            Online: Yes
+            Removable media: No
+            Readonly: No
+            Backing store type: rdwr
+            Backing store path: /dev/nova-volumes/volume-00000001
+            Backing store flags: 
+    Account information:
+    ACL information:
+        ALL
+	</screen>
+
+	<para>También podemos verlo en el nodo de computación, ya que tendrá una
+	sesión iSCSI abierta y un nuevo disco disponible:</para>
+	<screen>
+	  <prompt>root@io:~# </prompt><userinput>iscsiadm -m session</userinput>
+tcp: [1] 172.20.251.190:3260,1 iqn.2012-08.net.iescierva:jupiter:volume-00000001
+	  <prompt>root@io:~# </prompt><userinput>lsscsi</userinput>
+[4:2:0:0]    disk    SMC      SMC2108          2.12  /dev/sda
+[7:0:0:0]    cd/dvd  KVM      vmDisk-CD        0.01  /dev/sr0
+[8:0:0:0]    disk    KVM      vmDisk           0.01  /dev/sdb
+[9:0:0:0]    storage IET      Controller       0001  -       
+[9:0:0:1]    disk    IET      VIRTUAL-DISK     0001  /dev/sdc
+	  <prompt>root@io:~# </prompt><userinput>fdisk -l /dev/sdc</userinput>
+
+Disk /dev/sdc: 5368 MB, 5368709120 bytes
+166 heads, 62 sectors/track, 1018 cylinders, total 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+Disk /dev/sdc doesn't contain a valid partition table
+	</screen>
+      </listitem>
+
+      <listitem>
+	<para>A la máquina virtual, se le presenta un nuevo dispositivo:</para>
+	<screen>
+	  <prompt>root@server00:~# </prompt><userinput>fdisk -l /dev/vdb</userinput>
+
+Disco /dev/vdb: 5368 MB, 5368709120 bytes
+16 cabezas, 63 sectores/pista, 10402 cilindros, 10485760 sectores en total
+Unidades = sectores de 1 * 512 = 512 bytes
+Tamaño de sector (lógico / físico): 512 bytes / 512 bytes
+Tamaño E/S (mínimo/óptimo): 512 bytes / 512 bytes
+Identificador del disco: 0x00000000
+
+El disco /dev/vdb no contiene una tabla de particiones válida
+	</screen>
+
+	<para>... y podemos hacer uso de él a través de los siguientes comandos,
+	una vez particionado el disco correctamente:</para>
+	<screen>
+	  <prompt>root@server00:~# </prompt><userinput>mkfs.xfs /dev/vdb1</userinput>
+meta-data=/dev/vdb1              isize=256    agcount=4, agsize=327616 blks
+         =                       sectsz=512   attr=2, projid32bit=0
+data     =                       bsize=4096   blocks=1310464, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0
+log      =registro interno       bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =ninguno                extsz=4096   blocks=0, rtextents=0
+	  <prompt>root@server00:~# </prompt><userinput>mkdir /doc</userinput>
+	  <prompt>root@server00:~# </prompt><userinput>mount /dev/vdb1 /doc</userinput>
+	  <prompt>root@server00:~# </prompt><userinput>df -h</userinput>
+S.ficheros     Tamaño Usado  Disp Uso% Montado en
+/dev/vda1        5,0G  1,1G  3,7G  23% /
+udev             112M  8,0K  112M   1% /dev
+tmpfs             48M  252K   48M   1% /run
+none             5,0M     0  5,0M   0% /run/lock
+none             120M     0  120M   0% /run/shm
+/dev/vdb1        5,0G   33M  5,0G   1% /doc
+	</screen>
+
+	<note>
+	  <para>Utilizando KVM como hipervisor, la máquina virtual no verá el
+	  disco a no ser que se reinicie. Se puede evitar esto si cargamos en la
+	  máquina virtual el módulo <literal>acpiphp</literal>. Este módulo
+	  proporciona el driver ACPI para conexión en caliente de dispositivos
+	  PCI. Podemos hacer el cambio permanente a través del comando:</para>
+	  <screen><prompt>root@server00:~# </prompt><userinput>echo acpiphp >> /etc/modules</userinput></screen>
+	</note>
+      </listitem>
+      
+    </itemizedlist>    
+  </section>
+
+  <section xml:id="id-vol-problemas">
+    <title>Resolución de problemas</title>
+    <para></para>
+    
+  </section>
+
+  <section xml:id="id-vol-backups">
+    <title>Copias de seguridad de los volúmenes</title>
+    <para></para>
+    
+  </section>
+
+  <section xml:id="id-drivers">
+    <title>Volume Drivers</title>
+    <para>Podemos incluir:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>Ceph Rados block Device</para>
+      </listitem>
+
+      <listitem>
+	<para>Nexenta</para>
+      </listitem>
+
+      <listitem>
+	<para>Integración con Openfiler</para>
+      </listitem>
+      
+    </itemizedlist>
+   
+  </section>
+
+  <section xml:id="id-arranque-volumenes">
+    <title>Iniciando una instancia desde un volumen</title>
+    <para></para>
+    
+  </section>
+
+</chapter>

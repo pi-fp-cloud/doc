@@ -1657,10 +1657,28 @@ vncserver_proxyclient_address=172.20.253.191
 vncserver_listen=172.20.253.191
 	    </programlisting>
 
-	    <para>... quedando tal que así:</para>
+	    <para>... quedando de la siguiente forma. Nos aseguramos antes de los permisos
+	    (<literal>600</literal>) y del propietario y grupo
+	    (<literal>nova.nova</literal>):</para>
 	  <programlisting>
 <xi:include parse="text" href="samples/nova.conf.io"/>
 	  </programlisting>
+
+	  </listitem>
+
+	  <listitem>
+	    <para>Borramos la base de datos SQLite que acompaña a la instalación
+	    de nova-compute:</para>
+	    <screen><prompt>$ </prompt><userinput>rm /var/lib/nova/nova.sqlite</userinput></screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>Revisamos los permisos del directorio
+	    <filename>/var/lib/nova</filename>:</para>
+	    <screen>
+	      <prompt>root@io:~# </prompt><userinput>chown -R nova.nova /var/lib/nova</userinput>
+	      <prompt>root@io:~# </prompt><userinput>chmod 770 /var/lib/nova</userinput>
+	    </screen>
 
 	  </listitem>
 

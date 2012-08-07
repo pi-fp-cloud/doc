@@ -135,11 +135,15 @@ Título: Administración de OpenStack
 	<Aquí se explicaría cómo crear imágenes para la creación de VM, cómo crear instancias de prueba, instancias de Ubuntu, Fedora, Windows, etc.>
 	<Pensaba hacerlo yo>
 
-5.- Networking.
+5.- Gestión de volúmenes.
+	<En el manual de OpenStack lo han sacado como capítulo independiente>.
+        <Nosotros también, es suficientemente iomportante como para que así sea>
+
+6.- Networking.
 	<Todo lo referente a la red de OpenStack>.
 	<Está claro de quién es, ¿no?>
 	
-6.- Administración (OCAM capítulos 11 y 12).
+7.- Administración (OCAM capítulos 11 y 12).
 	<Descripción de las tareas más usuales>.
 	<Por detallar completamente>
 	Arquitectura de los servicios de computación.
@@ -149,6 +153,10 @@ Título: Administración de OpenStack
 	Live Migrations.
 	Introducción al DashBoard.
 	Descripción de VNC Proxy.
+
+5.- Gestión de volúmenes.
+	<En el manual de OpenStack lo han sacado como capítulo independiente>.
+        <Nosotros también, es suficientemente iomportante como para que así sea>
 -->
 
     <xi:include href="ch-prerrequisitos.xml" />
@@ -164,4 +172,5 @@ Título: Administración de OpenStack
     <xi:include href="ch-gest-imagenes.xml" />
     <xi:include href="ch-networking.xml" />
     <xi:include href="ch-admin-openstack.xml" />
+    <xi:include href="ch-gest-volumenes.xml" />
 </book>
