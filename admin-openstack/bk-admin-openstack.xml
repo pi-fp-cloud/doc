@@ -171,6 +171,6 @@ Título: Administración de OpenStack
     <xi:include href="ch-gest-identidad.xml" />
     <xi:include href="ch-gest-imagenes.xml" />
     <xi:include href="ch-networking.xml" />
-    <xi:include href="ch-admin-openstack.xml" />
     <xi:include href="ch-gest-volumenes.xml" />
+    <xi:include href="ch-admin-openstack.xml" />
 </book>

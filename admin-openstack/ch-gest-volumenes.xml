@@ -217,7 +217,7 @@
 	    <para>En terminología SCSI, un LUN (Logical Unit Number) es una dirección lógica. Un LUN
 	    representa un dispositivo SCSI direccionable individualmente, que es
 	    parte de dispositivo físico SCSI (target)
-AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI
+AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
 	  </listitem>
 	</varlistentry>
 
@@ -263,8 +263,8 @@ AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI
 	  <listitem>
 	    <para>Creamos el VG:</para>
 	    <screen>
-	      <prompt>root@jupiter:~# </prompt><userinput>pvcreate /dev/sda4</userinput>
-	      <prompt>root@jupiter:~# </prompt><userinput>vgcreate nova-volumes /dev/sda4</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>pvcreate /dev/sda4</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>vgcreate nova-volumes /dev/sda4</userinput>
 	    </screen>
 	  </listitem>
 	  
@@ -311,9 +311,7 @@ InitiatorName=iqn.2012-08.net.iescierva:initiator:io
 	optamos por ésta última. El paquete se habrá instalado al instalar
 	nova-volume, si no, lo hacemos a través de este comando:</para>
 
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>apt-get install iscsitarget</userinput>
-	</screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install iscsitarget</userinput></screen>
 
 	<warning>
 	  <para>La documentación oficial de OpenStack instala el paquete
@@ -328,16 +326,12 @@ InitiatorName=iqn.2012-08.net.iescierva:initiator:io
 
 	<para>Reiniciamos el servicio en el controlador:</para>
 
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>service tgt restart</userinput>
-	</screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>service tgt restart</userinput></screen>
 
 	<para>Iniciamos también los servicios iSCSI en los nodos de
 	computación:</para>
 
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>service open-iscsi restart</userinput>
-	</screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>service open-iscsi restart</userinput></screen>
       </listitem>
 
       <listitem>
@@ -356,15 +350,12 @@ iscsi_target_prefix=iqn.2012-08.net.iescierva:jupiter:
 
       <listitem>
 	<para>Iniciamos el servicio:</para>
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>service nova-volume stop</userinput>
-	  <prompt>root@jupiter:~# </prompt><userinput>service nova-volume start</userinput>
-	</screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>service nova-volume	stop</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>service nova-volume start</userinput></screen>
 
 	<para>Comprobamos que el servicio está activo a través del
 	comando:</para>
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>nova-manage service	list</userinput>
 Binary           Host                                 Zone             Status     State Updated_At
 nova-scheduler   jupiter                              nova             enabled    :-)   2012-08-06 08:13:10
 nova-consoleauth jupiter                              nova             enabled    :-)   2012-08-06 08:13:09
@@ -377,8 +368,254 @@ nova-compute     io                                   nova             enabled  
 
       </listitem>
 
+      <listitem>
+	<para>Creamos y conectamos un volumen.</para>
+	<para>Para crear un volumen necesitamos asignarle un nombre y un tamaño en
+	GiB, podemos hacerlo a través del siguiente comando:</para>
+
+	<screen><prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen00 5</userinput></screen>
+
+	<para>Podemos ver el volumen recién creado y su estado a través del
+	comando:</para>
+
+	<screen><prompt>root@jupiter:~# </prompt><userinput>nova volume-list</userinput>
++----+-----------+--------------+------+-------------+-------------+
+| ID |   Status  | Display Name | Size | Volume Type | Attached to |
++----+-----------+--------------+------+-------------+-------------+
+| 1  | available | volumen00    | 5    | None        |             |
++----+-----------+--------------+------+-------------+-------------+
+	</screen>
+
+	<para>Una vez que el estado es 'disponible' (available), el volumen ya puede
+	conectarse a una instancia. Al crear el volumen, podemos ver que se ha
+	creado un nuevo volumen lógico:</para>
+	<screen>
+<prompt>root@jupiter:~# </prompt><userinput>lvs</userinput>
+  LV              VG           Attr   LSize   Origin Snap%  Move Log Copy%  Convert
+  volume-00000001 nova-volumes -wi-ao   5,00g
+<prompt>root@jupiter:~# </prompt><userinput>lvdisplay</userinput>
+  --- Logical volume ---
+  LV Name                /dev/nova-volumes/volume-00000001
+  VG Name                nova-volumes
+  LV UUID                MHDJ7R-eeZP-dfCm-Tt81-gacq-4EV7-ZddL8s
+  LV Write Access        read/write
+  LV Status              available
+  # open                 1
+  LV Size                5,00 GiB
+  Current LE             1280
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           252:0
+	</screen>
+
+	<para> Y que a nivel de iSCSI, el volumen también está disponible:</para> 
+	<screen>
+<prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
+Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Readonly: No
+	    Backing store type: null
+	    Backing store path: None
+            Backing store flags: 
+        LUN: 1
+            Type: disk
+            SCSI ID: IET     00010001
+            SCSI SN: beaf11
+            Size: 5369 MB, Block size: 512
+            Online: Yes
+            Removable media: No
+            Readonly: No
+            Backing store type: rdwr
+            Backing store path: /dev/nova-volumes/volume-00000001
+            Backing store flags: 
+    Account information:
+    ACL information:
+        ALL
+	</screen>
+
+	<para>Podemos conectar el volumen a una instancia a través del siguiente
+	comando, para ello necesitamos:</para>
+	<itemizedlist>
+	  <listitem>
+	    <para>El UID de la instancia, lo obtenemos a partir de los comandos
+	    <command>nova list</command> y <command>nova show</command>, este
+	    últimos solo si queremos obtener más detalles de la instancia y asegurarnos
+	    de ella.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>El identificador del volumen, lo obtenemos a través del comando
+	    <command>nova volume-list</command>.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>El dispositivo que verá la instancia que se ejecuta en el nodo de
+	    computación. Normalmente un dispositivo de la forma
+	    <filename>/dev/vdX</filename>. KVM nombra a los dispositivos de otra
+	    forma, distinguiendo los discos de las máquinas virtuales (invitados),
+	    <literal>/dev/vdX</literal>, de los dispositivos del anfitrión,
+	    <literal>/dev/sdX</literal>.</para>
+	  </listitem>
+	  
+	</itemizedlist>
+
+	<para>El comando queda así:</para>
+
+	<screen><prompt>root@jupiter:~# </prompt><userinput>nova volume-attach de701111-5b42-456a-b3ea-1609d49ebc2f 1 /dev/vdb</userinput></screen>
+
+	<para>Tras la ejecución podemos ver comprobar varias cosas:</para>
+
+	<itemizedlist>
+	  <listitem>
+	    <para>El estado del volumen ha cambiado:</para>
+	    <screen>
+<prompt>root@jupiter:~# </prompt><userinput>nova volume-list</userinput>
++----+--------+--------------+------+-------------+--------------------------------------+
+| ID | Status | Display Name | Size | Volume Type |             Attached to              |
++----+--------+--------------+------+-------------+--------------------------------------+
+| 1  | in-use | volumen00    | 5    | None        | de701111-5b42-456a-b3ea-1609d49ebc2f |
++----+--------+--------------+------+-------------+--------------------------------------+
+	    </screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>Hay una sesión iSCSI iniciada:</para>
+	    <screen>
+<prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
+Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+        I_T nexus: 1
+        Initiator: iqn.2012-08.net.iescierva:initiator:io
+        Connection: 0
+            IP Address: 172.20.251.191
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Readonly: No
+	    Backing store type: null
+	    Backing store path: None
+            Backing store flags: 
+        LUN: 1
+            Type: disk
+            SCSI ID: IET     00010001
+            SCSI SN: beaf11
+            Size: 5369 MB, Block size: 512
+            Online: Yes
+            Removable media: No
+            Readonly: No
+            Backing store type: rdwr
+            Backing store path: /dev/nova-volumes/volume-00000001
+            Backing store flags: 
+    Account information:
+    ACL information:
+        ALL
+	    </screen>
+
+	    <para>También podemos verlo en el nodo de computación, ya que tendrá una
+	    sesión iSCSI abierta y un nuevo disco disponible:</para>
+	    <screen>
+<prompt>root@io:~# </prompt><userinput>iscsiadm -m session</userinput>
+tcp: [1] 172.20.251.190:3260,1 iqn.2012-08.net.iescierva:jupiter:volume-00000001
+<prompt>root@io:~# </prompt><userinput>lsscsi</userinput>
+[4:2:0:0]    disk    SMC      SMC2108          2.12  /dev/sda
+[7:0:0:0]    cd/dvd  KVM      vmDisk-CD        0.01  /dev/sr0
+[8:0:0:0]    disk    KVM      vmDisk           0.01  /dev/sdb
+[9:0:0:0]    storage IET      Controller       0001  -       
+[9:0:0:1]    disk    IET      VIRTUAL-DISK     0001  /dev/sdc
+<prompt>root@io:~# </prompt><userinput>fdisk -l /dev/sdc</userinput>
+
+Disk /dev/sdc: 5368 MB, 5368709120 bytes
+166 heads, 62 sectors/track, 1018 cylinders, total 10485760 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+
+Disk /dev/sdc doesn't contain a valid partition table
+	    </screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>A la máquina virtual, se le presenta un nuevo dispositivo:</para>
+	    <screen><prompt>root@server00:~# </prompt><userinput>fdisk -l /dev/vdb</userinput>
+
+Disco /dev/vdb: 5368 MB, 5368709120 bytes
+16 cabezas, 63 sectores/pista, 10402 cilindros, 10485760 sectores en total
+Unidades = sectores de 1 * 512 = 512 bytes
+Tamaño de sector (lógico / físico): 512 bytes / 512 bytes
+Tamaño E/S (mínimo/óptimo): 512 bytes / 512 bytes
+Identificador del disco: 0x00000000
+
+El disco /dev/vdb no contiene una tabla de particiones válida
+	    </screen>
+
+	    <para>... y podemos hacer uso de él a través de los siguientes comandos,
+	    una vez particionado el disco correctamente:</para>
+	    <screen>
+<prompt>root@server00:~# </prompt><userinput>mkfs.xfs /dev/vdb1</userinput>
+meta-data=/dev/vdb1              isize=256    agcount=4, agsize=327616 blks
+         =                       sectsz=512   attr=2, projid32bit=0
+data     =                       bsize=4096   blocks=1310464, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0
+log      =registro interno       bsize=4096   blocks=2560, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =ninguno                extsz=4096   blocks=0, rtextents=0
+<prompt>root@server00:~# </prompt><userinput>mkdir /doc</userinput>
+<prompt>root@server00:~# </prompt><userinput>mount /dev/vdb1 /doc</userinput>
+<prompt>root@server00:~# </prompt><userinput>df -h</userinput>
+S.ficheros     Tamaño Usado  Disp Uso% Montado en
+/dev/vda1        5,0G  1,1G  3,7G  23% /
+udev             112M  8,0K  112M   1% /dev
+tmpfs             48M  252K   48M   1% /run
+none             5,0M     0  5,0M   0% /run/lock
+none             120M     0  120M   0% /run/shm
+/dev/vdb1        5,0G   33M  5,0G   1% /doc
+	    </screen>
+
+	    <note>
+	      <para>Utilizando KVM como hipervisor, la máquina virtual no verá el
+	      disco a no ser que se reinicie. Se puede evitar esto si cargamos en la
+	      máquina virtual el módulo <literal>acpiphp</literal>. Este módulo
+	      proporciona el driver ACPI para conexión en caliente de dispositivos
+	      PCI. Podemos hacer el cambio permanente a través del comando:</para>
+	      <screen><prompt>root@server00:~# </prompt><userinput>echo acpiphp >> /etc/modules</userinput></screen>
+	    </note>
+	  </listitem>
+	  
+	</itemizedlist>    
+
+      </listitem>
+
+
     </orderedlist>
 
+    
+  </section>
+
+  <section xml:id="id-vol-comandos">
+    <title>Comandos Nova para la gestión de volúmenes</title>
     <para>Para la configuración y trabajo con volúmenes tendremos a nuestra
     disposición los siguientes comandos:</para>
 
@@ -398,8 +635,8 @@ nova volume-create [--snapshot_id <snapshot_id>]
 	<para>Normalmente indicaremos un nombre y un tamaño en
 	GiB. Ejemplos:</para>
 	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen01 5</userinput>
-	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen02 5</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen01 5</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen02 5</userinput>
 	</screen>
 	<para>El nombre no es necesario que sea único ya que internamente
 	OpenStack le asigna otro identificador que sí lo es.</para>
@@ -443,9 +680,7 @@ nova volume-attach <server> <volume> <device>
 	</itemizedlist>
 
 	<para>Ejemplos:</para>
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-attach de701111-5b42-456a-b3ea-1609d49ebc2f 1 /dev/vdc</userinput>
-	</screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>nova volume-attach de701111-5b42-456a-b3ea-1609d49ebc2f 1 /dev/vdc</userinput></screen>
 	<para>Este comando conecta el volumen 1 con la instancia indicada por el
 	UUID. En la instancia el volumen aparecerá como /dev/vdc, siempre y
 	cuando vda y vdb estén ocupados y vdc libre.</para>	
@@ -453,263 +688,105 @@ nova volume-attach <server> <volume> <device>
 
       <listitem>
 	<para><emphasis role="bold">nova volume-detach</emphasis></para>
-	<para>AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
+	<para>Desconecta un volumen de una instancia (máquina virtual).</para>
+	<programlisting>
+<![CDATA[
+nova volume-detach <server> <volume>
+]]>  
+	</programlisting>
+	<para>Es necesario indicar:</para>
+	<itemizedlist>
+	  <listitem>
+	    <para>La instancia a la que desconectaremos el volumen, podemos obtener
+	    su ID a través del comando <command>nova list</command>.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para>El volumen a desconectar. Hay que indicar su identificador,
+	    podemos obtenerlo a través del comando <command>nova volume-list.</command></para>
+	  </listitem>
+	  
+	</itemizedlist>
+
+	<para>Ejemplos:</para>
+	<screen><prompt>root@jupiter:~#  </prompt><userinput>volume-detach de701111-5b42-456a-b3ea-1609d49ebc2f 1</userinput></screen>
       </listitem>
 
       <listitem>
 	<para><emphasis role="bold">nova volume-delete</emphasis></para>
-	<para></para>
+	<para>Elimina un volumen.</para>
+	<programlisting>
+<![CDATA[
+nova volume-delete <volume>
+]]>  
+	</programlisting>
+	<para>Es necesario indicar:</para>
+	<itemizedlist>
+	  <listitem>
+	    <para>El volumen a eliminar. Hay que indicar su identificador,
+	    podemos obtenerlo a través del comando <command>nova volume-list.</command></para>
+	  </listitem>
+	  
+	</itemizedlist>
+
+	<para>Ejemplos:</para>
+	<screen><prompt>root@jupiter:~#  </prompt><userinput>volume-delete
+	1</userinput></screen>
+	<para>El borrado es una operación costosa ya que, por razones de
+	seguridad, nova-volume sobrescribe con ceros todos los bloques de datos
+	físicos que conforman el volumen. Podemos acelerar el borrado
+	sobrescribiendo únicamente el primer gigabyte, eliminando el MBR y el
+	principio del sistema de ficheros, tal como se cuenta en:
+	https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/
+	Basta realizar el siguiente cambio:</para>
+	<itemizedlist>
+	  <listitem>
+	    <para>Editamos el fichero
+	    <filename>/usr/lib/python2.7/dist-packages/nova/volume/driver.py</filename>
+	    modificando la línea 131 con este cambio:</para>
+	    <programlisting language="Python">
+	      self._copy_volume('/dev/zero', self.local_path(volume), 1)
+	    </programlisting>
+	  </listitem>
+	  <listitem>
+	    <para>Podemos automatizar esto a través del siguiente
+	    script:</para>
+	    <programlisting language="Bash">
+<![CDATA[
+#!/bin/bash
+# https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/
+# Function for easy string replacement
+function sedeasy {
+    sed -i "s/$(echo $1 | sed -e 's/\([[\/.*]\|\]\)/\\&/g')/$(echo $2 | sed -e 's/[\/&]/\\&/g')/g" $3
+}
+
+# Backup original file
+cp /usr/lib/python2.7/dist-packages/nova/volume/driver.py\
+/usr/lib/python2.7/dist-packages/nova/volume/driver.py.bak
+
+# Change writing zero's to the whole file with only the first GB
+sedeasy "self._copy_volume('/dev/zero', self.local_path(volume), size_in_g)"\
+"self._copy_volume('/dev/zero', self.local_path(volume), 1)"\
+/usr/lib/python2.7/dist-packages/nova/volume/driver.py
+]]>
+	    </programlisting>
+	  </listitem>
+	</itemizedlist>
       </listitem>
 
       <listitem>
 	<para><emphasis role="bold">nova volume-list</emphasis></para>
-	<para></para>
+	<para>Muestra un listado con todos los volúmenes e información sobre
+	ellos.</para>
+	<programlisting>
+usage: nova volume-list
+	</programlisting>
       </listitem>
 
     </itemizedlist>
     
-    <para>Para crear un volumen necesitamos asignarle un nombre y un tamaño en
-    GiB, podemos hacerlo a través del siguiente comando:</para>
-
-    <screen>
-      <prompt>root@jupiter:~# </prompt><userinput>nova volume-create --display_name volumen00 5</userinput>
-    </screen>
-
-    <para>Podemos ver el volumen recién creado y su estado a través del
-    comando:</para>
-
-    <screen>
-      <prompt>root@jupiter:~# </prompt><userinput>nova volume-list</userinput>
-+----+-----------+--------------+------+-------------+-------------+
-| ID |   Status  | Display Name | Size | Volume Type | Attached to |
-+----+-----------+--------------+------+-------------+-------------+
-| 1  | available | volumen00    | 5    | None        |             |
-+----+-----------+--------------+------+-------------+-------------+
-    </screen>
-
-    <para>Una vez que el estado es 'disponible' (available), el volumen ya puede
-    conectarse a una instancia. Al crear el volumen, podemos ver que se ha
-    creado un nuevo volumen lógico:</para>
-    <screen>
-      <prompt>root@jupiter:~# </prompt><userinput>lvs</userinput>
-  LV              VG           Attr   LSize   Origin Snap%  Move Log Copy%  Convert
-  volume-00000001 nova-volumes -wi-ao   5,00g
-      <prompt>root@jupiter:~# </prompt><userinput>lvdisplay</userinput>
-  --- Logical volume ---
-  LV Name                /dev/nova-volumes/volume-00000001
-  VG Name                nova-volumes
-  LV UUID                MHDJ7R-eeZP-dfCm-Tt81-gacq-4EV7-ZddL8s
-  LV Write Access        read/write
-  LV Status              available
-  # open                 1
-  LV Size                5,00 GiB
-  Current LE             1280
-  Segments               1
-  Allocation             inherit
-  Read ahead sectors     auto
-  - currently set to     256
-  Block device           252:0
-    </screen>
-
-    <para> Y que a nivel de iSCSI, el volumen también está disponible:</para> 
-    <screen>
-      <prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
-Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
-    System information:
-        Driver: iscsi
-        State: ready
-    I_T nexus information:
-    LUN information:
-        LUN: 0
-            Type: controller
-            SCSI ID: IET     00010000
-            SCSI SN: beaf10
-            Size: 0 MB, Block size: 1
-            Online: Yes
-            Removable media: No
-            Readonly: No
-            Backing store type: null
-            Backing store path: None
-            Backing store flags: 
-        LUN: 1
-            Type: disk
-            SCSI ID: IET     00010001
-            SCSI SN: beaf11
-            Size: 5369 MB, Block size: 512
-            Online: Yes
-            Removable media: No
-            Readonly: No
-            Backing store type: rdwr
-            Backing store path: /dev/nova-volumes/volume-00000001
-            Backing store flags: 
-    Account information:
-    ACL information:
-        ALL
-    </screen>
-
-    <para>Podemos conectar el volumen a una instancia a través del siguiente
-    comando, para ello necesitamos:</para>
-    <itemizedlist>
-      <listitem>
-	<para>El UID de la instancia, lo obtenemos a partir de los comandos
-	<command>nova list</command> y <command>nova show</command>, este
-	últimos solo si queremos obtener más detalles de la instancia y asegurarnos
-	de ella.</para>
-      </listitem>
-
-      <listitem>
-	<para>El identificador del volumen, lo obtenemos a través del comando
-	<command>nova volume-list</command>.</para>
-      </listitem>
-
-      <listitem>
-	<para>El dispositivo que verá la instancia que se ejecuta en el nodo de
-	computación. Normalmente un dispositivo de la forma
-	<filename>/dev/vdX</filename>. KVM nombra a los dispositivos de otra
-	forma, distinguiendo los discos de las máquinas virtuales (invitados),
-	<literal>/dev/vdX</literal>, de los dispositivos del anfitrión,
-	<literal>/dev/sdX</literal>.</para>
-      </listitem>
-      
-    </itemizedlist>
-
-    <para>El comando queda así:</para>
-
-    <screen>
-      <prompt>root@jupiter:~# </prompt><userinput>nova volume-attach de701111-5b42-456a-b3ea-1609d49ebc2f 1 /dev/vdb</userinput>
-    </screen>
-
-    <para>Tras la ejecución podemos ver comprobar varias cosas:</para>
-
-    <itemizedlist>
-      <listitem>
-	<para>El estado del volumen ha cambiado:</para>
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>nova volume-list</userinput>
-+----+--------+--------------+------+-------------+--------------------------------------+
-| ID | Status | Display Name | Size | Volume Type |             Attached to              |
-+----+--------+--------------+------+-------------+--------------------------------------+
-| 1  | in-use | volumen00    | 5    | None        | de701111-5b42-456a-b3ea-1609d49ebc2f |
-+----+--------+--------------+------+-------------+--------------------------------------+
-	</screen>
-      </listitem>
-
-      <listitem>
-	<para>Hay una sesión iSCSI iniciada:</para>
-	<screen>
-	  <prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
-Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
-    System information:
-        Driver: iscsi
-        State: ready
-    I_T nexus information:
-        I_T nexus: 1
-            Initiator: iqn.2012-08.net.iescierva:initiator:io
-            Connection: 0
-                IP Address: 172.20.251.191
-    LUN information:
-        LUN: 0
-            Type: controller
-            SCSI ID: IET     00010000
-            SCSI SN: beaf10
-            Size: 0 MB, Block size: 1
-            Online: Yes
-            Removable media: No
-            Readonly: No
-            Backing store type: null
-            Backing store path: None
-            Backing store flags: 
-        LUN: 1
-            Type: disk
-            SCSI ID: IET     00010001
-            SCSI SN: beaf11
-            Size: 5369 MB, Block size: 512
-            Online: Yes
-            Removable media: No
-            Readonly: No
-            Backing store type: rdwr
-            Backing store path: /dev/nova-volumes/volume-00000001
-            Backing store flags: 
-    Account information:
-    ACL information:
-        ALL
-	</screen>
-
-	<para>También podemos verlo en el nodo de computación, ya que tendrá una
-	sesión iSCSI abierta y un nuevo disco disponible:</para>
-	<screen>
-	  <prompt>root@io:~# </prompt><userinput>iscsiadm -m session</userinput>
-tcp: [1] 172.20.251.190:3260,1 iqn.2012-08.net.iescierva:jupiter:volume-00000001
-	  <prompt>root@io:~# </prompt><userinput>lsscsi</userinput>
-[4:2:0:0]    disk    SMC      SMC2108          2.12  /dev/sda
-[7:0:0:0]    cd/dvd  KVM      vmDisk-CD        0.01  /dev/sr0
-[8:0:0:0]    disk    KVM      vmDisk           0.01  /dev/sdb
-[9:0:0:0]    storage IET      Controller       0001  -       
-[9:0:0:1]    disk    IET      VIRTUAL-DISK     0001  /dev/sdc
-	  <prompt>root@io:~# </prompt><userinput>fdisk -l /dev/sdc</userinput>
-
-Disk /dev/sdc: 5368 MB, 5368709120 bytes
-166 heads, 62 sectors/track, 1018 cylinders, total 10485760 sectors
-Units = sectors of 1 * 512 = 512 bytes
-Sector size (logical/physical): 512 bytes / 512 bytes
-I/O size (minimum/optimal): 512 bytes / 512 bytes
-Disk identifier: 0x00000000
-
-Disk /dev/sdc doesn't contain a valid partition table
-	</screen>
-      </listitem>
-
-      <listitem>
-	<para>A la máquina virtual, se le presenta un nuevo dispositivo:</para>
-	<screen>
-	  <prompt>root@server00:~# </prompt><userinput>fdisk -l /dev/vdb</userinput>
-
-Disco /dev/vdb: 5368 MB, 5368709120 bytes
-16 cabezas, 63 sectores/pista, 10402 cilindros, 10485760 sectores en total
-Unidades = sectores de 1 * 512 = 512 bytes
-Tamaño de sector (lógico / físico): 512 bytes / 512 bytes
-Tamaño E/S (mínimo/óptimo): 512 bytes / 512 bytes
-Identificador del disco: 0x00000000
-
-El disco /dev/vdb no contiene una tabla de particiones válida
-	</screen>
-
-	<para>... y podemos hacer uso de él a través de los siguientes comandos,
-	una vez particionado el disco correctamente:</para>
-	<screen>
-	  <prompt>root@server00:~# </prompt><userinput>mkfs.xfs /dev/vdb1</userinput>
-meta-data=/dev/vdb1              isize=256    agcount=4, agsize=327616 blks
-         =                       sectsz=512   attr=2, projid32bit=0
-data     =                       bsize=4096   blocks=1310464, imaxpct=25
-         =                       sunit=0      swidth=0 blks
-naming   =version 2              bsize=4096   ascii-ci=0
-log      =registro interno       bsize=4096   blocks=2560, version=2
-         =                       sectsz=512   sunit=0 blks, lazy-count=1
-realtime =ninguno                extsz=4096   blocks=0, rtextents=0
-	  <prompt>root@server00:~# </prompt><userinput>mkdir /doc</userinput>
-	  <prompt>root@server00:~# </prompt><userinput>mount /dev/vdb1 /doc</userinput>
-	  <prompt>root@server00:~# </prompt><userinput>df -h</userinput>
-S.ficheros     Tamaño Usado  Disp Uso% Montado en
-/dev/vda1        5,0G  1,1G  3,7G  23% /
-udev             112M  8,0K  112M   1% /dev
-tmpfs             48M  252K   48M   1% /run
-none             5,0M     0  5,0M   0% /run/lock
-none             120M     0  120M   0% /run/shm
-/dev/vdb1        5,0G   33M  5,0G   1% /doc
-	</screen>
-
-	<note>
-	  <para>Utilizando KVM como hipervisor, la máquina virtual no verá el
-	  disco a no ser que se reinicie. Se puede evitar esto si cargamos en la
-	  máquina virtual el módulo <literal>acpiphp</literal>. Este módulo
-	  proporciona el driver ACPI para conexión en caliente de dispositivos
-	  PCI. Podemos hacer el cambio permanente a través del comando:</para>
-	  <screen><prompt>root@server00:~# </prompt><userinput>echo acpiphp >> /etc/modules</userinput></screen>
-	</note>
-      </listitem>
-      
-    </itemizedlist>    
   </section>
+
 
   <section xml:id="id-vol-problemas">
     <title>Resolución de problemas</title>
