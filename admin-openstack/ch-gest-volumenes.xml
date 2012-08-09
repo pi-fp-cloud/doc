@@ -333,53 +333,42 @@ iqn.1992-01.com.example:storage.disk2.sys1.xyz[3]
 	</listitem>
 
 	<listitem>
-	  <para><emphasis role="bold">SCST</emphasis>, NOMBRE LARGO. SCST,
-	  mantenido principalmente por Vladislav Bolkhovitin y Bart van Assche es otro
-	  fork de IET con la meta principal de solucionar "todos los problemas, corner
-	  cases issues y violaciones del estándar que IET tiene", tal como indican en su
-	  página web. SCST tiene un gran número de devotos seguidores y usuarios, que
-	  alaban los beneficios del mayor rendimiento de SCST en comparación con el resto
-	  de implementaciones de targets.</para>
-	  <para>Contrariamente a STGT, pero de la misma forma que IET, SCST
-	  realiza un montón de su trabajo en espacio de kernel, y sus
-	  desarrolladores han solicitado repetidamente su inclusión en la rama
-	  principal del kernel de Linux. De momento y hasta ahora, dichos
-	  esfuerzos no han tenido recompensa, parcialmente por AQUIAQUIAQUI</para>
+	  <para><emphasis role="bold">SCST</emphasis>, Generic SCSI Target
+	  Subsystem for Linux. SCST, mantenido principalmente por Vladislav Bolkhovitin y
+	  Bart van Assche es otro fork de IET con la meta principal de solucionar "todos
+	  los problemas, casos límite y violaciones del estándar que IET tiene", tal como
+	  indican en su página web. SCST tiene un gran número de devotos seguidores y
+	  usuarios, que alaban los beneficios del mayor rendimiento de SCST en comparación
+	  con el resto de implementaciones de targets.</para> <para>Contrariamente a STGT,
+	  pero de la misma forma que IET, SCST realiza gran parte de su trabajo en espacio
+	  de kernel, y sus desarrolladores han solicitado repetidamente su inclusión en la
+	  rama principal del kernel de Linux. De momento y hasta ahora, dichos esfuerzos
+	  no han tenido recompensa, parcialmente por la llegada de un nuevo cuarto
+	  target: LIO.</para>
 	</listitem>
-	
+
+	<listitem>
+	  <para><emphasis role="bold">LIO</emphasis>, linux-iscsi.org, toma su
+	  nombre del dominio al que el proyecto pertenece, su principal
+	  desarrollador es Nicholas Bellinger. LIO es una implementación
+	  genérica de target que se ejecuta en espacio de kernel, de la cual,
+	  iSCSI es solamente uno de sus muchos frontends. Es el único que no
+	  tiene nada que ver con ninguno de los otros tres y éste no es
+	  únicamente su rasgo más destacado. LIO utiliza una aproximación muy
+	  inusual basada en ConfigFS para su configuración, la cual produjo
+	  varias polémicas en las listas de desarrollo del kernel. A pesar de
+	  esto, a principio del 2011, LIO derrotó a SCST en la batalla de ser el
+	  sustituto de STGT como subsistema de target preferido en la rama
+	  principal del kernel de Linux. Por esta razón muchas distribuciones ya
+	  han incluido a LIO en sus repositorios, como Ubuntu, pero otras aún
+	  no.</para>
+	</listitem>
+
       </itemizedlist>
 
-
- Contrary to
-STGT and similar to IET, SCST does a
-lot of its work in the kernel, and its
-developers have repeatedly submitted
-the target for inclusion in the mainline
-kernel. Thus far, however, these efforts
-have been unsuccessful—at least
-partially because a fourth target beat
-developers to it.
-That fourth target is LIO, named
-after the “linux-iscsi.org” domain that
-the project owns. Its main developer is
-Nicholas Bellinger. LIO is a generic, in-
-kernel target driver, of which the iSCSI
-target is merely one of many front ends.
-Of the four targets mentioned here, it is
-the only one not interrelated with any
-other, and that’s not its only interesting
-trait. LIO uses an unusual in-kernel
-configuration approach using ConfigFS,
-which has produced some interesting
-flame wars on the linux-kernel mailing
-list in years past. However, in early 2011,
-LIO beat out SCST to become the blessed
-replacement of STGT as the upstream
-kernel’s preferred target subsystem. As
-upstream kernel releases trickle into
-distributions slowly, some distros already
-have incorporated this upstream change,
-but most have not.
+      <para>Cualquiera de estas cuatro implementaciones sirven perfectamente para
+      el cometido de construir una solución de almacenamiento estable, simple
+      y completamente software libre basada en iSCSI.</para>
       
     </simplesect>
 
