@@ -216,8 +216,23 @@
 	  <listitem>
 	    <para>En terminología SCSI, un LUN (Logical Unit Number) es una dirección lógica. Un LUN
 	    representa un dispositivo SCSI direccionable individualmente, que es
-	    parte de dispositivo físico SCSI (target)
-AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
+	    parte de un target (de un dispositivo físico SCSI). En un entorno
+	    iSCSI un LUN representa una unidad de disco. Cuando se inicia la
+	    negociacion initiator/target, se establece la conectividad hacia un
+	    LUN, el resultado es una conexión iSCSI que simula una conexión con
+	    un disco duro SCSI. Los initiators tratan los LUN iSCSI de la misma
+	    forma que un disco SCSI físico o un disco IDE. Esto permite a los
+	    sistemas iSCSI formatear y gestionar sistemas de ficheros
+	    directamente sobre LUN iSCSI, en vez de montar de forma remota
+	    directorios tal como lo hace NFS o CIFS.</para>
+	    <para>En despliegues más grandes, los LUNs normalmente representan
+	    "rodajas" (slices) de arrays de discos RAID, reservadas de forma
+	    individual a los servidores cliente.</para>
+	    <para>iSCSI no impone ningún tipo de regla o restricción sobre la
+	    compartición de un LUN por varios servidores, el acceso concurente
+	    por parte de varios servidores a un mismo sistema de ficheros es una
+	    tarea del sistema operativo y que depende principalmente de que el
+	    sistema de ficheros lo permita.</para>
 	  </listitem>
 	</varlistentry>
 
@@ -225,18 +240,149 @@ AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
 	  <term>IQN</term>
 	  <listitem>
 	    <para>IQN, iSCSI Qualified Name. </para>
+	    <para>Hay tres formas de especificar un nombre para los targets y os
+	    initiators en un entorno iSCSI: IQN (iSCSI Qualified Name), EUI
+	    (Extended Unique Identifier) y NAA(T11 Network Address
+	    Authority).</para>
+	    <para>IQN se describe en los RFC 3720 y 3721 y es la más utilizada,
+	    consiste baśicamente en asignar a cada target e initiator una cadena
+	    que contiene los siguientes campos:</para>
+	    <itemizedlist>
+	      <listitem>
+		<para>El literal <literal>iqn</literal>.</para>
+	      </listitem>
+
+	      <listitem>
+		<para>La fecha en la que se creó el dominio o se creó el
+		target/initiator. Se especifica con el formato:
+		<literal>yyyy-mm</literal></para>
+	      </listitem>
+
+	      <listitem>
+		<para>Nombre del dominio DNS con los componentes en orden inverso.</para>
+	      </listitem>
+
+	      <listitem>
+		<para>De forma optativa el carácter ':' usado como prefijo para
+		una cadena de texto con el nombre asignado al almacenamiento.</para>
+	      </listitem>	      
+	    </itemizedlist>
+
+	    <para>Los siguientes ejemplos se pueden obtener del RFC 3720:</para>
+<programlisting>
+                  Naming     String defined by
+     Type  Date    Auth      "example.com" naming authority
++--++-----+ +---------+ +-----------------------------+
+|  ||     | |         | |                             |     
+
+iqn.1992-01.com.example:storage:diskarrays-sn-a8675309
+iqn.1992-01.com.example
+iqn.1992-01.com.example:storage.tape1.sys1.xyz
+iqn.1992-01.com.example:storage.disk2.sys1.xyz[3]
+</programlisting>
 	  </listitem>
 	</varlistentry>
 	
       </variablelist>
-      
-      
-      
 
+    </simplesect>
+
+    <simplesect>
+      <title>Implementaciones iSCSI en GNU/Linux</title>
+      <para>Desde el punto de vista del initiator, del cliente iSCSI que inicia
+      las conexiones al target o servidor, hay una clara solución dominante y es
+      la proporcionada por el proyecto <link
+      xlink:href="http://www.open-iscsi.org">open-iscsi</link>. Soportada
+      actualmente por las principales distribuciones está
+      ampliamente aceptada como el referente en cuanto a implementaciones de
+      initiators iSCSI en el mundo GNU/Linux.</para>
+
+      <para>En cuanto a targets, las cosas son un poco más complicadas, al menos
+      cuatro implementaciones FLOSS (Free/Libre Open Source Software) están
+      disponibles para el almacenamiento sobre TCP/IP</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para><emphasis role="bold">IET</emphasis>, the iSCSI Enterprise
+	  Target, es una implementación en espacio kernel disponible como módulo pero no
+	  incluida aún en los fuentes oficiales del kernel de Linux.</para> <para>IET
+	  tiene su origen en un fork GPL de una implementación iSCSI de la empresa
+	  holandesa Ardis Technologies y es usada ampliamente por vendedores de soluciones
+	  iSCSI de bajo coste. Varias distribuciones populares, incluyendo a Debian,
+	  Ubuntu o SUSE, incluyen IET en sus repositorios oficiales, en Ubuntu es incluso
+	  el target por defecto (paquete <literal>iscsitarget</literal>). Su desarrollo
+	  continúa de forma activa siendo Scott Walker y Arne Redlich los principales
+	  desarrolladores del proyecto.</para>
+	</listitem>
+
+	<listitem>
+	  <para><emphasis role="bold">STGT</emphasis>, the Linux SCSI target
+	  framework. Con STGT, el ex-desarrollador del proyecto IET, Fujita Tomonori,
+	  intentó escribir un reemplazo multiprotocolo y en espacio de usuario de
+	  IET.</para>
+	  <para>Solo una porción muy pequeña del código de STGT se ejecuta en
+	  espacio de kernel y fue incluida en la versión 2.6.20, el resto del
+	  target se ejecuta en espacio de usuario. Red Hat adoptó rápidamente STGT
+	  como su target iSCSI por defecto durante el lanzamiento de Red Hat
+	  Enterprise Linux 5 y continúa actualmente su soporte en RHEL 6. SUSE
+	  también adoptó esta implementación para su SUSE Linux Enterprise Server
+	  (SLES) 11, oras distribuciones como Debian o Ubuntu también lo
+	  incorporan en sus repositorios oficiales. Sin embargo, el activo desarrollo
+	  de STGT parece que se ha detenido y actualmente el proyecto se encuentra
+	  en un modo de solo mantenimiento.</para>
+	</listitem>
+
+	<listitem>
+	  <para><emphasis role="bold">SCST</emphasis>, NOMBRE LARGO. SCST,
+	  mantenido principalmente por Vladislav Bolkhovitin y Bart van Assche es otro
+	  fork de IET con la meta principal de solucionar "todos los problemas, corner
+	  cases issues y violaciones del estándar que IET tiene", tal como indican en su
+	  página web. SCST tiene un gran número de devotos seguidores y usuarios, que
+	  alaban los beneficios del mayor rendimiento de SCST en comparación con el resto
+	  de implementaciones de targets.</para>
+	  <para>Contrariamente a STGT, pero de la misma forma que IET, SCST
+	  realiza un montón de su trabajo en espacio de kernel, y sus
+	  desarrolladores han solicitado repetidamente su inclusión en la rama
+	  principal del kernel de Linux. De momento y hasta ahora, dichos
+	  esfuerzos no han tenido recompensa, parcialmente por AQUIAQUIAQUI</para>
+	</listitem>
+	
+      </itemizedlist>
+
+
+ Contrary to
+STGT and similar to IET, SCST does a
+lot of its work in the kernel, and its
+developers have repeatedly submitted
+the target for inclusion in the mainline
+kernel. Thus far, however, these efforts
+have been unsuccessful—at least
+partially because a fourth target beat
+developers to it.
+That fourth target is LIO, named
+after the “linux-iscsi.org” domain that
+the project owns. Its main developer is
+Nicholas Bellinger. LIO is a generic, in-
+kernel target driver, of which the iSCSI
+target is merely one of many front ends.
+Of the four targets mentioned here, it is
+the only one not interrelated with any
+other, and that’s not its only interesting
+trait. LIO uses an unusual in-kernel
+configuration approach using ConfigFS,
+which has produced some interesting
+flame wars on the linux-kernel mailing
+list in years past. However, in early 2011,
+LIO beat out SCST to become the blessed
+replacement of STGT as the upstream
+kernel’s preferred target subsystem. As
+upstream kernel releases trickle into
+distributions slowly, some distros already
+have incorporated this upstream change,
+but most have not.
       
     </simplesect>
 
-    
   </section>
 
   <section xml:id="id-vol-instalacion">
