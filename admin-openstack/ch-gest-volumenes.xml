@@ -952,11 +952,11 @@ Logout of [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, p
 	  </listitem>
 
 	  <listitem>
-	    <para>Detenemos el servicio iSCSI y el servicio nova-volume en el
+	    <para>Detenemos el servicio nova-volume y el servicio iSCSI en el
 	    nodo controlador:</para>
 	    <screen>
-<prompt>root@jupiter:~# </prompt><userinput>service tgt stop</userinput>
 <prompt>root@jupiter:~# </prompt><userinput>service nova-volume stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service tgt stop</userinput>
 	    </screen>
 	  </listitem>
 
@@ -975,7 +975,7 @@ Logout of [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, p
 	  </listitem>
 
 	  <listitem>
-	    <para>Eliminamos todos los volúmenes lógicos LVm creados:</para>
+	    <para>Eliminamos todos los volúmenes lógicos LVM creados:</para>
 	    <screen>
 <prompt>root@jupiter:~# </prompt><userinput>lvremove /dev/nova-volumes/volume-00000001</userinput>
 <prompt>root@jupiter:~# </prompt><userinput>lvremove /dev/nova-volumes/volume-00000002</userinput>
@@ -983,13 +983,38 @@ Logout of [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, p
 	    </screen>
 	  </listitem>
 
-	  AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI
+	  <listitem>
+	    <para>Eliminamos las siguientes entradas de la base de datos de
+	    Nova:</para>
+	    <screen>
+<prompt>root@jupiter:~# </prompt><userinput>mysql-u root -p</userinput>
+<prompt>mysql> </prompt><userinput>delete from iscsi_targets;</userinput>
+<prompt>mysql> </prompt><userinput>delete from volume_metadata;</userinput>
+<prompt>mysql> </prompt><userinput>delete from volume_type_extra_specs;</userinput>
+<prompt>mysql> </prompt><userinput>delete from volume_types;</userinput>
+<prompt>mysql> </prompt><userinput>delete from block_device_mapping;</userinput>
+<prompt>mysql> </prompt><userinput>delete from volumes;</userinput>
+	    </screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>Volvemos a iniciar el servicio iSCSI en los nodos de
+	    computación:</para>
+	    <screen><prompt>root@io:~# </prompt><userinput>service open-iscsi start</userinput></screen>
+	  </listitem>
+
+	  <listitem>
+	    <para>Iniciamos el servicio iSCSI y el servicio nova-volume en el
+	    nodo controlador:</para>
+	    <screen>
+<prompt>root@jupiter:~# </prompt><userinput>service tgt start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-volume start</userinput>
+	    </screen>
+	  </listitem>
 	  
 	</orderedlist>
-	
 
       </listitem>
-
       
     </itemizedlist>
   </section>
@@ -1001,24 +1026,126 @@ Logout of [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, p
   </section>
 
   <section xml:id="id-drivers">
-    <title>Volume Drivers</title>
-    <para>Podemos incluir:</para>
+    <title>Controladores de Volúmenes (Volume Drivers)</title>
+    <para>El comportamiento por defecto de nova-volume se puede alterar usando
+    diferentes drivers para nova-volume. Estos drivers ya están incluidos en el
+    código base de Nova, tan solo hay que seleccionarlos a través de la
+    directiva <literal>volume_driver</literal> del fichero
+    <filename>nova.conf</filename>. El valor por defecto es el siguiente:</para>
+    <programlisting>
+volume_driver=nova.volume.driver.ISCSIDriver
+    </programlisting>
+
+    <para>Pero Nova pone a disposición drivers para los siguientes backends de almacenamiento:</para>
 
     <itemizedlist>
       <listitem>
-	<para>Ceph Rados block Device</para>
+	<para>Ceph Rados block device (RBD).</para>
+	<para>Si se usa KVM/QEMU como hipervisor, se puede configurar Nova para
+	que use RBD para la gestión de volúmenes. Tan solo hay que añadir las
+	siguientes directivas en los nodos que ejecuten
+	<literal>nova-volume</literal>:</para>
+	<programlisting>
+volume_driver=nova.volume.driver.RBDDriver
+rbd_pool=nova	  
+	</programlisting>
       </listitem>
 
       <listitem>
-	<para>Nexenta</para>
+	<para>Nexenta.</para>
+	<para>El Sistema Operativo NexentaStor es una plataforma software
+	NAS/SAN para la construcción de arrays de almacenamiento en red rápido y
+	confiable, al estar basado en el sistema operativo OpenSolaris y usar
+	ZFS como sistema de ficheros nativo. NexentaStor puede actuar como nodo
+	de almacenamiento en una infraestructura OpenStack y proporcionar
+	volúmenes a nivel de bloque para las instancias en ejecución a través
+	del protocolo iSCSI.</para>
+	<para>El driver de Nexenta permite utilizar Nexenta SA para almacenar
+	volúmenes de Nova. Cada volumen Nova está representado a través de un
+	único <literal>zvol</literal> en un volumen predefinido de Nexenta. Para
+	cada nuevo volumen, el driver crea un target iSCSI y un grupo de targets
+	que se utilizarán para el acceso por las instancias.</para>
+	<para>Para el uso de Nexenta por Nova, hay que configurar los siguientes
+	parámetros:</para>
+	<itemizedlist>
+	  <listitem>
+	    <para><literal>volume_driver=nova.volume.nexenta.volume.NexentaDriver</literal></para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_host</literal>: nombre del host o la
+	    dirección IP del servidor NexentaStor.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_user</literal> y
+	    <literal>nexenta_password</literal>: usename y password del usuario
+	    que cuente con todos los privilegios necesarios en el servidor,
+	    incluyendo acceso a la API REST.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_volume</literal>: nombre del volumen Nexenta
+	    a utilizar, por defecto se utilizará <literal>nova</literal>.</para>
+	  </listitem>
+	  
+	</itemizedlist>
+	<para>Otros parámetros interesantes para modificar serían los
+	siguientes:</para>
+	<itemizedlist>
+	  <listitem>
+	    <para><literal>nexenta_target_prefix</literal>: prefijo añadido al
+	    identificador de volumen para formar el nombre del target que
+	    Nexenta ofrecerá.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_target_group_prefix</literal>: prefijo para
+	    el grupo de targets.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_blocksize</literal>: tamaño del bloque de
+	    datos a utilizar. Ejemplo: <literal>8K</literal></para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_sparse</literal>: valor booleano que indica
+	    si se usarán zvols libres para ahorrar espacio.</para>
+	  </listitem>
+	  
+	</itemizedlist>
+
+	<para>Los siguientes parámetros se pueden fijar en sus valores por
+	defecto:</para>
+	
+	<itemizedlist>
+	  <listitem>
+	    <para><literal>nexenta_rest_port</literal>: puerto donde Nexenta
+	    escucha las peticiones REST.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_rest_protocol</literal>: puede ser
+	    <literal>http</literal> o <literal>https</literal>, el valor por
+	    defecto es <literal>auto</literal>.</para>
+	  </listitem>
+
+	  <listitem>
+	    <para><literal>nexenta_iscsi_target_portal_port</literal>: puerto donde Nexenta
+	    escucha las peticiones iSCSI.</para>
+	  </listitem>
+	  
+	</itemizedlist>
+
       </listitem>
 
       <listitem>
-	<para>Integración con Openfiler</para>
+	<para>Xen Storage Manager</para>
       </listitem>
       
     </itemizedlist>
-   
+
   </section>
 
   <section xml:id="id-arranque-volumenes">
