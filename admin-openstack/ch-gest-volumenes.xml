@@ -104,41 +104,42 @@
     hardware y cableado específico como Fibre Channel o Infiniband.</para>
 
     <para>iSCSI es un protocolo de nivel de aplicación que trabaja sobre TCP,
-    normalmente los puertos 860 ó 3260. Básicamente, iSCSI simplemente permite a
-    dos hosts negociar ciertos parámetros para poder después intercambiar
-    comandos SCSI utilizando redes IP. De esta forma iSCSI es capaz de tomar un
+    normalmente los puertos 860 ó 3260. Básicamente, iSCSI permite a
+    dos hosts negociar sobre ciertos parámetros para poder después intercambiar
+    comandos SCSI utilizando una red IP. De esta forma iSCSI es capaz de tomar un
     protocolo de alto rendimiento muy utilizado en buses de almacenamiento local
     y emularlo sobre redes de área extensa creando una red de almacenamiento
     (SAN). De forma diferente a otros protocolos utilizados en redes de
     almacenamiento, iSCSI no necesita de cableado especial ya que puede utilizar
     la infraestructura de red existente (interfaces de red, cableado, switches,
     etc.), por lo que a menudo se ve como una alternativa más económica a Fibre
-    Channel (exceptuando FCoE, Fibre Channel sover Ethernet) o Infiniband. Sin
-    embargo, el rendimiento de iSCSI en un despliegue SAN se puede verse
+    Channel (exceptuando FCoE, Fibre Channel sobre Ethernet) o Infiniband. Sin
+    embargo, el rendimiento de iSCSI en un despliegue SAN se puede ver
     reducido en gran medida si no se configura en una red o subred separada (LAN
     ó VLAN).</para>
 
-    <para>Aunque iSCSI permite comunicar cualquier tipo de dispositivo SCSI,
-    casi siempre se utiliza por los administradores de sistemas para permitir
-    que determinados hosts que ofrecen servicios (web, FTP, bases de datos,
-    servicios de virtualización, ...), puedan acceder a volúmenes de discos
-    situados en arrays de almacenamiento. Las SAN iSCSI se diseñan normalmente
-    con dos objetivos en mente:</para>
+    <para>Aunque iSCSI permite comunicar cualquier tipo de dispositivos, casi
+    siempre es utilizado por los administradores de sistemas para la conexión de
+    discos. Permitiendo a hosts que ofrecen servicios (web, FTP, bases de datos,
+    servicios de virtualización, ...), poder acceder a volúmenes de discos situados
+    en arrays de almacenamiento. Una SAN iSCSI se diseña normalmente con dos
+    objetivos en mente:</para>
 
     <itemizedlist>
       <listitem>
 	<para><emphasis role="bold">Consolidación de almacenamiento.</emphasis>
-	Consiste en trasladar los diferentes recursos de almacenamiento a un
-	lugar centralizado y más eficiente. Un entorno SAN proporciona un mayor
-	grado de flexibilidad en el almacenamiento ya que es posible localizar
-	nuevos volúmenes de discos para cualquier servidor en cualquier momento
-	sin modificar nada ni en el cableado ni en la configuración hardware.</para>
+	Consiste en trasladar los diferentes recursos de almacenamiento a un lugar
+	centralizado y más eficiente. Un entorno SAN proporciona un mayor grado de
+	flexibilidad en el almacenamiento ya que es posible localizar nuevos volúmenes
+	de discos para cualquier servidor en cualquier momento, sin tener que realizar
+	ningún cambio ni en el cableado ni en la configuración hardware.</para>
       </listitem>
       
       <listitem>
-	<para><emphasis role="bold">Recuperación de desastres.</emphasis>En un
-	entorno SAN, los recursos de almacenamiento pueden fácilmente tanto
-	migrarse, como replicarse (mirroring) de una localización a otra.</para>
+	<para><emphasis role="bold">Recuperación de desastres.</emphasis> Un
+	entorno SAN permite un mayor grado de flexibilidad, ya que los recursos
+	de almacenamiento pueden replicarse y migrarse (mirroring) entre
+	localizaciones (incluso alejadas geográficamente) muy fácilmente.</para>
       </listitem>
 
     </itemizedlist>
@@ -162,7 +163,7 @@
 	    initiators pueden ser de dos tipos:</para>
 	    <itemizedlist>
 	      <listitem>
-		<para>Los initiators software utilizan código para implementar
+		<para>Software. Utilizan código para implementar
 		el protocolo. Normalmente en drivers de dispositivo a nivel de
 		kernel utilizando toda la pila de red del sistema
 		operativo.</para>
@@ -172,12 +173,11 @@
 	      </listitem>
 
 	      <listitem>
-		<para>Hardware. Un initiator hardware utiliza hardware dedicado,
-		combinado normalmente con un determinado sofwtare (firmware)
-		para implementar iSCSI. Este tipo de initiators reducen en gran
-		medida la sobrecarga del procesamiento del protocolo sobre TCP y
-		de las interrupciones Ethernet, por lo que aumentan el
-		rendimiento global de los servidores a la hora de utilizar
+		<para>Hardware. Utilizan un hardware dedicado, combinado
+		normalmente con un determinado software (firmware) para la implementación
+		iSCSI. Este tipo de initiators reducen en gran medida la sobrecarga de la CPU en
+		el procesamiento del protocolo TCP y de las interrupciones Ethernet, por lo que
+		aumentan el rendimiento global de los servidores a la hora de utilizar
 		iSCSI.</para>
 
 		<para>Un HBA (iSCSI Host Bus Adapter) es una tarjeta que
@@ -203,7 +203,7 @@
 	    almacenamiento que un sistema operativo ofrezca a través de
 	    iSCSI. De la misma forma que un sistema operativo puede implementar
 	    un initiator por software, también puede implementar un
-	    target. Estas solución está implementada en los sistemas operativos
+	    target. Esta solución está implementada en los sistemas operativos
 	    más comunes como Linux, BSD, Solaris o Windows Server.</para>
 
 	    <para>También existen ciertas distribuciones como FreeNAS, Openfiler
@@ -220,7 +220,7 @@
 	    iSCSI un LUN representa una unidad de disco. Cuando se inicia la
 	    negociacion initiator/target, se establece la conectividad hacia un
 	    LUN, el resultado es una conexión iSCSI que simula una conexión con
-	    un disco duro SCSI. Los initiators tratan los LUN iSCSI de la misma
+	    un disco duro. Los initiators tratan los LUN iSCSI de la misma
 	    forma que un disco SCSI físico o un disco IDE. Esto permite a los
 	    sistemas iSCSI formatear y gestionar sistemas de ficheros
 	    directamente sobre LUN iSCSI, en vez de montar de forma remota
@@ -231,8 +231,8 @@
 	    <para>iSCSI no impone ningún tipo de regla o restricción sobre la
 	    compartición de un LUN por varios servidores, el acceso concurente
 	    por parte de varios servidores a un mismo sistema de ficheros es una
-	    tarea del sistema operativo y que depende principalmente de que el
-	    sistema de ficheros lo permita.</para>
+	    tarea del sistema operativo y depende principalmente del tipo de
+	    acceso soportado por el sistema de ficheros.</para>
 	  </listitem>
 	</varlistentry>
 
@@ -240,12 +240,12 @@
 	  <term>IQN</term>
 	  <listitem>
 	    <para>IQN, iSCSI Qualified Name. </para>
-	    <para>Hay tres formas de especificar un nombre para los targets y os
+	    <para>Hay tres formas de especificar un nombre para los targets y los
 	    initiators en un entorno iSCSI: IQN (iSCSI Qualified Name), EUI
-	    (Extended Unique Identifier) y NAA(T11 Network Address
+	    (Extended Unique Identifier) y NAA (T11 Network Address
 	    Authority).</para>
 	    <para>IQN se describe en los RFC 3720 y 3721 y es la más utilizada,
-	    consiste baśicamente en asignar a cada target e initiator una cadena
+	    consiste básicamente en asignar a cada target e initiator una cadena
 	    que contiene los siguientes campos:</para>
 	    <itemizedlist>
 	      <listitem>
@@ -299,16 +299,16 @@ iqn.1992-01.com.example:storage.disk2.sys1.xyz[3]
 
       <para>En cuanto a targets, las cosas son un poco más complicadas, al menos
       cuatro implementaciones FLOSS (Free/Libre Open Source Software) están
-      disponibles para el almacenamiento sobre TCP/IP</para>
+      disponibles para el almacenamiento sobre TCP/IP:</para>
 
       <itemizedlist>
 	<listitem>
 	  <para><emphasis role="bold">IET</emphasis>, the iSCSI Enterprise
 	  Target, es una implementación en espacio kernel disponible como módulo pero no
 	  incluida aún en los fuentes oficiales del kernel de Linux.</para> <para>IET
-	  tiene su origen en un fork GPL de una implementación iSCSI de la empresa
+	  tiene su origen en un fork GPL de la implementación iSCSI de la empresa
 	  holandesa Ardis Technologies y es usada ampliamente por vendedores de soluciones
-	  iSCSI de bajo coste. Varias distribuciones populares, incluyendo a Debian,
+	  iSCSI de bajo coste. Varias distribuciones populares, incluyendo Debian,
 	  Ubuntu o SUSE, incluyen IET en sus repositorios oficiales, en Ubuntu es incluso
 	  el target por defecto (paquete <literal>iscsitarget</literal>). Su desarrollo
 	  continúa de forma activa siendo Scott Walker y Arne Redlich los principales
@@ -324,7 +324,7 @@ iqn.1992-01.com.example:storage.disk2.sys1.xyz[3]
 	  espacio de kernel y fue incluida en la versión 2.6.20, el resto del
 	  target se ejecuta en espacio de usuario. Red Hat adoptó rápidamente STGT
 	  como su target iSCSI por defecto durante el lanzamiento de Red Hat
-	  Enterprise Linux 5 y continúa actualmente su soporte en RHEL 6. SUSE
+	  Enterprise Linux 5 (RHEL 5) y continúa actualmente su soporte en RHEL 6. SUSE
 	  también adoptó esta implementación para su SUSE Linux Enterprise Server
 	  (SLES) 11, oras distribuciones como Debian o Ubuntu también lo
 	  incorporan en sus repositorios oficiales. Sin embargo, el activo desarrollo
@@ -375,7 +375,7 @@ iqn.1992-01.com.example:storage.disk2.sys1.xyz[3]
   </section>
 
   <section xml:id="id-vol-instalacion">
-    <title>Instalación y configuración</title>
+    <title>Instalación y configuración de nova-volume</title>
     <para>Para la instalación y configuración del servicio seguiremos los
     siguientes pasos:</para>
 
@@ -396,7 +396,7 @@ iqn.1992-01.com.example:storage.disk2.sys1.xyz[3]
 	  </listitem>
 
 	  <listitem>
-	    <para>Creamos el VG:</para>
+	    <para>Creamos el grupo de volúmenes (VG):</para>
 	    <screen>
 <prompt>root@jupiter:~# </prompt><userinput>pvcreate /dev/sda4</userinput>
 <prompt>root@jupiter:~# </prompt><userinput>vgcreate nova-volumes /dev/sda4</userinput>
@@ -409,7 +409,7 @@ iqn.1992-01.com.example:storage.disk2.sys1.xyz[3]
       <listitem>
 	<para>Instalación y configuración de iSCSI: recordamos que todos los
 	nodos de computación actúan como <emphasis>iSCSI initiators</emphasis>
-	mientras que el controlador actúa como <emphasis>iSCSI
+	mientras que el nodo controlador actúa como <emphasis>iSCSI
 	target</emphasis>. Esto implica que los nodos de computación deben
 	poder establecer conexiones con el controlador en el puerto TCP
 	<literal>3260</literal>.</para>
@@ -446,7 +446,7 @@ InitiatorName=iqn.2012-08.net.iescierva:initiator:io
 	optamos por ésta última. El paquete se habrá instalado al instalar
 	nova-volume, si no, lo hacemos a través de este comando:</para>
 
-	<screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install iscsitarget</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install tgt</userinput></screen>
 
 	<warning>
 	  <para>La documentación oficial de OpenStack instala el paquete
@@ -455,8 +455,8 @@ InitiatorName=iqn.2012-08.net.iescierva:initiator:io
 	  el sistema con dos implementaciones distintas de targets iSCSI, con el
 	  correspondiente conflicto de configuración, puertos, etc. Solo hay que
 	  instalar uno, por lo que nos decantamos por TGT.</para>
-	  <para><emphasis role="bold">No hay que instalar ni el paquete iscsitarget ni el
-	  paquete iscsitarget-dkms</emphasis></para>
+	  <para><emphasis role="bold">¡¡No hay que instalar ni el paquete iscsitarget ni el
+	  paquete iscsitarget-dkms!!</emphasis></para>
 	</warning>
 
 	<para>Reiniciamos el servicio en el controlador:</para>
@@ -466,7 +466,7 @@ InitiatorName=iqn.2012-08.net.iescierva:initiator:io
 	<para>Iniciamos también los servicios iSCSI en los nodos de
 	computación:</para>
 
-	<screen><prompt>root@jupiter:~# </prompt><userinput>service open-iscsi restart</userinput></screen>
+	<screen><prompt>root@io:~# </prompt><userinput>service open-iscsi restart</userinput></screen>
       </listitem>
 
       <listitem>
@@ -521,9 +521,10 @@ nova-compute     io                                   nova             enabled  
 +----+-----------+--------------+------+-------------+-------------+
 	</screen>
 
-	<para>Una vez que el estado es 'disponible' (available), el volumen ya puede
-	conectarse a una instancia. Al crear el volumen, podemos ver que se ha
-	creado un nuevo volumen lógico:</para>
+	<para>Una vez que el estado es 'disponible' (available), el volumen ya
+	puede conectarse a una instancia. Al crear el volumen, podemos ver que se ha
+	creado un nuevo volumen lógico, en este caso sobre
+	<filename>/dev/nova-volumes/volume-00000001</filename>:</para>
 	<screen>
 <prompt>root@jupiter:~# </prompt><userinput>lvs</userinput>
   LV              VG           Attr   LSize   Origin Snap%  Move Log Copy%  Convert
@@ -581,8 +582,9 @@ Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
         ALL
 	</screen>
 
-	<para>Podemos conectar el volumen a una instancia a través del siguiente
-	comando, para ello necesitamos:</para>
+	<para>Podemos conectar el volumen a una instancia a través del subcomando
+	<command>volume-attach</command> del comando <command>nova</command>, para ello
+	necesitamos:</para>
 	<itemizedlist>
 	  <listitem>
 	    <para>El UID de la instancia, lo obtenemos a partir de los comandos
@@ -599,7 +601,7 @@ Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
 	  <listitem>
 	    <para>El dispositivo que verá la instancia que se ejecuta en el nodo de
 	    computación. Normalmente un dispositivo de la forma
-	    <filename>/dev/vdX</filename>. KVM nombra a los dispositivos de otra
+	    <filename>/dev/vdX</filename>. KVM nombra a los dispositivos de esta
 	    forma, distinguiendo los discos de las máquinas virtuales (invitados),
 	    <literal>/dev/vdX</literal>, de los dispositivos del anfitrión,
 	    <literal>/dev/sdX</literal>.</para>
@@ -627,7 +629,7 @@ Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
 	  </listitem>
 
 	  <listitem>
-	    <para>Hay una sesión iSCSI iniciada:</para>
+	    <para>Hay una sesión iSCSI iniciada en el nodo controlador:</para>
 	    <screen>
 <prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
 Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
@@ -802,11 +804,11 @@ nova volume-attach <server> <volume> <device>
 	  <listitem>
 	    <para>El dispositivo que verá la máquina virtual. Los volúmenes se
 	    exportan por iSCSI, por lo que el nodo de computación que contiene
-	    la máquina virtual, verá un nuevo disco son su fichero de
+	    la máquina virtual, verá un nuevo disco con su fichero de
 	    dispositivo asociado de la forma <filename>/dev/sdX</filename>,
 	    normalmente <literal>/dev/sdb</literal>. La máquina virtual lo verá
 	    a través de KVM, a través de un fichero de dispositivo  de la forma
-	    /dev/vdX, nomrmalmente <literal>/dev/vdb</literal>. Hay que tener
+	    /dev/vdX, normalmente <literal>/dev/vdb</literal>. Hay que tener
 	    muy en cuenta a la hora de indicar este parámetro cuál es el
 	    siguiente libre en la máquina virtual. El comando no funcionará si
 	    el dispositivo ya existe, si lo hará aunque asigne otra letra si el
@@ -816,11 +818,12 @@ nova volume-attach <server> <volume> <device>
 	  
 	</itemizedlist>
 
-	<para>Ejemplos:</para>
+	<para>Ejemplo:</para>
 	<screen><prompt>root@jupiter:~# </prompt><userinput>nova volume-attach de701111-5b42-456a-b3ea-1609d49ebc2f 1 /dev/vdc</userinput></screen>
-	<para>Este comando conecta el volumen 1 con la instancia indicada por el
-	UUID. En la instancia el volumen aparecerá como /dev/vdc, siempre y
-	cuando vda y vdb estén ocupados y vdc libre.</para>	
+	<para>Este comando conecta el volumen <literal>1</literal> con la
+	instancia indicada por el UUID. En la instancia el volumen aparecerá como
+	<literal>/dev/vdc</literal>, siempre y cuando <literal>vda</literal> y
+	<literal>vdb</literal> estén ocupados y <literal>vdc</literal> libre.</para>
       </listitem>
 
       <listitem>
@@ -845,7 +848,7 @@ nova volume-detach <server> <volume>
 	  
 	</itemizedlist>
 
-	<para>Ejemplos:</para>
+	<para>Ejemplo:</para>
 	<screen><prompt>root@jupiter:~#  </prompt><userinput>nova volume-detach de701111-5b42-456a-b3ea-1609d49ebc2f 1</userinput></screen>
       </listitem>
 
@@ -872,8 +875,9 @@ nova volume-delete <volume>
 	seguridad, nova-volume sobrescribe con ceros todos los bloques de datos
 	físicos que conforman el volumen. Podemos acelerar el borrado
 	sobrescribiendo únicamente el primer gigabyte, eliminando el MBR y el
-	principio del sistema de ficheros, tal como se cuenta en:
-	https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/
+	principio del sistema de ficheros, tal como se explica en: 
+	<link xlink:href="https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/">https://dijks.wordpress.com</link>
+	
 	Basta realizar el siguiente cambio:</para>
 	<itemizedlist>
 	  <listitem>
@@ -923,7 +927,7 @@ usage: nova volume-list
 	<para><emphasis role="bold">nova volume-show</emphasis></para>
 	<para>Muestra información detallada sobre un volumen.</para>
 	<programlisting>
-<![CDATA[[
+<![CDATA[
 usage: nova volume-show <volume>
 ]]>
 	</programlisting>
@@ -948,21 +952,21 @@ usage: nova volume-show <volume>
     <title>Resolución de problemas</title>
     <para>Si por cualquier motivo, no se consigue la conexión entre los
     volúmenes y las instancias, podemos realizar ciertas comprobaciones para
-    chequear que todo esté correcto. La fuente de información más importante son
-    los ficheros de logs, concretamente:</para>
+    chequear que todo esté correctamente configurado. La fuente de información más
+    importante son los ficheros de logs, concretamente:</para>
     <itemizedlist>
       <listitem>
 	<para><filename>/var/log/nova/nova-volume.log</filename>, en el controlador.</para>
       </listitem>
 
       <listitem>
-	<para><filename>/var/log/nova/nova-compute.log></filename>, en los nodos
+	<para><filename>/var/log/nova/nova-compute.log</filename>, en los nodos
 	de computación.</para>
       </listitem>
       
     </itemizedlist>
 
-    <para>Los errores más comunes pueden ser:</para>
+    <para>Los errores más comunes pueden ser, entre otros:</para>
 
     <itemizedlist>
       <listitem>
@@ -980,7 +984,8 @@ usage: nova volume-show <volume>
 	<para>También se puede producir este error si todo está bien configurado
 	pero el target del volumen en concreto no se está exportando. En ese
 	caso debemos borrar las referencias al volumen de la tabla
-	block_device_mapping de la base de datos de Nova.</para>
+	<literal>block_device_mapping</literal> de la base de datos de
+	Nova.</para>
       </listitem>
 
       <listitem>
@@ -1005,27 +1010,30 @@ usage: nova volume-show <volume>
 	entonces chequear cortafuegos, comprobar conectividad a través del
 	comando <command>ping</command>, <command>traceroute</command>,
 	etc. Nos puede ayudar también comprobar si una operación
-	<emphasis>discovery</emphasis> de iSCSI tiene éxito:</para>
-	<screen><prompt>$ </prompt><userinput>iscsiadm --mode discovery --type sendtargets --portal 172.20.251.190</userinput></screen>
+	<emphasis>discovery</emphasis> de iSCSI desde los nodos de computación
+	tiene éxito:</para>
+	<screen><prompt>root@io:~# </prompt><userinput>iscsiadm --mode discovery --type sendtargets --portal 172.20.251.190</userinput></screen>
       </listitem>
 
       <listitem>
-	<para><emphasis>Pérdida de conexión entre nova-volume y nova-error. Cómo
-	recuperar a un estado limpio. </emphasis></para> 
-	<para>Las desconexiones de red se producen, desde el punto de vista
-	iSCSI, una pérdida de conexión implica la extracción física de un disco en el
-	servidor (el cliente iSCSI). Si la instancia estaba utilizando el volumen cuando
-	se produjo la desconexión, nova-volumen no podrá desconectar el volumen
-	(<literal>detach</literal>)</para>
+	<para><emphasis>Pérdida de conexión entre nova-volume y nova-compute. Cómo
+	recuperar a un estado limpio. </emphasis></para>
+
+	<para>Las desconexiones de red, por desgracia, se producen. Desde el
+	punto de vista iSCSI, una pérdida de conexión implica la extracción física de un
+	disco en el servidor (el cliente iSCSI). Si la instancia estaba utilizando el
+	volumen cuando se produjo la desconexión, nova-volumen no podrá desconectar el
+	volumen (<literal>detach</literal>)</para>
+
 	<para>Para solucionar este problema y que todo vuelva a la "normalidad"
 	seguimos estos pasos:</para>
 	<orderedlist>
 	  <listitem>
 	    <para>Desde el nodo de computación eliminamos todas las sesiones
 	    iSCSI activas (stalled), obtenemos el listado de todas ellas:</para>
-	    <screen><prompt>root@callisto:~# </prompt><userinput>iscsiadm -m session</userinput></screen>
+	    <screen><prompt>root@calisto:~# </prompt><userinput>iscsiadm -m session</userinput></screen>
 	    <para>... y eliminamos las problemáticas:</para>
-	    <screen><prompt>root@callisto:~# </prompt><userinput>iscsiadm -m session-r &lt;ID&gt;> -u</userinput></screen>
+	    <screen><prompt>root@calisto:~# </prompt><userinput>iscsiadm -m session-r &lt;ID&gt;> -u</userinput></screen>
 	    <para>... siendo ID el identificador de la sesión a cerrar. Ejemplo:
 	    podemos cerrar la sesión iSCSI 10 de esta salida:</para>
 	    <programlisting>
@@ -1033,7 +1041,7 @@ tcp: [10] 172.20.251.190:3260,1 iqn.2012-08.net.iescierva:jupiter:volume-0000000
 	    </programlisting>
 	    <para>A través de este comando:</para>
 	    <screen>
-<prompt>root@callisto:~# </prompt><userinput>iscsiadm -m session -r 10 -u</userinput>
+<prompt>root@calisto:~# </prompt><userinput>iscsiadm -m session -r 10 -u</userinput>
 Logging out of session [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, portal: 172.20.251.190,3260]
 Logout of [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, portal: 172.20.251.190,3260]: successful
 	    </screen>
@@ -1096,11 +1104,9 @@ Logout of [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, p
 	  </listitem>
 
 	  <listitem>
-	    <para>No debe quedar ningún target en el nodo controlador:</para>
-	    <screen>
-<prompt>root@jupiter:~# </prompt><userinput>service tgt stop</userinput>
+	    <para>No debe quedar ningún target en el nodo controlador (ni
+	    siquiera con el servicio <literal>tgt</literal> activo:</para>
 
-	    </screen>
 	    <para>Si quedara alguno, lo eliminamos:</para>
 	    <screen>
 <prompt>root@jupiter:~# </prompt><userinput>tgtadm --lld iscsi --op show --mode target</userinput>
@@ -1152,12 +1158,6 @@ Logout of [sid: 10, target: iqn.2012-08.net.iescierva:jupiter:volume-00000004, p
       </listitem>
       
     </itemizedlist>
-  </section>
-
-  <section xml:id="id-vol-backups">
-    <title>Copias de seguridad de los volúmenes</title>
-    <para>AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
-    
   </section>
 
   <section xml:id="id-drivers">
@@ -1225,8 +1225,7 @@ rbd_pool=nova
 	  </listitem>
 	  
 	</itemizedlist>
-	<para>Otros parámetros interesantes para modificar serían los
-	siguientes:</para>
+	<para>Otros parámetros interesantes son los siguientes:</para>
 	<itemizedlist>
 	  <listitem>
 	    <para><literal>nexenta_target_prefix</literal>: prefijo añadido al
@@ -1285,7 +1284,7 @@ rbd_pool=nova
 
   <section xml:id="id-arranque-volumenes">
     <title>Iniciando una instancia desde un volumen</title>
-    <para></para>
+    <para>POR HACER.</para>
     
   </section>
 
