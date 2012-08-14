@@ -645,7 +645,7 @@ bond0.63       | 63  | bond0
       <orderedlist>
 	<listitem>
 	  <para>Nos aseguramos que el paquete <literal>ntpdate</literal> esté
-	  instalado.</para>
+	  instalado en todos los nodos, incluyendo el nodo controlador.</para>
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>dpkg --list | grep ntpdate</userinput></screen>
 	  <para>Si no lo estuviera lo instalamos:</para>
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install ntpdate</userinput></screen>
@@ -1975,5 +1975,95 @@ iface bond0.60 inet manual
 
 <!-- Falta completar con la instalación de swift -->
 <!-- Falta completar con la instalación del cliente -->
+
+  <section xml:id="id_instUbuntu_InstCliente">
+    <title>Instalación del cliente administrativo</title>
+    <para>Durante la instalación que acabamos de ver, el nodo controlador y
+    posiblemente el nodo de computación se han configurado también como cliente
+    de la infraestructura Cloud Computing que OpenStack proporciona. Si queremos
+    instalar un cliente de administración para OpenStack en un host aparte (con
+    el nombre <literal>venus</literal> tan solo tenemos que seguir los
+    siguientes pasos:</para>
+    <orderedlist>
+      <listitem>
+	<para>Realizar una instalación de Ubuntu 12.04 LTS Desktop (a partir de
+	los CDs <literal>desktop</literal> ó <literal>alternate</literal>).</para>
+      </listitem>
+
+      <listitem>
+	<para>Configurar el cliente <literal>NTP</literal> tal como se vió para
+	los servidores:</para>
+
+	<orderedlist>
+	  <listitem>
+	    <para>Nos aseguramos que el paquete <literal>ntpdate</literal> esté
+	    instalado:</para>
+	    <screen><prompt>root@venus:~# </prompt><userinput>dpkg --list | grep ntpdate</userinput></screen>
+	    <para>Si no lo estuviera lo instalamos:</para>
+	    <screen><prompt>root@venus:~# </prompt><userinput>apt-get install ntpdate</userinput></screen>
+
+	  </listitem>
+	  
+	  <listitem>
+	    <para>Configuramos crontab para que se ejecute el comando
+	    <command>ntpdate</command> de forma periódica. Para ello ejecutamos
+	    (como root) el comando <command>crontab -e</command> y editamos el
+	    fichero que nos sugiere con el siguiente contenido:</para>
+	    <programlisting>
+	      0 4 * * * ntpdate ntp.iescierva.net ; hwclock --systohc
+	    </programlisting>
+	    <para>Podemos sustituir el servidor <literal>ntp.iescierva.net</literal> por uno en
+	    Internet como <literal>ntp.ubuntu.com</literal> o como
+	    <literal>hora.rediris.es</literal>.</para>
+
+	    <para>Podemos comprobar que la configuración es correcta a través del
+	    comando <command>crontab -l</command></para>
+	    <programlisting>
+	      root@venus:~# crontab -l
+	      # m h  dom mon dow   command
+	      0 4 * * * ntpdate ntp.iescierva.net ; hwclock -w
+	      root@venus:~#
+	    </programlisting>
+	  </listitem>
+
+	</orderedlist>
+      </listitem>
+
+      <listitem>
+	<para>Instalamos las herramientas cliente. Utilizaremos este host para la
+	gestión completa de OpenStack, incluyendo los servicios de gestión de
+	instancias (máquinas virtuales) y de gestión de imágenes. Al tratarse de
+	un host con interfaz gráfica, siempre podremos iniciar un navegador y
+	administrar nuestro cloud a través del Dashboard, pero las herramientas
+	de consola siempre resultan ser más útiles. Las instalamos:</para>
+
+	<screen><prompt>root@venus:~# </prompt><userinput>apt-get install glance-client python-novaclient</userinput></screen>
+      </listitem>
+
+      <listitem>
+	<para>Exportamos las siguientes variables de entorno en el fichero
+	<filename>.bashrc</filename> del usuario que vaya a utilizar el cliente
+	de OpenStack:</para>
+	<programlisting language="Bash">
+export OS_TENANT_NAME=admin
+export OS_USERNAME=admin
+export OS_PASSWORD=calex2010!!
+export OS_AUTH_URL="http://172.20.254.190:5000/v2.0/"
+export SERVICE_ENDPOINT="http://172.20.254.190:35357/v2.0"
+	</programlisting>
+      </listitem>
+
+      <listitem>
+	<para>Ya podemos probar el cliente con cualquiera de los siguientes
+	comandos: <command>nova list</command>, <command>nova show</command>,
+	<command>nova boot</command>, <command>glance index</command>, etc.  </para>
+
+	<para>Por supuesto, el Dashboard estará disponible a través del
+	navegador en la URL <literal>http://172.20.254.190</literal></para>
+      </listitem>
+      
+    </orderedlist>
+    
+  </section>
 
 </chapter>
