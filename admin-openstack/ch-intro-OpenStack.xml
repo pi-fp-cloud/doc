@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="ch-intro-Opentack">
+  <title>OpenStack</title>
+  <para>OpenStack es una colección de tecnologías Open Source que proporcionan
+  un software para el despliegue escalable de un cloud computing. OpenStack
+  proporciona Infraestructura como Servicio ó IaaS (Infrastructure as a
+  Service) y es un proyecto que se inició en el año 2010 por la empresa
+  <emphasis>Rackspace Cloud</emphasis> y por la agencia espacial
+  norteamericana, NASA. Actualmente más de 150 empresas se han unido al
+  proyecto, entre las que se encuentran empresas tan importantes como AMD,
+  Intel, Canonical, SUSE Linux, Red Hat, IBM, Dell, HP, Cisco, etc. OpenStack
+  es software libre bajo los términos de la licencia Apache.</para>
+
+  <para>Actualmente OpenStack desarrolla dos proyectos relacionados:
+  <emphasis>OpenStack Compute</emphasis>, que proporciona recursos
+  computacionales a través de máquinas virtuales y gestión de la red, y
+  <emphasis>OpenStack Object Storage</emphasis>, que proporciona un servicio
+  de almacenamiento de objetos redundante y escalable. Muy relacionado con el 
+  proyecto "OpenStack Compute" tenemos otros proyectos complementarios como
+  Keytone ó Glance que describiremos en breve.</para>
+
+  <para>OpenStack puede ser utilizado por cualquiera organización que busque
+  desplegar un cloud de gran escala tanto para uso privado como
+  público. OpenStack es un proyecto intersante casi para cualquier tipo de
+  organización: pequeñas y medianas empresas, administración, grandes
+  corporaciones, proveedores de servicio, empresas de valor añadido, centros
+  de cálculo y un largo etcétera.</para>    
+
+  <section xml:id="id-intro-Cloud">
+    <title>¿Qué es el "Cloud Computing"?</title>
+    <para></para>    
+  </section>
+
+  <section xml:id="id-intro-OpenStack">
+    <title>¿Qué es OpenStack?</title>
+    <para>Básicamente OpenStack es un software Open Source usado para la
+    construcción de clouds públicas y privadas. OpenStack representa tanto a una
+    comunidad y un proyecto de Software Libre, como un software para ayudar a
+    las organizaciónes a ejecutar sus propios clouds para computación o
+    almacenamiento virtual.</para>
+
+    <para>Desde el punto de vista de software, OpenStack es una colección de
+    proyectos Open Source mantenidos por la comunidad que incluyen a:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>OpenStack Compute, con nombre en clave <emphasis role="bold">Nova</emphasis>.</para>
+      </listitem>
+
+      <listitem>
+	<para>OpenStack Object Storage, con nombre en clave <emphasis role="bold">Swift</emphasis>.</para>
+      </listitem>
+
+      <listitem>
+	<para>OpenStack Image Service, con nombre en clave <emphasis role="bold">Glance</emphasis>.</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>A través de estos servicios, OpenStack proporciona una completa plataforma
+    operativa para la administración y gestión de clouds.</para>
+
+    <para>Definir a OpenStack es mucho más sencillo una vez que los principales
+    conceptos sobre Computación en la Nube se hacen más aparentes. La misión
+    principal del proyecto es proporcionar un software que cubra el ciclo
+    completo de este tipo de despliegues y que proporcione el poder desplegar de
+    forma sencilla, escalable, elástica y de cualquier tamaño, tanto clouds
+    públicos como clouds privados.</para>
+    
+    <para>Para alguien que se acerca por primera vez a OpenStack, esta
+    aproximación puede resultar difícil y abrumadora. Hay conceptos difíciles, y
+    pueden surgir multitud de dudas, en cuanto a instalación, despliegue y
+    uso. Lo bueno es que al tratarse de un proyecto abierto, un proyecto de
+    Sofwtare Libre mantenido por y para la Comunidad, hay un montón de
+    documentación, guías, foros, para ayudar a resolver cualquier problema o
+    incidencia que surja. Este propio documento, trata precisamente de allanar
+    el camino de todo aquel que se inicie en el despliegue de este tipo de
+    soluciones.</para>
+
+    <para>OpenStack es muy joven, por lo que el propio software, e incluso la
+    propia documentación están en constante revisión. Hay que estar muy atento a
+    la página oficial del proyecto:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para><link xlink:href="http://www.openstack.org/">Home: OpenStack Open Source Cloud Computing Software.</link></para>
+      </listitem>      
+    </itemizedlist>
+  </section>
+
+  <section xml:id="id-componentes-OpenStack">
+    <title>Componentes de OpenStack</title>
+    <para>Actualmente, hay tres componentes principales de OpenStack:
+    <emphasis>Compute</emphasis>, <emphasis>Object Storage</emphasis>, e
+    <emphasis>Image Service</emphasis>.</para>
+    
+    <para><emphasis>OpenStack Compute</emphasis> es el controlador de la
+    estructura básica del Cloud. Es el encargado de iniciar las instancias
+    (máquinas virtuales) de los usuarios y grupos. También es el servicio
+    encargado de la gestión de la red virtual para cada instancia o para las
+    múltiples instancias que formen parte de un proyecto (tenant).</para>
+
+    <para><emphasis>OpenStack Object Storage</emphasis> es el servicio encargado
+    del almacenamiento masivo de objetos a través de un sistema escalable,
+    redundante y tolerante a fallos. Las posibles aplicaciones de Object Storage
+    son numerosas, como por ejemplo: almacenamiento simple de ficheros, copias
+    de seguridad, almacenamiento de streamings de audio/vídeo, almacenamiento
+    secundario/terciario, desarrollo de nuevas aplicaciones con almacenamiento
+    integrado, etc.</para>
+
+    <para><emphasis>OpenStack Image Service</emphasis> es un servicio para la
+    búsqueda y recuperación de imágenes de máquinas virtuales. Este servicio
+    puede almacenar las imágenes directamente o utilizar mecanismos más
+    avanzados como: usar Object Storage como servicio de almacenamiento, usar
+    Amazon's Simple Storage Solution (S3) directamente, ó usar Object Storage
+    como almacenamiento intermedio de S3.</para>
+
+    <para>El siguiente diagrama muestra las relaciones entre los proyectos,
+    cómo están relacionados y cómo pueden cumplir los objetivos propuestos por
+    OpenStack para el despliegue de infraestructuras de cloud computing.</para>
+
+    <informalfigure>
+      <mediaobject>
+        <imageobject>
+          <imagedata fileref="figures/OpenStackCore.png" />
+        </imageobject>
+	<caption><para>(c) 2012. OpenStack Compute: Administration Manual. http://www.openstack.org</para></caption>
+      </mediaobject>
+    </informalfigure>
+
+  </section>
+
+  <section xml:id="id-arquitectura-OpenStack">
+    <title>Arquitectura de OpenStack</title>
+    <para>Antes de revisar los componentes de OpenStack, conviene revisar un
+    poco la historia del proyecto. Fundado en 2010 por la empresa Rackspace y
+    por la NASA, el proyecto ha tenido hasta la fecha cuatro versiones,
+    actualmente se encuentra en su quinta revisión, lanzada en abril con el
+    nombre en clave <emphasis>Essex</emphasis> (ó 2012.1). Originalmente el
+    proyecto consistía en tan solo tres servicios principales:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>Object Store (<emphasis>"Swift"</emphasis>): proporciona
+	almacenamiento de objetos. Swift nos permite almacenar y/o recuperar
+	ficheros, pero no montar directorios como un sistema de ficheros basado
+	en NFS ó CIFS. Varias compañías proporcionan servicios de almacenamiento
+	comercial basado en Swift, tales como la propia Rackspace (desde la que
+	se inició este proyecto), KT, ó Internap entre otras. Una página web
+	puede fácilmente mostrar imágenes almacenadas en un servidor Swift.</para>
+      </listitem>
+
+      <listitem>
+	<para>Image (<emphasis>"Glance"</emphasis>): proporciona un catálogo y
+	un repositorio de imágenes de discos virtuales. Muy utilizado por Nova y
+	de forma casi exclusiva, aunque es un servicio técnicamente opcional,
+	cualquier infraestructura de cloud de un tamaño considerable lo
+	necesita.</para>
+      </listitem>
+      
+      <listitem>
+	<para>Compute (<emphasis>"Nova"</emphasis>): proporciona máquinas
+	virtuales bajo demanda. Similar al servicio EC2 de Amazon. Nova también
+	es capaz de proporcionar gestión de volúmenes de discos a través de uno
+	de sus servicios, de forma similar al EBS (Elastic Block
+	Service).</para>
+      </listitem>
+
+    </itemizedlist>
+
+    <para>Estos son los servicios básicos hasta la versión Essex de OpenStack,
+    que además incluye dos servicios básicos adicionales:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>Dashboard (<emphasis>"Horizon"</emphasis>): proporciona una
+	interfaz de usuario modular, basada en la web, para la gestión de todos
+	los servicios de OpenStack.</para>
+      </listitem>
+      
+      <listitem>
+	<para>Identity (<emphasis>"Keystone"</emphasis>): proporciona servicios
+	de autenticación y autorización a todos los servicios de
+	OpenStack. Keystone proporciona, además, un catálogo de los servicios
+	ofrecidos en un despliegue de Openstack en concreto.</para>
+      </listitem>
+ 
+    </itemizedlist>
+
+    <para>Estos dos proyectos adicionales, ya incluidos en la última versión de
+    OpenStack, proporcionan una infraestructura adicional para los tres
+    proyectos originales. Básicamente servicios de autenticación y un frontend
+    basado en web.</para>
+
+    <section>
+      <title>Arquitectura conceptual</title>
+      <para>Desde una perspectiva global, OpenStack está diseñado para
+      "entregar un sistema operativo para el despliegue de clouds masivamente
+      escalables". Para poder lograrlo, cada uno de los servicios que conforman
+      OpenStack están diseñados para trabajar conjuntamente y poder proporcionar
+      una <emphasis>Infraestructura</emphasis> como Servicio (IaaS,
+      Infrastructure as a Service) completa. Esta integración se consigue a
+      través de APIs (Application Programming Interfaces) que cada servicio
+      ofrece, y que cada servicio puede consumir. Mientras que estas APIs
+      permiten a cada uno de los servicios utilizar el resto, también permiten
+      al desarrollador poder reemplazar cualquier servicio con otra
+      implementación, siempre y cuando se respeten estas APIs. Dichas APIs
+      también se encuentran disponibles para el usuario final del cloud.</para>
+
+      <para>Conceptualmente, se pueden representar las relaciones entre los
+      servicios a través del siguiente diagrama:</para>
+
+      <informalfigure>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata scale="50" fileref="figures/nova-concept-int-essex.jpg"/>
+	  </imageobject>
+	</mediaobject>
+      </informalfigure>
+
+      <para>En la figura quedan claras las siguientes relaciones:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para><emphasis>Horizon</emphasis> proporciona un frontend gráfico
+	  basado en web para la gestión del resto de servicios de OpenStack</para>
+	</listitem>
+
+	<listitem>
+	  <para>Nova almacena y recupera imágenes de discos virtuales y sus
+	  datos asociados (metadatos) a través del servicio
+	  <emphasis>Glance</emphasis>.</para>
+	</listitem>
+
+	<listitem>
+	  <para><emphasis>Glance</emphasis> almacena las imágenes en un
+	  directorio en disco, pero puede hacerlo a través del servicio <emphasis>Swift</emphasis>.</para>
+	</listitem>
+
+	<listitem>
+	  <para>El servicio <emphasis>Keystone</emphasis> es el encargado de la
+	  autenticación de todos los servicios.</para>
+	</listitem>	
+      </itemizedlist>
+
+      <para>Esta es una visión muy simplificada de toda la arquitectura,
+      asumiendo además que utilicemos todos los servicios. Por otro lado, muestra
+      únicamente el lado "operador" del cloud, la imagen no representa cómo
+      los consumidores del cloud pueden realmente usarlo, por ejemplo, se puede
+      hacer uso del servicio Swift de forma intensa y directa.</para>
+ 
+    </section>
+
+    <section>
+      <title>Arquitectura lógica</title>
+      <para>Como nos podemos imaginar, la arquitectura real del cloud, su
+      arquitectura lógica,  es mucho más complicada que la mostrada
+      anteriormente. Como cualquier arquitectura orientada a servicios,
+      cualquier diagrama que intente ilustrar todas las posibles combinaciones
+      de comunicación de servicios, enseguida se vuelve muy confuso. El
+      siguiente diagrama trata de mostrar el escenario más común, mostrando
+      arquitectura perfectamente integrada de un cloud basado en
+      OpenStack:</para>
+
+      <informalfigure>
+        <mediaobject>
+          <imageobject>
+            <imagedata scale="20"
+              fileref="figures/nova-logical-arch-essex.jpg"/>
+          </imageobject>
+        </mediaobject>
+      </informalfigure>
+
+      <para>Este dibujo es perfectamente consistente con la arquitectura
+      conceptual descrita anteriormente:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>Los usuarios finales del cloud pueden interactuar con él a
+	  través de la interfaz web (Horizon) o directamente con cada servicio a
+	  través de su API.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Todos los servicios se autentican a través de un mismo servicio,
+	  el proporcionado por Keystone.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Los servicios individuales interactúan con el resto a través de
+	  sus APIs públicas (excepto en los casos en los que se requieran
+	  comandos administrativos con privilegios).</para>
+	</listitem>	
+      </itemizedlist>
+
+      <para>En los siguientes apartados se describirán las arquitecturas para
+      cada uno de los servicios.</para>      
+    </section>
+
+    <section>
+      <title>Dashboard</title>
+      <para><emphasis role="bold">Horizon</emphasis> es una aplicación web
+      modular desarrollada con el framework de Python Django, cuyo objetivo
+      principal es proporcionar una interfaz a los servicios de OpenStack al
+      administrador del cloud y a los usuarios.</para>
+
+      <para>Horizon no proporciona toda la funcionalidad que podemos conseguir a
+      través del intérprete de comandos, pero lo "poco" que hace lo hace
+      correctamente.</para>
+
+      <para>Como cualquier aplicación web, la arquitectura de Horizon es
+      bastante simple:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>Horizon normalmente se despliega a través del módulo de Apache
+	  <link xlink:href="http://code.google.com/p/modwsgi/">mod_wsgi</link>, el cual
+	  implementa la interfaz WSGI que permite al servidor Apache ejecutar aplicaciones
+	  Python.</para>
+	  <para>El código de Horizon está separado en dos módulos Python
+	  reutilizables, uno de ellos mantiene toda la lógica de la aplicación y
+	  es el encargado de interactuar con varias de las APIs de OpenStack,
+	  mientras que el otro es el encargado de la presentación, permitiendo
+	  fácilmente la adaptabilidad e integración con el look&amp;feel del
+	  sitio web.</para> 
+	</listitem>
+
+	<listitem>
+	  <para>Una base de datos. Horizon almacena muy pocos datos, ya que
+	  utiliza los datos del resto de servicios.</para>
+	</listitem>	
+      </itemizedlist>
+
+      <para>Desde el punto de vista de la red, este servicio debe ser accesible
+      por los usuarios a través de la web (tráfico HTTP), de la misma forma que
+      necesita poder acceder a las APIs públicas del resto de servicios. Si
+      además se usa la funcionalidad de administración, necesita además
+      conectividad a las APIs de administración de los endpoints (las cuales no
+      son accesibles por los usuarios finales).</para>      
+    </section>
+
+    <section>
+      <title>Compute</title>
+      <para><emphasis>Nova</emphasis> no ha cambiado mucho desde las anteriores
+      versiones, se han añadido ciertas mejoras en determinados servicios para la
+      compatibilidad de EC2 y servicios de consola.</para>
+
+      <para>Nova depende de los siguientes demonios para su
+      funcionamiento:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para><literal>nova-api</literal> es la encargada de aceptar y
+	  responder a las llamadas del usuario final a las APIs de
+	  <literal>nova-compute</literal> y <literal>nova-volume</literal>. El
+	  demonio <literal>nova-api</literal> soporta la API de OpenStack, la
+	  API EC2 de Amazon y la API especial de administración (para usuarios
+	  con privilegios que realicen tareas administrativas).</para>
+
+	  <para>Además, este demonio es el encargado de la coordinación de
+	  ciertas actividades (como la ejecución de una instancia) y la
+	  aplicación de ciertas políticas (como la comprobación de
+	  cuotas).</para>
+
+	  <para>En Essex, <literal>nova-api</literal> se ha modularizado,
+	  permitiendo únicamente la ejecución de determinadas APIs.</para>
+	</listitem>
+
+	<listitem>
+	  <para>El demonio <literal>nova-compute</literal> es el principal
+	  encargado de crear y acabar con las máquinas virtuales (instancias)
+	  utilizando para ello las APIs del hipervisor
+	  utilizado. <literal>nova-compute</literal> utiliza libvirt para
+	  KVM/QEMU, XenAPI para XenServer/XCP y VMwareAPI para Vmware.</para>
+	  <para>El proceso completo de creación/destrucción de instancias es
+	  bastante complejo, pero la base es muy simple: aceptar acciones de la
+	  cola de mensajes y ejecutar un conjunto de comandos del sistema
+	  asociados (como lanzar una instancia de KVM), todo mientras que se
+	  actualiza el estado en la base de datos.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>nova-volume</literal> gestiona la creación, conexión y
+	  desconexión de volúmenes persistentes a las instancias, de forma similar a como
+	  lo realizar el servicio EBS (Elastic Block Storage) de Amazon. Se pueden
+	  utilizar volúmenes de diferentes proveedores como iSCSI ó <link
+	  xlink:href="http://ceph.com/">RADOS Block Device (RBD) de Ceph</link> .</para>
+	</listitem>
+
+	<listitem>
+	  <para>El demonio <literal>nova-network</literal> es muy parecido a los
+	  demonios <literal>nova-compute</literal> y
+	  <literal>nova-volume</literal>. Acepta tareas de red desde la cola de
+	  mensajes y realiza ciertas que modifican el estado de la red, como por
+	  ejemplo configurar una interfaz bridge ó cambiar las reglas de
+	  iptables.</para>
+	</listitem>
+
+	<listitem>
+	  <para>El demonio <literal>nova-schedule</literal> es conceptualmente
+	  la pieza de código más simple de <emphasis>Nova</emphasis>. A partir de un
+	  mensaje de solicitud de creación de una instancia, determina qué nodo de
+	  OpenStack debe ejecutar dicha instancia. La elección se realiza entre todos los
+	  nodos que ejecutan el demonio <literal>nova-compute</literal>.</para>
+	</listitem>
+
+	<listitem>
+	  <para>La cola de mensajes (queue) proporciona un hub centralizado para
+	  el intercambio de mensajes entre todos los demonios. Como cola de mensajes, se
+	  utiliza actualmente <link
+	  xlink:href="http://www.rabbitmq.com/">RabbitMQ</link>, pero se puede utilizar
+	  cualquier otra cola de mensajes compatible con AMQP como por ejemplo <link
+	  xlink:href="http://qpid.apache.org/">Apache Qpid</link>.</para>
+ 	</listitem>
+
+	<listitem>
+	  <para>Una base de datos SQL. El sistema gestor de BBDD será el
+	  encargado de almacenar toda la información del cloud así como el
+	  estado inicial y de ejecución. Esto incluye los tipos de instancia que
+	  están disponibles para el uso, las instancias creadas en un momento
+	  determinado, las redes disponibles, los proyectos existentes,
+	  etc. Teóricamente, <emphasis>Nova</emphasis> soporta cualquier base de
+	  datos soportada por <link xlink:href="http://www.sqlalchemy.org/">
+	  SQL-Alchemy</link>, pero las bases de datos realmente utilizadas
+	  actualmente son PostgreSQL, MySQL y sqlite3 (esta última solo para
+	  pruebas y desarrollo).</para>
+
+	  <note>
+	    <para>SQL-Alchemy es un toolkit SQL y un sistema de mapeo
+	  objeto/relacional para el lenguaje de programación Python. Permite
+	  utilizar objetos desde Python al mismo tiempo que se aprovecha la
+	  velocidad, el rendimiento y la fiablidad de las bases de datos
+	  relacionales.</para>
+	  </note>
+	</listitem>
+      </itemizedlist>
+      
+      <para>Durante las últimas dos revisiones, Nova ha visto aumentado sus
+      servicios de consola. Los servicios de consola permiten a los usuarios finales
+      acceder a sus máquinas virtuales a través de una consola de texto (caso de
+      GNU/Linux) o consola gráfica (caso de máquinas virtuales Linux y Windows). Este
+      acceso se realiza utilizando un proxy y se basa en los demonios
+      <literal>nova-console</literal> y <literal>nova-consoleauth</literal></para>
+
+      <para>Nova interactúa con el resto de servicios de la forma esperada:
+      con Keystone para la autenticación, con Glance para la recuperación de
+      imágenes y con Horizon para la interfaz web. La interacción con Glance es
+      interesante, El proceso <literal>nova-api</literal> puede subir imágenes y
+      consultar a Glance, mientras que <literal>nova-compute</literal> se
+      descargará la imagen necesaria para lanzar una nueva instancia.</para>
+    </section>
+
+    <section>
+      <title>Object Storage</title>
+      <para>La arquitectura de <emphasis>Swift</emphasis> es distribuida tanto
+      para prevenir cualquier punto simple de fallo como para posibilitar
+      escalar horizontalmente. <emphasis>Swift</emphasis> incluye los siguientes
+      componentes:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>Un servidor proxy. El proxy acepta solicitudes a través de la
+	  API OpenStack Object o directamente a través de HTTP. Una solicitud puede ser
+	  una subida de un fichero, modificación de los metadatos o la creación de un
+	  contenedor. También acepta solicitudes de descarga de ficheros o del listado de
+	  objetos del contenedor a través de un navegador web. Para mejorar el
+	  rendimiento, el servidor proxy puede, de forma optativa, utilizar una caché
+	  (normalmente memcache).</para>
+	</listitem>
+
+	<listitem>
+	  <para>Un servidor de cuentas de usuario. Este servidor gestiona las
+	  cuentas de usuario definidas con el servicio de almacenamiento de objetos.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Servidores de objetos. Los servidores de objetos gestionan los
+	  objetos reales (como ficheros o contenedores) en los nodos de almacenamiento.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Hay también un conjunto de procesos que se ejecutan de forma
+	  periódica que realizan ciertas tareas de limpieza sobre los datos. El
+	  más importante de estos procesos es el servicio de replicación, los
+	  cuales aseguran consistencia y disponibilidad en todo el
+	  cluster. Otros procesos periódicos incluyen auditores, actualizadores
+	  y reapers.</para>
+	</listitem>	
+      </itemizedlist>
+
+      <para>La autenticación se realiza normalmente a través de Keystone.</para>
+    </section>
+
+    <section>
+      <title>Image Storage</title>
+      <para>La arquitectura de <emphasis>Glance</emphasis> se ha mentenido
+      relativamente estable desde la versión <emphasis>Cactus</emphasis> de
+      OpenStack. El mayor cambio lo representa la incorporación de Keystone como
+      sistema de autenticación y autorización, la cual se añadió en la versión
+      <emphasis>Diablo</emphasis>. Glance está formado por cuatro componentes
+      principales:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>El demonio <literal>glance-api</literal>. Encargado de aceptar
+	  peticiones a través de su API para el descubrimiento, recuperación y
+	  almacenamiento de imágenes.</para>
+	</listitem>
+
+	<listitem>
+	  <para><literal>glance-registry</literal>. Encargado de almacenar,
+	  procesar y recuperar metainformación sobre las imágenes (tamaño, tipo,
+	  etc.).</para>
+	</listitem>
+
+	<listitem>
+	  <para>Una base de datos para almacenar dicha metainformación. De la
+	  misma forma que Nova, la base de datos es optativa, pero la decisión
+	  siempre gira en torno a MySQL ó PostgreSQL para entornos en
+	  producción.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Un repositorio de almacenamiento para los ficheros de
+	  imágenes. Este almacenamiento es configurable y pueden utilizarse
+	  desde directorios locales al propio servicio Swift. Otras soluciones
+	  pasan por volúmenes iSCSI, directorios NFS ó CIFS, RADOS block device,
+	  Amazon S3 ó HTTP.</para>
+	</listitem>	
+      </itemizedlist>
+
+      <para>Existen también un conjunto de servicios para la gestión de la
+      caché.</para>
+
+      <para>Glance representa un papel central en la arquitectura de OpenStack,
+      ya que acepta peticiones para la gestión de imágenes tanto de los usuarios
+      finales como de otros servicios como Nova.</para>     
+    </section>
+
+    <section>
+      <title>Identity</title>
+      <para>Keystone permite la integración de los serviciós de OpenStack en un
+      único punto en aspectos tan importantes como proporcionar servicios de
+      autenticación, gestión de tokens y el mantenimiento de un catálogo y un
+      repositorio de políticas de identidad.</para>
+
+      <para>Cada función de Keystone puede conectarse a un backend distinto que
+      permite realizar esa misma función de diferentes formas utilizando un
+      servicio distinto. De esta forma, Keystone puede integrarse fácilmente con
+      diferentes almacenamiento como SQL, LDAP ó KVS (Key Value Stores).</para>
+
+      <para>Esto es muy útil en cuanto a la integración de los servicios de
+      autenticación de OpenStakc con los servicios de autenticación existentes
+      en un despliegue en concreto.</para>
+      
+    </section>
+
+    <section>
+      <title>Proyectos futuros</title>
+      <para>Estos servicios enumerados son los que se encuentran en la actual
+      revisión de OpenStack, Essex, pero el desarrollo de OpenStack continua de
+      forma intensa. Para la siguiente revisión de OpenStack, con nombre en
+      clave <emphasis>Folsom</emphasis>, se añadirá al menos los siguientes
+      servicios:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>Network. El servicio Network, con nombre
+	  <emphasis>Quantum</emphasis>, verá la luz probablemente a finales del año
+	  2012. El objetivo principal de Quantum es proporcionar "conectividad de red como
+	  servicio" entre las interfaces de red gestionadas por otros servicios como
+	  Nova. Esto permitirá una gran flexibilidad a la hora de que los usuarios finales
+	  puedan crear sus propias redes e interconectar entre sí sus máquinas
+	  virtuales.</para>
+	</listitem>
+	
+      </itemizedlist>
+
+    </section>
+
+  </section>
+
+  <section>
+    <title>Introducción a OpenStack Compute</title>
+    <para><emphasis>OpenStack Compute, Nova, </emphasis>
+</para>
+    
+  </section>
+
+  <section>
+    <title>Introducción a OpenStack Keystone</title>
+    <para>Manual del administrador, capítulo 6.</para>
+    
+  </section>
+
+  <section>
+    <title>Introducción a OpenStack Glance</title>
+    <para>¿De dónde?</para>
+    
+  </section>
+
+  <section>
+    <title>Introducción a OpenStack Swift</title>
+    <para>¿De dónde?</para>
+  </section>
+
+</chapter>
