@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<section xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="sect-introNova">
+<?dbhtml stop-chunking?>
+  <title xml:id="sect-introNova.title"> Introducción a OpenStack Compute (Nova)</title>
+  <para>OpenStack Compute proporciona todas las herramientas necesarias para la
+  completa gestión y uso del Cloud, incluyendo máquinas virtuales (instancias en
+  la terminología de OpenStack), gestión de redes y control de acceso a la nube
+  por proyectos y por usuarios. El nombre del proyecto Open Source es <emphasis
+  role="bold">Nova</emphasis> y proporciona todo el software capaz de controlar
+  nuestra plataforma de cloud computing IaaS. En cuanto al ámbito del proyecto,
+  Nova proporciona una funcionalidad similar al EC2 de Amazon ó al Cloud Servers
+  de Racksapace. Nova no proporciona ningún tipo de software de virtualización,
+  sino que define un conjunto de drivers que interactúan con la capa de
+  virtualización utilizada por el sistema operativo anfitrión, exponiendo
+  una API basada en la web.</para>
+
+  <section>
+    <title>Hipervisores</title>
+    <para>Nova requiere un hipervisor para su funcionamiento, Nova controla a
+    este hipervisor a través de su API. El proceso para seleccionar el
+    hipervisor correcto depende de varios y diversos factores como: presupuesto
+    y recursos disponibles, características soportadas, especificaciones
+    técnicas, software libre versus software propietario, etc. Gran parte del
+    desarrollo hecho por los programadores de OpenStack se ha realizado sobre
+    hipervisores KVM y los basados en Xen. Para una lista más detallada sobre
+    características y soporte se recomienda visitar
+    http://wiki.openstack.org/HypervisorSupportMatrix. </para>
+
+    <para>Con OpenStack Compute se pueden gestionar nubes utilizando distintos
+    hipervisores en diferentes zonas. Los hipervisores soportados son:</para>
+    <itemizedlist>
+      <listitem>
+	<para><link xlink:href="http://www.linux-kvm.org/page/Main_Page">KVM</link> -
+	Kernel Based Virtual Machine</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://lxc.sourceforge.net/">LXC</link> - Linux Containers
+	(a través de libvirt)</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://wiki.qemu.org/Manual">QEMU</link> - Quick
+	EMUlator</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://user-mode-linux.sourceforge.net/">UML</link> - User
+	Mode Linux</para>
+      </listitem>
+      <listitem>
+	<para><link
+		  xlink:href="http://www.vmware.com/products/vsphere-hypervisor/support.html"
+		  >VMWare ESX/ESXi</link> 4.1 update 1</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://www.xen.org/support/documentation.html">Xen</link> -
+	Xen, Citrix XenServer and Xen Cloud Platform (XCP)</para>
+      </listitem>
+    </itemizedlist>
+
+    <para>Sobre Xen merece destacar las siguientes puntualizaciones:</para>
+    <itemizedlist>
+      <listitem>
+	<para>XenServer es la versión comercial de Xen, es un producto soportado
+	por Citrix. Más información en la <link
+	xlink:href="http://wiki.openstack.org/XenServer">Wiki de OpenStack sobre
+	XenServer.</link></para>
+      </listitem>
+
+      <listitem>
+	<para>Xen Cloud Platform (XCP) es la versión Open Source de
+	XenServer. En OpenStack, todo lo aplicable a XenServer, lo es a XCP.</para>
+      </listitem>
+
+      <listitem>
+	<para>XenAPI es la API de gestión que exponen tanto XenServer como  XCP.</para>
+      </listitem>
+
+      <listitem>
+	<para>XAPI: uno de los demonios principales de XenServer y XCP, es el
+	que expone la XenAPI. </para>
+      </listitem>      
+    </itemizedlist>
+
+    <para>Nova soporta tanto XenServer como XCP a través de la capa de
+    virtualización XenAPI. Esto es importante porque no implica que OpenStack
+    soporte otras plataformas Xen como las que acompañan a RHEL 5 ó
+    SUSE. El soporte a estas últimas se realiza a través de libvirt.</para>    
+  </section>
+
+  <section>
+    <title>Usuarios y Proyectos (Tenants)</title>
+    <para>OpenStack Compute está diseñado para ser utilizado por diferentes
+    consumidores o clientes del cloud, básicamente tenants (inquilinos) de un
+    sistema compartido y utilizando asignaciones de acceso basadas en
+    roles. Cuando el Servicio de Identidad (Identity Service) emite un token, se
+    emita también los roles asociados al usuario. El Servicio de Identidad llama
+    a los proyectos <emphasis>tenants</emphasis>. Los <emphasis>roles</emphasis>
+    controlan las acciones que se les está permitido realizar a los usuarios,
+    por ejemplo: a un usuario no se le está permitido reservar una IP pública
+    sin los roles <literal>netadmin</literal> o <literal>admin</literal>
+    (siempre y cuando se configure el sistema de esa forma). La asignación de
+    roles se puede realizar de dos formas, o global o por proyecto (tenant). El
+    acceso de un usuario a una imagen en particular está limitada por proyecto,
+    pero la clave de acceso (access key) y la clave privada (secret key) se
+    asignan por usuario. De esta forma, los pares de claves garantizan que el acceso a una
+    instancia se habilite por usuario, mientras que las cuotas que controlan el
+    consumo de los recursos hardware se habilite por proyecto.</para>
+
+    <para>A través del flag <literal>--use_deprecated_auth</literal>, OpenStack
+    Compute utiliza un sistema de gestión de derechos que utiliza un modelo de
+    Control de Acceso basado en Roles (RBAC), el cual soporta los siguientes
+    roles:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>Cloud Administrator (admin): rol global. Los usuarios de esta
+	clase tienen un completo acceso al sistema.</para>
+      </listitem>
+
+      <listitem>
+	<para>IT Security (itsec): rol global. Este rol esta limitado al
+	personal de seguridad IT, permite "poner" en cuarentena a instancias de
+	cualquier proyecto.</para>
+      </listitem>
+
+      <listitem>
+	<para>Project Manager (projectmanager): rol de proyecto. El es rol por
+	defecto para los propietarios de un proyecto. Los usuarios con este rol
+	pueden: añadir a otros usuarios al proyecto, interactuar con las
+	imágenes del proyecto, lanzar y terminar instancias.</para>
+      </listitem>
+
+      <listitem>
+	<para>Network Administrator (netadmin): rol de proyecto. A los usuarios
+	con este rol les está permitido: reservar y asignar direcciones IP
+	públicas para las instancias, así como modificar la reglas del cortafuegos.</para>
+      </listitem>
+
+      <listitem>
+	<para>Developer (developer): rol de proyecto. Es un rol de
+	propósito general, se asigna a los usuarios por defecto.</para>
+      </listitem>      
+    </itemizedlist>
+
+    <para>Mientras que la API original de EC2 de Amazon, solo soporta usuarios,
+    Nova añade el concepto de proyectos (tenants) siempre que se utilice en el
+    despliegue el Servicio de Identidad (KeyStone). Los proyectos, aislados de
+    los contenedores de recursos, forman al princiapl estructura organizativa
+    dentro de Nova.</para>
+
+    <para>Un proyecto consiste en una VLAN separada, volúmenes, instancias,
+    imágenes, claves y usuarios. Un usuario puede especificar en qué proyecto desea
+    darse a conocer, tan solo tiene que añadir <literal>:project_id</literal> a su
+    clave de acceso. Si no se especifica ningún proyecto en la solicitud, Nova
+    intenta usar un proyecto con el mismo identificador que el usuario.</para>
+
+    <para>Para cada proyecto ó tenant, existen cuotas que limitan:</para>
+    <itemizedlist>
+      <listitem>
+	<para>Número de volúmenes que pueden ser creados.</para>
+      </listitem>
+
+      <listitem>
+	<para>Tamaño total de los volúmenes dentro de un proyecto (en GB).</para>
+      </listitem>
+
+      <listitem>
+	<para>Número de instancias que pueden ser lanzadas.</para>
+      </listitem>
+
+      <listitem>
+	<para>Número de cores (procesadores) reservados.</para>
+      </listitem>
+
+      <listitem>
+	<para>Direcciones IP accesibles públicamente.</para>
+      </listitem>      
+    </itemizedlist>
+
+  </section>
+
+  <section>
+    <title>Imágenes e Instancias</title>
+    <para>En esta introducción se proporciona una visión global sobre qué son
+    las imágenes y las instancias, así como una descripción del ciclo de vida de
+    una máquina virtual típica dentro del cloud. Hay multitud de formas de
+    configurar los detalles de un cloud basado en OpenStack, así como multitud
+    de formas de implementar una máquina virtual, tanto los detalles de
+    configuración como los comandos específicos se describirán en capítulos
+    posteriores.</para>
+    <!-- Añadir nombres de capítulos y enlaces -->
+
+    <para>Las <emphasis role="bold">imágenes</emphasis> son imágenes de disco
+    que se utilizarán como plantillas para la creación de los sistemas de
+    ficheros raíz a utilizar por las máquinas virtuales. El Servicio de
+    Imágenes, Glance, es el responsable del almacenamiento y gestión de estas
+    imágenes dentro de OpenStack.</para>
+
+    <para>AQUIAQUIAQUIAQUIAQUIAQUIAQUIAQUI</para>
+
+
+
+  </section>
+
+  <section>
+    <title>Arquitectura del Sistema</title>
+    <para></para>
+    
+  </section>
+
+  <section>
+    <title>Nova y el almacenamiento en bloques</title>
+    <para></para>
+    
+  </section>
+
+</section>
