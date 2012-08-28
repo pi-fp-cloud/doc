@@ -31,7 +31,7 @@
       </listitem>
 
       <listitem>
-	<para>Instalación y configuración de Glance (servicio de gestión de imágenes).(</para>
+	<para>Instalación y configuración de Glance (servicio de gestión de imágenes).</para>
       </listitem>
 
       <listitem>
@@ -80,8 +80,8 @@
   <section xml:id="id_instUbuntu_prerrequisitos">
     <title>Prerrequisitos</title>
     <para>Para el seguimiento del proceso de instalación y configuración de
-    OpenStack que se detalla posteriormente, es necesario partir de algunas suposiciones y de cumplir ciertos
-    requisitos. Como los siguientes:</para>
+    OpenStack que se detalla posteriormente, es necesario partir de algunas
+    suposiciones y de cumplir ciertos requisitos, son los siguientes:</para>
 
     <itemizedlist>
       <listitem>
@@ -132,6 +132,7 @@
 	proceso de instalación/configuración:</para>
 	<para><command>apt-get update</command></para>
 	<para><command>apt-get upgrade</command></para>
+	<para><command>apt-get dist-upgrade</command></para>
       </listitem>
       
     </itemizedlist>
@@ -174,7 +175,9 @@
 	  independiente. En este equipo todavía no está definido el software que
 	  se instalará, pero lo más  probable es que sea una distribución
 	  especializada en infraestructuras SAN/NAS como
-	  <literal>OpenFiler</literal> ó <literal>FreeNAS</literal>.</para>
+	  <literal>OpenFiler</literal> ó <literal>FreeNAS</literal>. Este nodo
+	  ofrecerá espacio de almacenamiento extra a través de los protocolos
+	  iSCSI y NFS.</para>
 	</listitem>
 	<listitem>
 	  <para><emphasis role="bold">venus</emphasis>: un equipo convencional
@@ -182,7 +185,7 @@
 	  <literal>nova</literal> con el que podemos gestionar el cloud desde
 	  línea de comandos sin la necesidad de realizar las operaciones desde
 	  <literal>jupiter</literal>. La administración del Cloud a través de la
-	  interfaz web del dashboard (Horizon) se podrá realizar desde
+	  interfaz web del Dashboard (Horizon) se podrá realizar desde
 	  cualquier máquina que tenga acceso a la red pública del Cloud
 	  (incluyendo máquinas Windows).</para> 
 	</listitem>
@@ -192,7 +195,7 @@
       configuración, tal como se muestra en la figura:</para>
 
       <figure xml:id="infra_red">
-	<title>Infraestructura de nuestro Cloud Computing (IES Cierva/IES Los Albares)</title>
+	<title>Infraestructura Cloud Computing (IES Cierva/IES Los Albares)</title>
 	<mediaobject>
 	  <imageobject role="fo">
 	    <imagedata fileref="figures/infra_red_iescierva.svg" format="SVG" scale="60"/>
@@ -267,8 +270,8 @@
       <itemizedlist>
 	<listitem>
 	  <para>Todas las interfaces desde <literal>eth0</literal> hasta
-	  <literal>eth6</literal> unidas por bonding a través de la interfaz
-	  bond0.</para>
+	  <literal>eth5</literal> unidas por bonding a través de la interfaz
+	  <literal>bond0</literal>.</para>
 	</listitem>
 
 	<listitem>
@@ -344,10 +347,10 @@
 
       <section>
 	<title>Configuración de bonding y VLAN</title>
-	<para>Para rendimientos alto, es casi obligatorio el uso de bonding, y
-	altamente recomendable el uso de LACP (802.3ad), por lo que se recomienda un
-	switch con soporte LACP. Si no se cuenta con LACP, se puede optar por
-	otros modos de bonding tal como se detalla en <link
+	<para>Para ofrecer un alto rendimiento, es casi obligatorio el uso de
+	bonding, y altamente recomendable el uso de LACP (802.3ad), por lo que se
+	recomienda un switch con soporte LACP. Si no se cuenta con él, se puede optar
+	por otros modos de bonding tal como se detalla en <link
 	xlink:href="http://www.kernel.org/doc/Documentation/networking/bonding.txt">http://www.kernel.org/doc/Documentation/networking/bonding.txt</link>.</para>
 
 	<para>Además de bonding, vamos a configurar varias VLAN, para tener
@@ -386,15 +389,15 @@ rtc
 	  <listitem>
 	    <para>Instalamos los siguientes paquetes:</para>
 	    <screen>
-	      <prompt>$ </prompt><userinput>apt-get install ifenslave ethtool</userinput>
+<prompt>$ </prompt><userinput>apt-get install ifenslave ethtool</userinput>
 	    </screen>
 	  </listitem>
 
 	  <listitem>
 	    <para>Bajamos las interfaces de red:</para>
 	    <screen>
-	      <prompt>$ </prompt><userinput>ifdown eth0</userinput>
-	      <prompt>$ </prompt><userinput>ifdown eth1</userinput>
+<prompt>$ </prompt><userinput>ifdown eth0</userinput>
+<prompt>$ </prompt><userinput>ifdown eth1</userinput>
 	    </screen>
 	  </listitem>
 
@@ -403,48 +406,48 @@ rtc
 	    <filename>/etc/modprobe.d/bonding.conf</filename> con el siguiente
 	    contenido:</para>
 	    <programlisting>
-	      alias bond0 bonding
-	      # options bonding mode=0 miimon=100
+alias bond0 bonding
+# options bonding mode=0 miimon=100
 	    </programlisting>
 	  </listitem>
 
 	  <listitem>
 	    <para>Configuramos las nuevas interfaces a través del fichero
 	    <filename>/etc/network/interfaces</filename>:</para>
-	    <programlisting language="Python">
-	      # This file describes the network interfaces available on your system 
-	      # and how to activate them. For more information, see interfaces(5). 
+	    <programlisting>
+# This file describes the network interfaces available on your system 
+# and how to activate them. For more information, see interfaces(5). 
 
-	      # The loopback network interface 
-	      auto lo 
-	      iface lo inet loopback 
+# The loopback network interface 
+auto lo 
+iface lo inet loopback 
 
-	      auto eth0 
-	      iface eth0 inet manual 
-	      bond-master bond0 
-	      pre-up ethtool -s eth0 wol g 
-	      post-down ethtool -s eth0 wol g 
+auto eth0 
+iface eth0 inet manual 
+      bond-master bond0 
+      pre-up ethtool -s eth0 wol g 
+      post-down ethtool -s eth0 wol g 
 
-	      auto eth1 
-	      iface eth1 inet manual 
-	      bond-master bond0 
-	      pre-up ethtool -s eth1 wol g 
-	      post-down ethtool -s eth1 wol g
+auto eth1 
+iface eth1 inet manual 
+      bond-master bond0 
+      pre-up ethtool -s eth1 wol g 
+      post-down ethtool -s eth1 wol g
 
-	      # The primary network interface 
-	      auto bond0 
-	      iface bond0 inet static 
-	      address 172.20.254.192 
-	      netmask 255.255.255.0 
-	      broadcast 172.20.254.255 
-	      network 172.20.254.0 
-	      gateway 172.20.254.254 
-	      bond-mode 802.3ad 
-	      bond-miimon 100 
-	      bond-lacp-rate 1 
-	      bond-slaves none 
-	      dns-nameservers 172.20.254.104 172.20.254.235 
-	      dns-search iescierva.net
+# The primary network interface 
+auto bond0 
+      iface bond0 inet static 
+      address 172.20.254.192 
+      netmask 255.255.255.0 
+      broadcast 172.20.254.255 
+      network 172.20.254.0 
+      gateway 172.20.254.254 
+      bond-mode 802.3ad 
+      bond-miimon 100 
+      bond-lacp-rate 1 
+      bond-slaves none 
+      dns-nameservers 172.20.254.104 172.20.254.235 
+      dns-search iescierva.net
 	    </programlisting>
 	  </listitem>
 
@@ -459,51 +462,50 @@ rtc
 	    configurado:</para>
 	    <screen>
 	      <prompt>$ </prompt><userinput>cat /proc/net/bonding/bond0</userinput>
-	      Ethernet Channel Bonding Driver: v3.7.1 (April 27, 2011)
+Ethernet Channel Bonding Driver: v3.7.1 (April 27, 2011)
 
-	      Bonding Mode: IEEE 802.3ad Dynamic link aggregation
-	      Transmit Hash Policy: layer2 (0)
-	      MII Status: up
-	      MII Polling Interval (ms): 100
-	      Up Delay (ms): 0
-	      Down Delay (ms): 0
+Bonding Mode: IEEE 802.3ad Dynamic link aggregation
+Transmit Hash Policy: layer2 (0)
+MII Status: up
+MII Polling Interval (ms): 100
+Up Delay (ms): 0
+Down Delay (ms): 0
 
-	      802.3ad info
-	      LACP rate: fast
-	      Min links: 0
-	      Aggregator selection policy (ad_select): stable
-	      Active Aggregator Info:
-	      Aggregator ID: 1
-	      Number of ports: 2
-	      Actor Key: 17
-	      Partner Key: 58
-	      Partner Mac Address: 00:9c:02:b7:f9:40
+802.3ad info
+LACP rate: fast
+Min links: 0
+Aggregator selection policy (ad_select): stable
+Active Aggregator Info:
+      Aggregator ID: 1
+      Number of ports: 2
+      Actor Key: 17
+      Partner Key: 58
+      Partner Mac Address: 00:9c:02:b7:f9:40
 
-	      Slave Interface: eth1
-	      MII Status: up
-	      Speed: 1000 Mbps
-	      Duplex: full
-	      Link Failure Count: 0
-	      Permanent HW addr: 00:25:90:72:2c:47
-	      Aggregator ID: 1
-	      Slave queue ID: 0
+Slave Interface: eth1
+MII Status: up
+Speed: 1000 Mbps
+Duplex: full
+Link Failure Count: 0
+Permanent HW addr: 00:25:90:72:2c:47
+Aggregator ID: 1
+Slave queue ID: 0
 
-	      Slave Interface: eth0
-	      MII Status: up
-	      Speed: 1000 Mbps
-	      Duplex: full
-	      Link Failure Count: 0
-	      Permanent HW addr: 00:25:90:72:2c:46
-	      Aggregator ID: 1
-	      Slave queue ID: 0
+Slave Interface: eth0
+MII Status: up
+Speed: 1000 Mbps
+Duplex: full
+Link Failure Count: 0
+Permanent HW addr: 00:25:90:72:2c:46
+Aggregator ID: 1
+Slave queue ID: 0
 	    </screen>
 	  </listitem>
 
 	  <listitem>
 	  <para>Podemos comprobar las VLAN activas a través del siguiente
 	  comando:</para>
-	  <screen>
-            <prompt>$ </prompt><userinput>cat /proc/net/vlan/config</userinput>
+	  <screen><prompt>$ </prompt><userinput>cat /proc/net/vlan/config</userinput>
 VLAN Dev name	 | VLAN ID
 Name-Type: VLAN_NAME_TYPE_RAW_PLUS_VID_NO_PAD
 bond0.60       | 60  | bond0
@@ -586,10 +588,25 @@ bond0.63       | 63  | bond0
       volúmenes lógicos con LVM.</para>
 
       <para>Tras la instalación del sistema, configuraremos el subsistema LVM
-      pero sin llegar a crear ningún volumen:</para>
-      <programlisting>
-	COMPLETAR
-      </programlisting>
+      pero sin llegar a crear ningún volumen. Podemos crear un volumen en
+      cualquier momento a través de los comandos
+      <literal>pvcreate</literal>, <literal>vgcreate</literal> y
+      <literal>lvcreate</literal>. Los directorios susceptibles de residir en un
+      volumen son:</para>
+      <itemizedlist>
+	<listitem>
+	  <para><literal>/var/lib/glance</literal>, incluye los ficheros
+	  imágenes del servicio Glance. Conviene formatearlo con el Sistema de
+	  Ficheros XFS.</para>
+	</listitem>
+	
+	<listitem>
+	  <para><literal>/var/lib/nova</literal>, incluye ciertos ficheros para
+	  el funcionamiento del servicio Nova, así como los discos virtuales de
+	  las instancias en ejecución. Conviene formatearlo con el Sistema de
+	  Ficheros XFS. </para>
+	</listitem>
+      </itemizedlist>
 
       <para>Aunque la controladora RAID es hardware y el sistema
       operativo no la gestiona, es importante que se pueda controlar
@@ -608,22 +625,55 @@ bond0.63       | 63  | bond0
 	[127301.671991] 3w-9xxx: scsi6: AEN: INFO (0x04:0x0029): Verify started:unit=0.
 	[131817.864145] 3w-9xxx: scsi6: AEN: INFO (0x04:0x002B): Verify completed:unit=0.
       </programlisting>           
-      <para>Pendiente de hacer:</para>
-      <para>http;//jonas.genannt.name/  Hay repositorio, con
-      aplicaciones para manejar el RAID 3ware 9650SE</para>
+      <para>Para Debian existe un repositorio bajo <link
+      xlink:href="http://jonas.genannt.name/">http://jonas.genannt.name</link>
+      con aplicaciones para manejar el RAID 3ware 9650SE. Para Ubuntu podemos
+      optar por utilizar el software oficial de 3ware. Para instalar este
+      software seguimos los siguientes pasos:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para>Nos descargamos el software desde el link "SUPPORT" de la página
+	  http://www.3ware.com (ahora LSI). Se trata de la controladora RAID
+	  3ware 9650SE-2LP.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Nos descargamos el fichero
+	  <filename>3DM2_CLI-Linux_10.2.1_9.5.4.zip</filename></para>
+	</listitem>
+
+	<listitem>
+	  <para>Ejecutamos:</para>
+	  <screen>
+<prompt>root@jupiter:~# </prompt><userinput>unzip 3DM2_CLI-Linux-10.1.zip -d 3dm2</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>cd 3dm2</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>bash install.sh -i</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Seguimos el asistente en modo texto.</para>
+	</listitem>
+
+	<listitem>
+	  <para>Al finalizar tendremos un demonio iniciado, una web
+	  administrativa (opcional) y el comando <command>tw_cli</command> para
+	  la gestión de la controladora.</para>
+	</listitem>	
+      </itemizedlist>
 
       <para>Como software a instalar solo instalaremos el servidor SSH, a través
       del comando:</para>
 
-      <screen><prompt>$ </prompt><userinput>apt-get install
-      openssh-server</userinput></screen>
+      <screen><prompt>$ </prompt><userinput>apt-get install openssh-server</userinput></screen>
 
       <para>Tras finalizar la instalación actualizaremos la máquina a través de
       los comandos:</para>
       <screen>
-	<prompt>$ </prompt><userinput>apt-get update</userinput>
-	<prompt>$ </prompt><userinput>apt-get upgrade</userinput>
-	<prompt>$ </prompt><userinput>apt-get dist-upgrade</userinput>
+<prompt>$ </prompt><userinput>apt-get update</userinput>
+<prompt>$ </prompt><userinput>apt-get upgrade</userinput>
+<prompt>$ </prompt><userinput>apt-get dist-upgrade</userinput>
       </screen>
 
       <para>Tras la instalación, lo más probable es que tengamos que reiniciar.</para>
@@ -682,7 +732,7 @@ bond0.63       | 63  | bond0
       <title>MySQL</title>
       <para>Vamos a configurar todos los servicios del Cloud para que utilicen
       como base de datos <literal>MySQL</literal>, en vez de la base de datos
-      <literal>SQLite</literal> que usan en la configuración por defecto. Para
+      <literal>SQLite</literal> que se usa en la configuración por defecto. Para
       ello será necesario instalar MySQL y fijar una contraseña para el usuario
       root. Para ello seguimos los siguientes pasos:</para>
 
@@ -756,61 +806,6 @@ mysql>
     gestión de la identidad (Identity Service): Keystone</para>
 
     <section>
-      <title>¿Qué es Keystone?</title>
-      <para>Keystone, es el componente de OpenStack encargado de la
-      autentificación y la autorización de los distintos componentes que
-      conforman OpenStack. Se incluyó desde la versión Essex y es el encargado
-      de dos tareas principales:</para>
-
-      <para>REVISARRRRRRRRRRRRRRRRRRRRRRRRRRRRR</para>
-      <itemizedlist>
-	<listitem>
-	  <para>Gestión de usuarios: Keystone es el encargado de
-	  mantener un registro de usuarios y los permisos que tiene cada 
-	  uno de ellos.</para>
-	</listitem>
-	<listitem>
-	  <para>Registro los servicios ofrecidos: Keystone ofrece un catálogo de
-	  los servicios ofrecidos, así como información sobre cómo acceder a sus
-	  APIs.</para>
-	</listitem>
-      </itemizedlist>
-
-      <para>Los componentes básicos de los servicios de identidad son:</para>
-      <itemizedlist>
-	<listitem>
-	  <para>Usuario: Podemos guardar su nombre, 
-	  correo electrónico y contraseña.</para>
-	</listitem>
-	<listitem>
-	  <para>Proyecto (<emphasis>tenant</emphasis> en la jerga de
-	  OpenStack): En un proyecto podemos ejecutar un conjunto de
-	  instancias con características en común, por ejemplo pueden estar
-	  todas las instancias en el misma red, pueden utilizar una serie de
-	  imágenes de sistemas o tener limitado el uso de recursos del
-	  cloud.</para>
-	</listitem>
-	<listitem>
-	  <para>Rol: Nos indica qué operaciones puede realizar
-	  cada usuario. A un usuario se le pueden asignar diferentes roles
-	  en cada proyecto.</para>
-	</listitem>
-      </itemizedlist>
-
-      <para>Los conceptos fundamentales del <emphasis>registro de
-      servicio</emphasis> son:</para>
-      <itemizedlist>
-	<listitem><para>Servicio: Corresponde a un componente de
-	OpenStack que puede utilizar el módulo de
-	autentificación.</para></listitem>
-	<listitem><para>Endpoints: Representa las URL que nos permiten
-	acceder a las API de cada uno de los servicios o componentes de
-	OpenStack</para></listitem>
-      </itemizedlist>
-      
-    </section>
-
-    <section>
       <title>Instalación y configuración</title>
       <para>Una infraestructura OpenStack solo necesita un servidor que ejecute
       el servicio KeyStone, en nuestra instalación el servicio se ejecutará en
@@ -829,16 +824,16 @@ mysql>
 	  <para>Desde el prompt de MySQL ejecutamos las siguientes
 	  sentencias:</para>
 	  <screen>
-	    <prompt>mysql> </prompt><userinput>CREATE DATABASE keystone;</userinput>
-	    <prompt>mysql> </prompt><userinput>GRANT ALL ON keystone.* to 'keystone'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
-	    <prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
+<prompt>mysql> </prompt><userinput>CREATE DATABASE keystone;</userinput>
+<prompt>mysql> </prompt><userinput>GRANT ALL ON keystone.* to 'keystone'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
+<prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
 	  </screen>
 	</listitem>
 
 	<listitem>
 	  <para>Instalamos todo el software necesario:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install keystone python-keystone python-keystoneclient</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>apt-get install keystone python-keystone python-keystoneclient</userinput>
 	  </screen>
 	</listitem>
 
@@ -847,7 +842,7 @@ mysql>
 	  por lo que tendremos que borrar la base de datos que se configura en
 	  la instalación por defecto:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>rm /var/lib/keystone/keystone.db</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>rm /var/lib/keystone/keystone.db</userinput>
 	  </screen>
 	</listitem>
 
@@ -878,7 +873,7 @@ connection = mysql://keystone:calex2010!!@172.20.254.190/keystone
 	<listitem>
 	  <para>Reiniciamos el servicio:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>service keystone restart</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service keystone restart</userinput>
 	  </screen>
 	</listitem>
 
@@ -1006,7 +1001,7 @@ export SERVICE_TOKEN=CALEX2010!!
 	    </listitem>
 
 	    <listitem>
-	      <para>Crear los roles necesarios: <literal>admin</literal>y <literal>Member</literal></para>
+	      <para>Crear los roles necesarios: <literal>admin</literal> y <literal>Member</literal></para>
 	    </listitem>
 
 	    <listitem>
@@ -1017,7 +1012,7 @@ export SERVICE_TOKEN=CALEX2010!!
 	    <listitem>
 	      <para>Crear los servicios (<literal>nova</literal>,
 	      <literal>volume</literal>, <literal>glance</literal>, <literal>swift</literal>,
-	      <literal>keystone</literal> y <literal>ec2</literal>. Define los
+	      <literal>keystone</literal> y <literal>ec2</literal>). Define los
 	      endpoints y los asigna a los servicios.</para>
 	    </listitem>
 	    
@@ -1078,6 +1073,33 @@ root@jupiter:~#
 	  </programlisting>
 	</listitem>
       </orderedlist>
+
+      <section xml:id="id_expl_resumida_admin_token">
+	<title>¿Qué es el ADMIN_TOKEN?</title>
+	<para>Keystone introduce en OpenStack un sistema de
+	autenticación basado en tokens, de manera que todos los
+	elementos del cloud (usuarios y servicios principalmente), no se
+	autentican directamente unos a otros, sino que lo hace con un
+	actor intermedio mediante tokens, este actor intermedio
+	encargado de verificar la autenticidad de cada uno de los
+	elementos es Keystone.</para>
+	<para>Con Keystone recién instalado no tenemos ningún usuario
+	con privilegios de administración en la base de datos de
+	Keystone, por lo no podríamos hacer ninguna modificación. El
+	mecanismo que proporciona keystone para solventar esta situación
+	es definir en el fichero de configuración un token con
+	privilegios de administración, que recibe el nombre de
+	ADMIN_TOKEN, que puede definirse directamente en la instalación
+	o cuando queramos en el fichero
+	<filename>/etc/keystone/keystone.conf</filename>, el ADMIN_TOKEN
+	puede tener cualquier valor, pero hay que custodiarlo
+	adecuadamente mientras esté activo, ya que otorga privilegios de
+	administración sobre Keystone a quien lo
+	conozca. Posteriormente, una vez definidos los usuarios en  
+	keystone y los demás elementos, podemos borrar este campo del
+	fichero de configuración de keystone y no volver a
+	utilizarlo.</para>
+      </section>
     </section>
   </section>
 
@@ -1087,12 +1109,6 @@ root@jupiter:~#
     módulo de OpenStack, Glance. Este servicio es el encargado de la
     gestión y registro de las imágenes que posteriormente se van a poder
     instanciar en máquinas virtuales.</para>
-
-    <section>
-      <title>¿Qué es Glance?</title>
-      <para></para>
-      
-    </section>
 
     <section>
       <title>Instalación y configuración</title>
@@ -1164,7 +1180,7 @@ sql_connection = mysql://glance:calex2010!!@172.20.254.190/glance
 	  </programlisting>
 
 	  <para>También añadimos la siguiente configuración para que
-	  <literal>Glance></literal> utilice <literal>Keystone</literal> como
+	  <literal>Glance</literal> utilice <literal>Keystone</literal> como
 	  servicio de autenticación.</para>
 	  <programlisting>
 [paste_deploy]
@@ -1184,8 +1200,8 @@ flavor = keystone
 	<listitem>
 	  <para>Creamos el esquema de la base de datos:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>glance-manage version_control 0</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>glance-manage db_sync</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>glance-manage version_control 0</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>glance-manage db_sync</userinput>
 	  </screen>
 	  <para>Podemos ignorar los warnings de Python.</para>
 	</listitem>
@@ -1193,8 +1209,8 @@ flavor = keystone
 	<listitem>
 	  <para>Reiniciamos los demonios del servicio Glance:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>service glance-api restart</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service glance-registry restart</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service glance-api restart</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service glance-registry restart</userinput>
 	  </screen>
 	</listitem>
 
@@ -1219,7 +1235,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  siguiente comando, que muestra la lista de imágenes disponible, nos
 	  debería dar una lista vacía:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
 	  </screen>
 	  <para>Podemos asegurarnos que todo ha ido bien (incluyendo la
 	  autenticación con Keystone) si tras ejecutar el comando anterior, la
@@ -1259,7 +1275,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	<listitem>
 	  <para>Damos la imagen de alta en Glance a través del siguiente comando:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>glance add name="Cirros (test) 0.3.0 64 bits" is_public=true container_format=bare disk_format=qcow2 &lt; cirros-0.3.0-x86_64-disk.img</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>glance add name="Cirros (test) 0.3.0 64 bits" is_public=true container_format=bare disk_format=qcow2 &lt; cirros-0.3.0-x86_64-disk.img</userinput>
 	  </screen>
 	</listitem>
 
@@ -1286,12 +1302,6 @@ root@jupiter:~#
     servicio central de toda la infraestructura de Openstack.</para>
 
     <section>
-      <title>¿Qué es Nova?</title>
-      <para>COMPLETAR POSTERIORMENTE</para>
-      
-    </section>
-
-    <section>
       <title>Instalación y configuración</title>
       <para>Una infraestructura OpenStack puede ejecutar tantos nodos
       <literal>nova</literal> como desee. Como mínimo uno, esto hace que sea posible tener una
@@ -1305,7 +1315,7 @@ root@jupiter:~#
       <literal>europa</literal>, <literal>ganimedes</literal> y
       <literal>calisto</literal>. Inicialmente configuraremos al controlador
       (<literal>jupiter</literal>) como nodo de computación, pero lo
-      eliminaremos una vez que vayamos añadiendo a los otros nodos..</para>
+      eliminaremos una vez que vayamos añadiendo a los otros nodos.</para>
 
       <para>Tanto para la instalación de Nova, como para la instalación del resto
       de servicios, partiremos de los repositorios oficiales de Ubuntu, basta
@@ -1316,7 +1326,7 @@ root@jupiter:~#
 	<listitem>
 	  <para>Instalamos todo el software necesario:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install nova-api nova-cert nova-compute nova-compute-kvm nova-doc nova-network nova-objectstore nova-scheduler nova-volume rabbitmq-server novnc nova-consoleauth</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>apt-get install nova-api nova-cert nova-compute nova-compute-kvm nova-doc nova-network nova-objectstore nova-scheduler nova-volume rabbitmq-server novnc nova-consoleauth</userinput>
 	  </screen>
 	</listitem>
 
@@ -1324,14 +1334,14 @@ root@jupiter:~#
 	  <para>Creamos la base de datos que el servicio necesita en MySQL. Para
 	  ello iniciamos el cliente MySQL:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
 	  </screen>
 	  <para>Desde el prompt de MySQL ejecutamos las siguientes
 	  sentencias:</para>
 	  <screen>
-	    <prompt>mysql> </prompt><userinput>CREATE DATABASE nova;</userinput>
-	    <prompt>mysql> </prompt><userinput>GRANT ALL ON nova.* to 'nova'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
-	    <prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
+<prompt>mysql> </prompt><userinput>CREATE DATABASE nova;</userinput>
+<prompt>mysql> </prompt><userinput>GRANT ALL ON nova.* to 'nova'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
+<prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
 	  </screen>
 	</listitem>
 
@@ -1352,8 +1362,8 @@ root@jupiter:~#
 	  siguientes comandos, suponiendo una partición <literal>sda4</literal>
 	  libre:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput> pvcreate /dev/sda4</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput> vgcreate nova-volumes /dev/sda4</userinput>
+<prompt>root@jupiter:~# </prompt><userinput> pvcreate /dev/sda4</userinput>
+<prompt>root@jupiter:~# </prompt><userinput> vgcreate nova-volumes /dev/sda4</userinput>
 	  </screen>
 	</listitem>
 
@@ -1361,8 +1371,8 @@ root@jupiter:~#
 	  <para>Cambiamos los permisos del directorio /etc/nova y del fichero
 	  /etc/nova/nova.conf:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>chown -R nova.nova /etc/nova</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>chmod 644 /etc/nova/nova.conf</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>chown -R nova.nova /etc/nova</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>chmod 644 /etc/nova/nova.conf</userinput>
 	  </screen>
 	</listitem>
 
@@ -1391,7 +1401,7 @@ admin_password = calex2010!!
 	<listitem>
 	  <para>Creamos el esquema de la base de datos que Nova necesita:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>nova-manage db sync</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova-manage db sync</userinput>
 	  </screen>
 	  <para>Podemos ignorar los warnings de Python.</para>
 	</listitem>
@@ -1399,27 +1409,27 @@ admin_password = calex2010!!
 	<listitem>
 	  <para>Reiniciamos todos los demonios del servicio Nova:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>service novnc stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-consoleauth stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-volume stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-schedule  stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-objectstore stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-api stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-compute stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-network stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-cert stop</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service libvirt-bin stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service novnc stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-consoleauth stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-volume stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-schedule  stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-objectstore stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-api stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-compute stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-network stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-cert stop</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service libvirt-bin stop</userinput>
 
-	    <prompt>root@jupiter:~# </prompt><userinput>service libvirt-bin start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-cert start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-network start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-compute start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-api start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-objectstore start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-schedule  start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-volume start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service nova-consoleauth start</userinput>
-	    <prompt>root@jupiter:~# </prompt><userinput>service novnc start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service libvirt-bin start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-cert start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-network start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-compute start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-api start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-objectstore start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-schedule  start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-volume start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service nova-consoleauth start</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>service novnc start</userinput>
 	  </screen>
 
 	  <para>Mientras que trabajemos con el servicio Nova (instalación,
@@ -1436,7 +1446,7 @@ admin_password = calex2010!!
 	  <para>Proporcionamos una red (rango de IPs) que asociaremos a las
 	  instancias, lo podemos hacer a través del siguiente comando:</para>
 	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>nova-manage network create private --fixed_range_v4=10.0.0.0/24 --num_networks=1 --bridge=br100 --bridge_interface=bond0.60 --network_size=256 --dns1=172.20.254.235</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova-manage network create private --fixed_range_v4=10.0.0.0/24 --num_networks=1 --bridge=br100 --bridge_interface=bond0.60 --network_size=256 --dns1=172.20.254.235</userinput>
 	  </screen>
 	</listitem>
 
@@ -1456,7 +1466,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	<listitem>
 	  <para>Volvemos a reiniciar todos los servicios:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>/root/bin/nova.sh restart</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>/root/bin/nova.sh restart</userinput>
 	  </screen>
 	</listitem>
 
@@ -1464,7 +1474,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  <para>Comprobamos que todos los servicios estén iniciados, lo podemos
 	  hacer a través del comando:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>nova-manage service list</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
 	  </screen>
 	  <para>...que nos debería proporcionar una salida similar a la
 	  siguiente:</para>
@@ -1484,18 +1494,18 @@ nova-network     jupiter                              nova             enabled  
 	  mientras que el servicio está realmente en ejecución con el comando
 	  (en el caso de <literal>nova-compute</literal>):</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>ps ax | grep nova-compute</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>ps ax | grep nova-compute</userinput>
 	  </screen>
 	  <para>Si el servicio no está en ejecución, algo ha ido mal (o bastante
 	  mal), por lo que tendremos que revisar los logs:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>less /var/log/nova/nova-compute.log</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>less /var/log/nova/nova-compute.log</userinput>
 	  </screen>
 
 	  <note>
-	    <para>El servicio <literal>nova-compute</literal> suele mostrar las
-	    XXX durante bastante tiempo, no mostrará una cara feliz
-	    mientras que haya máquinas virtuales sin iniciar.</para>
+	    <para>El servicio <literal>nova-compute</literal> suele mostrar los
+	    caracteres <literal>XXX</literal> durante bastante tiempo, no mostrará una cara
+	    feliz mientras haya máquinas virtuales sin iniciar.</para>
 	  </note>
 
 	</listitem>
@@ -1505,30 +1515,30 @@ nova-network     jupiter                              nova             enabled  
 	  <para>Podemos comprobar las imágenes que podemos iniciar a través del
 	  servicio Glance con cualquiera de los siguientes comandos:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>glance index</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
 	  </screen>
 
 	  <screen>
-	    <prompt>$ </prompt><userinput>nova image-list</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova image-list</userinput>
 	  </screen>
 
 	  <para>Generamos las claves SSH necesarias para conectarnos a través
 	  del protocolo SSH a las máquinas virtuales una vez iniciadas:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>nova keypair-add test > /root/test.pem</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova keypair-add test > /root/test.pem</userinput>
 	  </screen>
 
 	  <para>Para iniciar una instancia necesitamos el nombre de la imagen,
 	  el flavor (podemos crear más) y las claves SSH anteriormente
 	  generadas, ejecutamos el siguiente comando:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>nova boot --image "Cirros (test) 0.3.0 64 bits" --flavor m1.small --key_name test my-first-server</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova boot --image "Cirros (test) 0.3.0 64 bits" --flavor m1.small --key_name test my-first-server</userinput>
 	  </screen>
 
 	  <para>Podemos comprobar el estado de la instancia a través del
 	  comando:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>nova list</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova list</userinput>
 	  </screen>
 
 	  <para>... que debería mostrar una salida como ésta:</para>
@@ -1545,7 +1555,7 @@ root@jupiter:~#
 	  <para>Y obtener más información a través del UID de la instancia con
 	  el comando:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>nova show &lt;id&gt;</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova show &lt;id&gt;</userinput>
 	  </screen>
 
 	  <para>... de esta forma:</para>
@@ -1584,7 +1594,7 @@ root@jupiter:~#
 
 	  <para>Nos podemos conectar a través de SSH a la instancia con el comando:</para>
 	  <screen>
-	    <prompt>$ </prompt><userinput>ssh -i test.pem cirros@10.0.0.2</userinput>
+<prompt>$ </prompt><userinput>ssh -i test.pem cirros@10.0.0.2</userinput>
 	  </screen>
 	</listitem>
 
@@ -1638,10 +1648,10 @@ root@jupiter:~#
 
 	<orderedlist>
 	  <listitem>
-	    <para>No instalamos todo el software de nova, solo un
-	    paquete:</para>
+	    <para>No instalamos todo el software de Nova, solo un paquete,
+	    además de las herramientas para la configuración de bridges:</para>
 	  <screen>
-	    <prompt>root@io:~# </prompt><userinput>apt-get install nova-compute bridge-utils</userinput>
+<prompt>root@io:~# </prompt><userinput>apt-get install nova-compute bridge-utils</userinput>
 	  </screen>
 	  </listitem>
 
@@ -1669,15 +1679,15 @@ vncserver_listen=172.20.253.191
 	  <listitem>
 	    <para>Borramos la base de datos SQLite que acompaña a la instalación
 	    de nova-compute:</para>
-	    <screen><prompt>$ </prompt><userinput>rm /var/lib/nova/nova.sqlite</userinput></screen>
+	    <screen><prompt>root@io:~# </prompt><userinput>rm /var/lib/nova/nova.sqlite</userinput></screen>
 	  </listitem>
 
 	  <listitem>
 	    <para>Revisamos los permisos del directorio
 	    <filename>/var/lib/nova</filename>:</para>
 	    <screen>
-	      <prompt>root@io:~# </prompt><userinput>chown -R nova.nova /var/lib/nova</userinput>
-	      <prompt>root@io:~# </prompt><userinput>chmod 770 /var/lib/nova</userinput>
+<prompt>root@io:~# </prompt><userinput>chown -R nova.nova /var/lib/nova</userinput>
+<prompt>root@io:~# </prompt><userinput>chmod 770 /var/lib/nova</userinput>
 	    </screen>
 
 	  </listitem>
@@ -1700,7 +1710,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	    <para>Reiniciamos el servicio
 	    <literal>nova-compute</literal>:</para>
 	    <screen>
-	      <prompt>root@io:~# </prompt><userinput>service nova-compute restart</userinput>
+<prompt>root@io:~# </prompt><userinput>service nova-compute restart</userinput>
 	    </screen>
 	  </listitem>
 
@@ -1709,7 +1719,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	    poder obtener la siguiente salida...</para>
 
 	    <screen>
-	      <prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
 Binary           Host                                 Zone             Status     State Updated_At
 nova-consoleauth jupiter                              nova             enabled    :-)   2012-07-31 15:47:23
 nova-cert        jupiter                              nova             enabled    :-)   2012-07-31 15:47:25
@@ -1920,12 +1930,6 @@ iface bond0.60 inet manual
     módulo de OpenStack, Nova. Este servicio es el encargado de gestionar las
     instancias (máquinas virtuales) del Cloud, por lo que lo convierte en el
     servicio central de toda la infraestructura de Openstack.</para>
-
-    <section>
-      <title>¿Qué es Horizon?</title>
-      <para>COMPLETAR POSTERIORMENTE</para>
-      
-    </section>
 
     <section>
       <title>Instalación y configuración</title>
