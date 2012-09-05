@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Beneficios del IaaS en la educación</title>
+  <para>Beneficios derivados del uso de una infraestructura IaaS privada en la formación informática.</para>
+  <itemizedlist>
+    <listitem><para> Implantar la infraestructura de hardware y software de un cloud
+    privado.
+    <itemizedlist>
+      <listitem><para> Conocer con detalle las características del hardware necesario
+      para implementar este tipo de infraestructura.</para></listitem>
+      <listitem><para> Instalar y configurar los sistemas operativos sobre los que se
+      sustenta.</para></listitem>
+      <listitem><para> Instalar, configurar y gestionar los sistemas de
+      virtualización sobre los que trabaja el software de la nube (Xen,
+      KVM y libvirt).</para></listitem>
+      <listitem><para> Instalar y configurar el software Opennebula para la gestión
+      del cloud.</para></listitem>
+    </itemizedlist>
+    <listitem><para> Adquirir las capacidades y destrezas necesarias para la
+    administración y gestión del cloud.</para></listitem>
+    <listitem><para> Instalar, configurar y gestionar servicios que utilicen la
+    potencia de procesamiento del cloud computing y que resulten de
+    utilidad para cualquier miembro de la comunidad educativa. </para></listitem>
+    <listitem><para> Instalar, configurar y gestionar sistemas de monitorización de
+    los recursos hardware del cloud computing, de forma que se
+    establecan criterios que aseguren el correcto funcionamiento del
+    sistema informático en su conjunto. </para></listitem>
+    <itemizedlist>
+      <listitem><para> Recibir por parte del profesorado implicado en el proyecto, la
+      formación necesaria para poder administrar y gestionar
+      adecuadamente el cloud.</para></listitem>
+      <listitem><para> Compartir experiencias entre los centros implicados en el
+      proyecto</para></listitem>
+    </itemizedlist>
+    <listitem><para> Utilizar del cloud en la práctica diaria en clase</para></listitem>
+    <itemizedlist>
+      <listitem><para> Evaluar las posibilidades educativas del cloud teniendo acceso
+      completo al mismo.</para></listitem>
+      <listitem><para> Identificar los servicios susceptibles de ser instalados en el
+      sistema operativo que se implante en el cloud computing y se
+      instalarán aquellos que se determinen atendienco a criterios de
+      necesidad de potencia de cálculo, memoria RAM y utilización por
+      parte de la comunidad educativa.</para></listitem>
+    </itemizedlist>
+    <listitem><para> Desarrollar materiales curriculares y documentación técnica. </para></listitem>
+    <itemizedlist>
+      <listitem><para> Elaborar una guía de prácticas para incluir en diferentes
+      módulos profesionales.</para></listitem>
+      <listitem><para> Elaborar documentación técnica específica: Manuales de
+      usuario, presentaciones, vídeos demostrativos, etcétera. </para></listitem>
+      <listitem><para> Utilizar de licencias libres en toda la documentación para
+      promover su difusión.</para></listitem>
+      <listitem><para> Utilizar recursos web 2.0 para difundir entre toda la
+      comunidad educativa los materiales curriculares.</para></listitem>
+    </itemizedlist>
+  </itemizedlist>
+
+</chapter>
