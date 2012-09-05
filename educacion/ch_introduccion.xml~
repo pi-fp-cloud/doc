@@ -1,0 +1,347 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Pasos previos</title>
+  <para>Antes de comenzar con la instalación de paquetes en sí, hay que
+  plantear claramente la estructura de red y los componentes que se
+  instalarán en cada equipo. La descripción física de los equipos que
+  componen el cloud ya se realizó en <link
+  xlink:href="???">enlace</link>, por lo que nos centraremos ahora en
+  la instalación en sí.</para>
+  <section xml:id="nombres">
+    <title>Nombres de los equipos</title>
+    <para>Se han elegido los siguientes nombres para los equipos en los que se
+    va a realizar la instalación del Cloud:</para>
+    <itemizedlist>
+      <listitem><para>jupiter: para el nodo controlador, que será el encargado
+      de gestionar todos los recursos del cloud, interaccionar con los clientes
+      y ordenar a los nodos de virtualización que ejecuten las instancias, pero
+      en el que no se ejecutarán máquinas virtuales. La mayor parte de
+      componentes del Cloud y configuración se realizará en este
+      equipo, pero comparado con los <emphasis>nodos de
+      computación</emphasis> la carga de trabajo será pequeña, por lo
+      que no es necesario un equipo con mucha memoria RAM o gran
+      capacidad de procesamiento.</para></listitem>
+      <listitem><para>io, europa, ganimedes y calisto (son las 4 lunas
+      principales de júpiter): para los 4 nodos de virtualización o
+      nodos de computación, como se les denomina habitualmente en la
+      jerga propia de OpenStack. En estos equipos se instalarán
+      sólo los componentes necesarios para que se ejecuten las
+      instancias en ellos y estarán esperando las órdenes de
+      jupiter.</para></listitem>
+      <listitem><para>saturno: para el nodo de almacenamiento, ya que es tan
+      importante como júpiter y a la vez independiente. En este equipo todavía
+      no está definido el software que se instalará.</para></listitem>
+      <listitem><para>venus: un equipo convencional en el que se instalarán los
+      paquetes necesarios para usar el cliente nova con el que podemos
+      gestionar el cloud desde línea de comandos sin la necesidad de
+      realizar las operaciones desde jupiter. Estará conectado sólo a
+      la red privada.</para></listitem>
+    </itemizedlist>
+  </section>
+  <section xml:id="esquema_red">
+    <title>Esquema de red</title>
+    <para>Cada uno de estos equipos está conectado a dos redes (salvo venus), lo
+    que en terminología de OpenStack se conoce como una red
+    <emphasis>pública</emphasis> y una red <emphasis>privada</emphasis>, 
+    términos a los que no se debe dar el sentido habitual que tienen en redes
+    IPv4, ya que en OpenStack la red pública se refiere a la que interaccionará
+    con los clientes y la privada la que se utiliza para la intercomunicación de
+    los componentes del cloud y en nuestro caso muy destacadamente, de la
+    transferencia de imágenes a los nodos en los que se deben ejecutar las
+    instancias. La red privada es una red aislada que no está conectada con
+    otras redes, mientras que la red pública sí lo está, bien a una
+    red local bien a Internet. Las transferencias de datos más
+    importante se realizan a través de la red privada, por lo que se
+    ha optado por conectar cada equipo (salvo jupiter) mediante tres
+    interfaces de red Gigabit Ethernet, para que configurándolas
+    adecuadamente en modo <emphasis>link aggregation</emphasis> 
+    de acuerdo al estándar 802.3ad, puedan aumentar las tasas de
+    transferencia en la red privada.</para>
+    <para>En la siguiente imagen, se puede ver de forma esquemática los equipos
+    y las redes a las que están conectados:</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/esquema_red_iesgn.png" width="20cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Esquema de red del Cloud, en la que aparecen los 6 equipos
+	conectados a las redes privada y pública del cloud.</para>
+      </caption>
+    </mediaobject>
+  </section>
+  <section xml:id="direccionamieno_ip">
+    <title>Direcciones IP de los equipos</title>
+    <para>En la siguiente tabla aparecen las direcciones IPv4 privadas
+    y públicas elegidas para los nodos del cloud.</para>
+    <table xml:id="tabla_ips">
+      <title>Direcciones IP de los equipos del cloud</title>
+      <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+	<thead>
+	  <row>
+	    <entry align="center"></entry>
+	    <entry align="center">IP pública</entry>
+	    <entry align="center">IP privada</entry>
+	  </row>
+	</thead>
+	<tbody>
+	  <row>
+	    <entry align="center">jupiter</entry>
+	    <entry align="center">172.22.222.1</entry>
+	    <entry align="center">192.168.222.1</entry>
+	  </row>
+	  <row>
+	    <entry align="center">saturno</entry>
+	    <entry align="center">172.22.222.2</entry>
+	    <entry align="center">192.168.222.2</entry>
+	  </row>
+	  <row>
+	    <entry align="center">venus</entry>
+	    <entry align="center"></entry>
+	    <entry align="center">192.168.222.10</entry>
+	  </row>
+	  <row>
+	    <entry align="center">io</entry>
+	    <entry align="center">172.22.222.11</entry>
+	    <entry align="center">192.168.222.11</entry>
+	  </row>
+	  <row>
+	    <entry align="center">europa</entry>
+	    <entry align="center">172.22.222.12</entry>
+	    <entry align="center">192.168.222.12</entry>
+	  </row>
+	  <row>
+	    <entry align="center">ganimedes</entry>
+	    <entry align="center">172.22.222.13</entry>
+	    <entry align="center">192.168.222.13</entry>
+	  </row>
+	  <row>
+	    <entry align="center">calisto</entry>
+	    <entry align="center">172.22.222.14</entry>
+	    <entry align="center">192.168.222.14</entry>
+	  </row>
+	</tbody>
+      </tgroup>
+    </table>
+  </section>
+  <section xml:id="instalacion_jupiter">
+    <title>Instalación de jupiter</title>
+    <section xml:id="configuracion_raid_jupiter">
+      <title>Configuración previa de RAID</title>
+      <para>jupiter incluye dos discos duros SATAII de 500 GiB y una
+      controladora de disco 3ware 9650SE. Se ha optado por configurar esta
+      controladora de disco en modo RAID 1, para incluir un nivel elemental de
+      seguridad y consistencia de datos, aunque obviamente esto no descarta la
+      utilización adicional de otros mecanismos de copias de seguridad que se
+      configurarán posteriormente. Al tratarse de una controladora RAID
+      hardware y estar configurado previamente, el sistema operativo que
+      arranque en el equipo sólo verá un disco duro en <code>/dev/sda</code>
+      de 500GB aproximadamente.</para>
+    </section>
+    <section xml:id="instalacion_debian_jupiter">
+      <title>Instalación de Debian Wheezy</title>
+      <para>El sistema operativo elegido para los equipos del cloud
+      es la versión de pruebas <emphasis>(testing)</emphasis> de Debian
+      GNU/Linux (amd64), que actualmente se conoce con el nombre de código
+      <emphasis>wheezy</emphasis> y que cuando finalmente se estabilice se
+      conocerá como Debian 7. Pensamos que es la mejor opción en el caso de
+      Debian, ya que <emphasis>squeeze</emphasis>, la versión estable
+      actualmente, no incluye paquetes de OpenStack y la opción de instalar
+      directamente desde los ficheros fuente o bien utilizar repositorios no
+      oficiales, no nos parece tan acertada. La
+      <emphasis>inestabilidad</emphasis> que comporta utilizar una versión no
+      estabilizada de Debian, nos parece en este momento asumible, más teniendo
+      en cuenta que vamos a implementar un cloud privado y no
+      crítico, que se utilizará a partir del curso próximo con fines
+      formativos.</para>
+      <para>Durante la instalación realizamos el siguiente esquema de
+      particionado:</para>
+      <programlisting>
+Disposit. Inicio    Comienzo      Fin      Bloques  Id Sistema
+/dev/sda1   *        2048     1953791      975872   83 Linux
+/dev/sda2         1953792   976539647   487292928   8e Linux LVM
+      </programlisting>
+      <para>Es decir, reservamos una pequeña partición de 1G en la
+      que ubicaremos el directorio /boot y el resto lo gestionamos
+      con LVM. Inicialmente creamos sólo dos volúmenes
+      lógicos (uno para el sistema raíz y otro para el área de
+      intercambio):</para>
+      <programlisting>
+LV           VG   Attr   LSize
+jupiter-root vg   -wi-ao 18,62g
+jupiter-swap vg   -wi-ao  1,86g
+      </programlisting>
+      <section xml:id="gestion_raid_jupiter">
+	<title>Gestión del RAID desde el sistema operativo</title>
+	<para>Aunque la controladora RAID es hardware y el sistema
+	operativo no la gestiona, es importante que se pueda controlar
+	su estado a través de alǵun módulo del kernel. En este caso el
+	módulo 3w-9xxx que se carga automáticamente y nos envía estos
+	mensajes al log del sistema:</para>
+	<programlisting>
+[    2.381798] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
+[    2.381841] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
+[    2.381849] 3w-9xxx 0000:01:00.0: setting latency timer to 64
+[    2.612067] scsi0 : 3ware 9000 Storage Controller
+[    2.612128] 3w-9xxx: scsi0: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
+[    2.952039] 3w-9xxx: scsi0: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
+	</programlisting>	    
+	<para>Pendiente de hacer:</para>
+	<para>http;//jonas.genannt.name/  Hay repositorio, con
+	aplicaciones para manejar el RAID 3ware 9650SE</para>
+      </section>
+    </section>
+    <section xml:id="configuracion_red_jupiter">
+      <title>Configuración de red jupiter</title>
+      <para>La configuración de red de jupiter es muy sencilla, ya que es un
+      equipo con dos interfaces de red (eth0 y eth1), conectadas a la red
+      pública y a la red privada respectivamente, el contenido del fichero
+      <filename>/etc/network/interfaces</filename> incluye la configuración 
+      estática de las dos interfaces de red:</para>
+      <programlisting>
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+        address 172.22.222.1
+        netmask 255.255.0.0
+        network 172.22.0.0
+        broadcast 172.22.255.255
+        gateway 172.22.0.1
+
+auto eth1
+iface eth1 inet static
+        address 192.168.222.1
+        netmask 255.255.255.0
+        network 192.168.222
+        broadcast 255.255.255.0
+      </programlisting>
+    </section>
+    <section xml:id="instalacion_mysql">
+      <title>Instalación y configuración inicial de MySQL</title>
+      <para>Todos los componentes de OpenStack (incluso glance y
+      keystone que por defecto utilizan sqlite) guardarán sus datos en
+      bases de datos MySQL. El servidor de bases de datos se instala
+      en jupiter, el nodo controlador:</para>
+      <screen><prompt>#</prompt><userinput>aptitude install
+      mysql-server</userinput></screen> 
+      <para>Introducimos la contraseña del usuario root de MySQL
+      cuando se requiera y esperamos a que finalice la
+      instalación. Una vez concluida, abrimos el fichero
+      <filename>/etc/mysql/my.cnf</filename> y realizamos la siguiente
+      modificación:</para>
+      <literallayout class="monospaced">
+      bind_address = 192.168.222.0/24</literallayout> 
+      <para>Para que la base de datos sea accesible sólo a través de
+      la red privada.</para>
+      <para>Entramos en MySQL con el usuario root que se crea durante
+      la instalación y creamos diferentes bases de datos para
+      los componentes keystone, glance y nova y un usuario para
+      OpenStack, que tendrá todos los permisos sobre  las bases de
+      datos:</para>
+      <programlisting>
+mysql> CREATE DATABASE keystone;
+mysql> CREATE DATABASE glance;
+mysql> CREATE DATABASE nova;
+mysql> CREATE USER "usuario_admin_openstack" IDENTIFIED BY 'password';
+mysql> GRANT ALL PRIVILEGES ON keystone.* TO 'openstackadmin'@'localhost' \
+    -> IDENTIFIED BY 'password';
+mysql> GRANT ALL PRIVILEGES ON glance.* TO 'opentackadmin"'@'localhost';
+mysql> GRANT ALL PRIVILEGES ON nova.* TO 'openstackadmin"'@'localhost';
+	</programlisting>
+    </section>
+    <section xml:id="otros_paquetes">
+      <title>Instalación de otros paquetes</title>
+      <para>Antes de instalar propiamente los paquetes relacionados
+      con los diferentes componentes de Openstack, es recomendable
+      instalar los siguientes paquetes:</para>
+      <screen><userinput>apt-get install rabbitmq-server
+      memcached</userinput></screen>
+      <para>rabbitmq-server se encarga de la gestión de mensajes
+      entre los diferentes componentes de OpenStack (es un paquete
+      obligatorio que si no instalamos ahora se instalará por
+      dependencias) y memcached de cachear en memoria peticiones a
+      bases de datos o a APIs</para>      
+    </section>
+  </section>
+  <section xml:id="instalacion_4_lunas">
+    <title>Instalación de io, europa, ganimedes y calisto</title>
+    <para>La instalación de estos cuatro nodos es idéntica, por lo que
+    sólo explicaremos la instalación de uno de ellos.</para>
+    <section xml:id="configuracion_raid_4_lunas">
+      <title>Configuración previa de RAID</title>
+      <para>Cada uno de estos equipos incluye dos discos duros SAS
+      de 300 GiB a 15000 rpm y una controladora LSI MegaRAID SAS que se
+      configura en modo RAID 0 al iniciar el equipo por primera
+      vez. Se opta por RAID 0 ya que en estos equipos la
+      configuración es muy sencilla y no hay datos persistentes,
+      sólo los discos volátiles de las instancias que se estén
+      ejecutando en ese momento, por lo que es más conveniente
+      utilizar RAID 0 para conseguir mayor rendimiento en el proceso
+      de lectura/escritura a disco. Una vez configurado el raid, el
+      sistema operativo que arranque en el equipo sólo ve un disco duro en
+      <code>/dev/sda</code> de 600GB aproximadamente.</para>
+    </section>
+    <section xml:id="instalacion_debian_4_lunas">
+      <title>Instalación de Debian Wheezy</title>
+      <para>Al igual que para el nodo controlador, para los nodos de
+      computación, se va a utilizar la versión wheezy de Debian
+      GNU/Linux (amd64), durante la instalación realizamos el
+      siguiente sencillo esquema de particionado:</para>
+      <programlisting>
+Disposit. Inicio    Comienzo      Fin      Bloques  Id  Sistema
+/dev/sda1   *        2048     1953791      975872   83  Linux
+/dev/sda2         1955838  1167964159   583004161    5  Extendida
+/dev/sda5      1164060672  1167964159     1951744   82  Linux swap / Solaris
+/dev/sda6         1955840  1164060671   581052416   83  Linux
+      </programlisting>
+      <para>Es decir, a parte de dos pequeñas particiones para el
+      área de intercambio y /boot, se utiliza prácticamente todo el
+      disco para el sistema raíz.</para>
+      <section xml:id="configuracion_bonding">
+	<title>Configuración de red</title>
+	<para></para>
+      </section>
+    </section>
+  </section>
+  <section xml:id="ntp">
+    <title>Sincronización de la hora de los equipos con ntp</title>
+    <para>Es muy importante que todos los equipos del cloud tengan
+    sus relojes sincronizados, por lo que lo más sencillo es
+    configurar un servidor local como servidor ntp, que se
+    sincronice con los servidores de hora públicos que hay
+    disponibles en Internet y ofrezca la hora a todos los equipos
+    del cloud. Realmente no es fundamental que la hora de los
+    equipos del cloud sea muy exacta, pero sí que estén siempre
+    sincronizados.</para>
+    <para>Ya que en la red local existía previamente un servidor ntp,
+    simplemente hay que instalar el paquete ntp en <emphasis>todos los
+    nodos</emphasis>, comentar todas las líneas que empiecen por
+    server en el fichero <filename>/etc/ntp.conf</filename> y añadir
+    una línea del tipo:</para>
+    <screen>server ntp.your-provider.example</screen>
+    <para>Podemos comprobar el funcionamiento correcto tras
+    reiniciar el servicio ntp y realizar una consulta:</para>
+    <screen><userinput>ntpq -np</userinput></screen>
+    <para>De forma paulatina, el reloj del equipo se irá sincronizanco
+    con el del servidor de hora de la red.</para>
+  </section>
+  <section xml:id="pretty-table">
+    <title>Instalación manual de python-prettytable</title>
+    <para>Uno de los paquetes que se instalan por dependencias
+    (python-prettytable), tiene abierto el <link
+    xlink:href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=673790">
+    bug 673790</link> en la versión 0.6 que actualmente está
+    en Debian Wheezy, por lo que es necesario instalar la versión 0.5
+    de forma manual y ponerla en estado <emphasis>hold</emphasis> para
+    que no se actualice, mientras persista este bug:</para>
+    <screen><userinput>
+wget http://ftp.es.debian.org/debian/pool/main/p/prettytable/python-prettytable_0.5-1_all.deb
+apt-get install python-prettytable=0.5-1
+echo python-prettytable hold |  dpkg --set-selections
+    </userinput></screen>
+  </section>
+</chapter>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    version="5.0"  xml:lang="es"
+    xml:id="infraestructura">
+    <title>Cloud computing en la educación</title>
+    <info>
+        <author>
+	  <!-- Vamos añadiendo autores a medida que vayan contribuyendo -->
+            <personname>
+                <firstname>Jesús</firstname>
+                <surname>Moreno León</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <!-- <copyright> -->
+        <!--     <year>2012</year> -->
+        <!-- </copyright> -->
+        <abstract>
+	  <para>En este documento se describen las ventajas del uso del Cloud Computing en la educación, analizando en profundidad aquellas derivadas del uso de una infraestructura de cloud privada en un insituto donde se impartan enseñanzas relacionadas con la familia profesional Informática y Comunicaciones.
+	  </para>
+        </abstract>
+    </info>
+    <xi:include href="ch_introduccion.xml"/>
+    <!-- <preface> -->
+    <!--   <title>sdf</title> -->
+    <!--   <para>asd</para> -->
+    <!-- </preface> -->
+    
+</book>
