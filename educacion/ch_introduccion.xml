@@ -28,7 +28,7 @@
       <listitem><para>Promueve una mayor estandarización de las tecnologías utilizadas.</para></listitem>      
       <listitem><para></para></listitem>
     </itemizedlist>
-    <para>Sin embargo, aunque los beneficios descritos por la mayoría de los autores aparecen en mayor o menor medida en todos los tipos de cloud computing, se centran fundamentalmente en el tipo de computación en la nube conocida como <emphasis>Software como Servicio</emphasis> (o SaaS, de sus siglas en inglés)</para>, y es por ello por lo que consideramos apropiado realizar un análisis más específico de las ventajas derivadas de otros tipos de cloud computing, como es el caso de las instalaciones de tipo <emphasis>Infraestructura como servicio</emphasis>, (o Iaas).
+    <para>Sin embargo, aunque los beneficios descritos por la mayoría de los autores aparecen en mayor o menor medida en todos los tipos de cloud computing, éstos se centran fundamentalmente en el tipo de computación en la nube conocida como <emphasis>Software como Servicio</emphasis> (o SaaS, de sus siglas en inglés)</para>, y es por ello por lo que consideramos apropiado realizar un análisis más específico de las ventajas derivadas de otros tipos de cloud computing, como es el caso de las instalaciones de tipo <emphasis>Infraestructura como servicio</emphasis>, (o Iaas).
   </section>
   <section xml:id="tipos_cloud">
     <title>Tipos de cloud computing</title>
@@ -91,4 +91,7 @@ clouds, podemos clasificarlos en:</para>
     IaaS, principalmente privados ya que permiten manejar y conocer todos
     los niveles de esta tecnología.</para>
  </section>
+  <section xml:id="beneficios_iaas">
+    <title>Beneficios derivados del uso de una infraestructura IaaS privada en la formación informática.</title>
+    <para></para>
 </chapter>
