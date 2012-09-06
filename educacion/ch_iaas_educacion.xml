@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?b
 <chapter xmlns="http://docbook.org/ns/docbook"
          xmlns:xi="http://www.w3.org/2001/XInclude"
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es">
   <title>Beneficios del IaaS en la educación</title>
-  <para>Beneficios derivados del uso de una infraestructura IaaS privada en la formación informática.</para>
+  <para>Además de los beneficios generales comentados en el primer capítulo, contar con una infraestructura IaaS privada en un centro educativo que imparta formación relacionada con la familia profesional informática y comunicaciones, ofrece al alumnado la oportunidad de instalar, configurar y administrar la instalación, ampliando por tanto su formación en un campo que, sin duda, es uno de los que tienen un futuro más prometedor en el panorama actual.</para>
+  <para>Para ilustrar de forma más presisa las posibilidades que ofrece una infraestructura de este tipo en un centro eduativo, se listan a continuación una serie de procedimientos que podrían incorporarse al curriculum de las enseñanzas impartidas en el centro, y que, además, no podrían impartirse si no se contara con estas instalaciones: </para>
   <itemizedlist>
     <listitem><para> Implantar la infraestructura de hardware y software de un cloud
     privado.
@@ -45,17 +46,5 @@
       necesidad de potencia de cálculo, memoria RAM y utilización por
       parte de la comunidad educativa.</para></listitem>
     </itemizedlist>
-    <listitem><para> Desarrollar materiales curriculares y documentación técnica. </para></listitem>
-    <itemizedlist>
-      <listitem><para> Elaborar una guía de prácticas para incluir en diferentes
-      módulos profesionales.</para></listitem>
-      <listitem><para> Elaborar documentación técnica específica: Manuales de
-      usuario, presentaciones, vídeos demostrativos, etcétera. </para></listitem>
-      <listitem><para> Utilizar de licencias libres en toda la documentación para
-      promover su difusión.</para></listitem>
-      <listitem><para> Utilizar recursos web 2.0 para difundir entre toda la
-      comunidad educativa los materiales curriculares.</para></listitem>
-    </itemizedlist>
   </itemizedlist>
-
 </chapter>
