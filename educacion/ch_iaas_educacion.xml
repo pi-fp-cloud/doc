@@ -1,14 +1,14 @@
-<?xml version="1.0" encoding="UTF-8"?b
+<?xml version="1.0" encoding="UTF-8"?>
 <chapter xmlns="http://docbook.org/ns/docbook"
          xmlns:xi="http://www.w3.org/2001/XInclude"
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es">
   <title>Beneficios del IaaS en la educación</title>
-  <para>Además de los beneficios generales comentados en el primer capítulo, contar con una infraestructura IaaS privada en un centro educativo que imparta formación relacionada con la familia profesional informática y comunicaciones, ofrece al alumnado la oportunidad de instalar, configurar y administrar la instalación, ampliando por tanto su formación en un campo que, sin duda, es uno de los que tienen un futuro más prometedor en el panorama actual.</para>
-  <para>Para ilustrar de forma más presisa las posibilidades que ofrece una infraestructura de este tipo en un centro eduativo, se listan a continuación una serie de procedimientos que podrían incorporarse al curriculum de las enseñanzas impartidas en el centro, y que, además, no podrían impartirse si no se contara con estas instalaciones: </para>
+  <para>Además de los beneficios generales comentados en el primer capítulo, contar con una infraestructura IaaS privada en un centro educativo que imparta formación relacionada con las TIC, ofrece al alumnado la oportunidad de instalar, configurar y administrar la instalación, ampliando por tanto su formación en un campo que, sin duda, es uno de los que tienen un futuro más prometedor en el panorama informático actual.</para>
+  <para>Para ilustrar de forma más precisa las posibilidades que ofrece una infraestructura de este tipo en un centro educativo, se listan a continuación una serie de procedimientos que podrían incorporarse al curriculum de las enseñanzas impartidas en el centro; procedimientos que, de no contar con esta tecnología, resultaría muy complicado impartir con una mínima calidad.</para>
   <itemizedlist>
     <listitem><para> Implantar la infraestructura de hardware y software de un cloud
-    privado.
+    privado.</para>
     <itemizedlist>
       <listitem><para> Conocer con detalle las características del hardware necesario
       para implementar este tipo de infraestructura.</para></listitem>
@@ -46,5 +46,6 @@
       necesidad de potencia de cálculo, memoria RAM y utilización por
       parte de la comunidad educativa.</para></listitem>
     </itemizedlist>
+    </listitem>
   </itemizedlist>
 </chapter>

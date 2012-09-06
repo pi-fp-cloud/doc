@@ -22,11 +22,14 @@
         <!--     <year>2012</year> -->
         <!-- </copyright> -->
         <abstract>
-	  <para>En este documento se describen las ventajas del uso del Cloud Computing en la educación, analizando en profundidad aquellas derivadas del uso de una infraestructura de cloud privada en un insituto donde se impartan enseñanzas relacionadas con la familia profesional Informática y Comunicaciones.
+	  <para>En este documento se describen las ventajas del uso del Cloud Computing en la educación, analizando en profundidad aquellas derivadas del uso de una infraestructura de cloud privada en una institución educativa donde se impartan enseñanzas relacionadas con las Tecnologías de la Información y la Comunicación (TIC).
 	  </para>
         </abstract>
     </info>
-    <xi:include href="ch_introduccion.xml"/>
+    <xi:include href="ch_introduccion.xml"/>    
+    <xi:include href="ch_tipos_de_cloud.xml"/>    
+    <xi:include href="ch_iaas_educacion.xml"/>    
+    <xi:include href="ch_conclusiones.xml"/>
     <!-- <preface> -->
     <!--   <title>sdf</title> -->
     <!--   <para>asd</para> -->
