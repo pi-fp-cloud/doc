@@ -2,7 +2,7 @@
 
 STYLESHEETS_DIR=/usr/share/xml/docbook/stylesheet/docbook-xsl-ns
 OBJDIR=www
-SOURCE=bk-admin-openstack
+SOURCE=cloud_en_la_educacion
 XSLTPROC=/usr/bin/xsltproc
 OPTS=--xinclude --stringparam paper.type A4
 XSL=none

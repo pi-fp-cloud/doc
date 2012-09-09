@@ -82,6 +82,15 @@
     <para>La forma más inmediata y obvia para emular un entorno real en un aula
     es la utilización de máquinas físicas que actúen como equipos servidores y
     clientes para poder realizar diversas prácticas.</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/epoca1.png" width="15cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Esquema de un aula de la primera época en la que los alumnos
+	debían compartir los pocos servidores físicos disponibles.</para>
+      </caption>
+    </mediaobject>
     <variablelist>
       <varlistentry>
 	<term>Ventajas:</term>
@@ -139,6 +148,15 @@
     utilización de sistemas virtuales, es posible que cada alumno disponga de
     varias máquinas virtuales en su equipo con diferentes sistemas operativos y
     configuraciones de red diversas.</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/epoca2.png" width="15cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Esquema de un aula de la segunda época en la que los alumnos
+	ejecutan máquinas virtuales en sus equipos.</para>
+      </caption>
+    </mediaobject>
     <variablelist>
       <varlistentry>
 	<term>Ventajas:</term>
@@ -199,6 +217,16 @@
     virtuales. Por las características y requisitos del cloud, lo más lógico
     es que se configure un cloud de infraestructura único en el centro
     educativo y que lo utilicen todos los alumnos.</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/epoca3.png" width="15cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Hipotético esquema de un aula de la tercera época en la que los alumnos
+	ejecutan instancias en el cloud de infraestructura del centro
+	educativo.</para>
+      </caption>
+    </mediaobject>
     <variablelist>
       <varlistentry>
 	<term>Ventajas:</term>
@@ -246,7 +274,7 @@
 	    <listitem><para>Sistema muy centralizado. La dependencia de un
 	    entorno tan centralizado puede provocar problemas cuando este no
 	    esté disponible. Si el cloud se convierte en una herramienta
-	    fundamentel en el día a día, debe implantarse en alta
+	    fundamental en el día a día, debe implantarse en alta
 	    disponibilidad, para evitar que un fallo deje sin trabajar a todo el
 	    centro.</para></listitem>
 	    <listitem><para>Administración del cloud. Un cloud IaaS es una
