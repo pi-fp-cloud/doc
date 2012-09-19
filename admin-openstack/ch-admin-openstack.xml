@@ -5,7 +5,260 @@
          xml:id="ch-admin-openstack">
   <title>Administración de OpenStack</title>
 
-  <para>Para seguir esta guía se necesita:</para>
+  <para>Aunque gran parte de tareas de administración de OpenStack se pueden realizar
+  de forma intuitiva desde la interfaz gráfica web Horizon(dashboard), aquí se presentan los comandos más usados para la administración desde la consola</para>
+ 
+  <section>
+    <title>Gestión de instancias</title>
+    
+    <para>Una vez que se tenga alguna imagen dada de alta en nuestro sistema se
+    podrán arrancar instancias de ésta. Estas instancias se ejecutarán en el o
+    los nodos de computación que estén activos.</para>
+
+    <para>Podemos listar las imágenes que tengamos en glance:</para>
+
+    <screen><prompt>$ </prompt><userinput>glance index</userinput></screen>
+
+    <screen>
+root@neo:~# glance index
+ID                                   Name                           Disk Format
+Container Format     Size          
+------------------------------------ ------------------------------
+-------------------- -------------------- --------------
+86119171-9ed6-435c-9620-573e0b440e58 Windows 7 general              vdi
+bare                    14463094784
+2710174c-9388-4d55-8ece-ace0250817de Ubuntu 12.04 Server            qcow2
+bare                      233177088
+838d547b-4a6c-4177-9e6a-fb6695b67cd4 Cirros (test) 0.3.0 64 bits    qcow2
+bare                        9761280
+root@neo:~#
+    </screen>
+    
+    <para>Como vemos tenemos actualmente tres imágenes disponibles para ser
+    instanciadas. Una imagen de Windows 7 en formato vdi (Virtualbox) y dos
+    imagenes en qcow2, una de Ubuntu 12.04 Server y otra Cirros.</para>
+
+    <para>Para instanciar una de las imágenes es necesario saber qué plantillas
+    de ejecución (flavor) tenemos disponibles en nuestro sistema.</para>
+
+    <para>Si no las conocemos, listamos las plantillas disponibles en nuestro sistema:</para>
+    
+    <screen><prompt>$ </prompt><userinput>nova manage flavor list</userinput></screen>
+
+    <screen>
+m1.medium: Memory: 4096MB, VCPUS: 2, Root: 40GB, Ephemeral: 0Gb, FlavorID: 3,
+Swap: 0MB, RXTX Factor: 1.0
+m1.large: Memory: 8192MB, VCPUS: 4, Root: 80GB, Ephemeral: 0Gb, FlavorID: 4,
+Swap: 0MB, RXTX Factor: 1.0
+m1.tiny: Memory: 512MB, VCPUS: 1, Root: 0GB, Ephemeral: 0Gb, FlavorID: 1, Swap:
+0MB, RXTX Factor: 1.0
+m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 160GB, Ephemeral: 0Gb, FlavorID: 5,
+Swap: 0MB, RXTX Factor: 1.0
+m1.small: Memory: 2048MB, VCPUS: 1, Root: 20GB, Ephemeral: 0Gb, FlavorID: 2,
+Swap: 0MB, RXTX Factor: 1.0
+    </screen>
+
+    <para>Vemos que por defecto el sistema viene con 5 plantillas de
+    ejecución</para>
+
+    <para>En nuestro ejenplo vamos a instanciar la imagen de Ubuntu con la plantilla
+    <emphasis>m1.small</emphasis></para>
+
+    <screen><prompt>$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small ubuntuserver1</userinput></screen>
+
+    <screen>
++-------------------------------------+--------------------------------------+
+|               Property              |                Value                 |
++-------------------------------------+--------------------------------------+
+| OS-DCF:diskConfig                   | MANUAL                               |
+| OS-EXT-SRV-ATTR:host                | None                                 |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | None                                 |
+| OS-EXT-SRV-ATTR:instance_name       | instance-00000035                    |
+| OS-EXT-STS:power_state              | 0                                    |
+| OS-EXT-STS:task_state               | scheduling                           |
+| OS-EXT-STS:vm_state                 | building                             |
+| accessIPv4                          |                                      |
+| accessIPv6                          |                                      |
+| adminPass                           | hvpgLFGuF9ne                         |
+| config_drive                        |                                      |
+| created                             | 2012-09-19T12:07:42Z                 |
+| flavor                              | m1.small                             |
+| hostId                              |                                      |
+| id                                  | f7cb19ef-06a4-433e-806c-ab0db55e30a2 |
+| image                               | Ubuntu 12.04 Server                  |
+| key_name                            |                                      |
+| metadata                            | {}                                   |
+| name                                | ubuntuserver1                        |
+| progress                            | 0                                    |
+| status                              | BUILD                                |
+| tenant_id                           | a70373bf297a42eb9203645d84476c23     |
+| updated                             | 2012-09-19T12:07:42Z                 |
+| user_id                             | 4c249654613e41208b2d03169ef29580     |
++-------------------------------------+--------------------------------------+
+    </screen>
+
+
+    <para>Podemos ver que el sistema nos ha devuelto todos los datos de la instancia que se
+    está construyendo.</para>
+
+    <para>Seguidamente se puede listar en qué estado está nuestras instancias con:</para>
+
+    <screen><prompt>$ </prompt><userinput>nova list</userinput></screen>
+
+    <screen>
++--------------------------------------+---------------+--------+------------------+
+|                  ID                  |      Name     | Status |     Networks
+|
++--------------------------------------+---------------+--------+------------------+
+| f7cb19ef-06a4-433e-806c-ab0db55e30a2 | ubuntuserver1 | BUILD  | private=10.0.0.2 |
++--------------------------------------+---------------+--------+------------------+
+    </screen>
+
+    <para>Como vemos la instancia está aún construyéndose</para>
+
+    <para>Si todo ha ido bien al cabo de un tiempo deberá aparecer la instancia como
+    activa</para>
+
+    <screen><prompt>$ </prompt><userinput>nova list</userinput>
++--------------------------------------+---------------+--------+------------------+
+|                  ID                  |      Name     | Status |     Networks
+|
++--------------------------------------+---------------+--------+------------------+
+| f7cb19ef-06a4-433e-806c-ab0db55e30a2 | ubuntuserver1 | ACTIVE | private=10.0.0.2 |
++--------------------------------------+---------------+--------+------------------+
+    </screen>
+
+    <para>Una vez creadas varias instancias podemos ver su estado:</para>
+
+    <screen><prompt>$ </prompt><userinput>nova list</userinput>
++--------------------------------------+---------------+--------+------------------+
+|                  ID                  |      Name     | Status |     Networks
+|
++--------------------------------------+---------------+--------+------------------+
+| 9273c28b-7db9-41aa-916a-b4589420af58 | ubuntuserver4 | ACTIVE |
+private=10.0.0.5 |
+| cd5e6c35-9e62-49d7-815f-c3ea09540806 | ubuntuserver2 | ACTIVE |
+private=10.0.0.3 |
+| dbefde80-48e1-48b0-a8b0-84f2ddc7a1f7 | ubuntuserver3 | ACTIVE |
+private=10.0.0.4 |
+| f7cb19ef-06a4-433e-806c-ab0db55e30a2 | ubuntuserver1 | ACTIVE |
+private=10.0.0.2 |
++--------------------------------------+---------------+--------+------------------+
+    </screen>
+
+    <para>Las demás acciones que se pueden realizar con una instancia se listan
+    a continuación:</para>
+    <itemizedlist>
+      <listitem>
+	<para><emphasis role="bold">Lanzar instancia en un nodo:</emphasis>si
+	se desea lanzar una instancia en un nodo en concreto se tiene que forzar
+	con los flags <emphasis>--hint force_hosts=</emphasis></para>
+	<screen><prompt>$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small --hint force_hosts=trinity ubuntuserver5</userinput>
+
++-------------------------------------+----------------------------------------------------------+
+|               Property              |                          Value
+|
++-------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                   | MANUAL
+|
+| OS-EXT-SRV-ATTR:host                | trinity
+|
+| OS-EXT-SRV-ATTR:hypervisor_hostname | None
+|
+| OS-EXT-SRV-ATTR:instance_name       | instance-0000003c
+|
+| OS-EXT-STS:power_state              | 1
+|
+| OS-EXT-STS:task_state               | None
+|
+| OS-EXT-STS:vm_state                 | active
+|
+| accessIPv4                          |
+|
+| accessIPv6                          |
+|
+| config_drive                        |
+|
+| created                             | 2012-09-19T18:30:48Z
+|
+| flavor                              | m1.small
+|
+| hostId                              |
+c4cfd12e74d001411d189ab076248cd268b2b7cfda5017cf67376682 |
+| id                                  | d21be20f-3a03-4979-8d5c-6a32dab71a43
+|
+| image                               | Ubuntu 12.04 Server
+|
+| key_name                            |
+|
+| metadata                            | {}
+|
+| name                                | ubuntuserver5
+|
+| private network                     | 10.0.0.6
+|
+| progress                            | 0
+|
+| status                              | ACTIVE
+|
+| tenant_id                           | a70373bf297a42eb9203645d84476c23
+|
+| updated                             | 2012-09-19T18:30:29Z
+|
+| user_id                             | 4c249654613e41208b2d03169ef29580
+|
++-------------------------------------+----------------------------------------------------------+
+	</screen>
+	<note><para>Atención la funcionalidad de forzar nodo de computación solo funciona con ciertos tipos
+	de planificadores (scheduler). No funciona
+	con<emphasis>SimpleScheduler</emphasis> pero si con <emphasis>Filter Scheduler</emphasis></para></note> 
+
+      </listitem>
+      <listitem>
+	<para><emphasis role="bold">Pausar instancia:</emphasis></para>
+	<screen><prompt>$ </prompt><userinput> nova pause $id_de_instancia</userinput></screen>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">Reanudar instancia pausada:</emphasis></para>                                              
+        <screen><prompt>$ </prompt><userinput> nova unpause $id_de_instancia</userinput></screen>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">Suspender una instancia:</emphasis></para>
+        <screen><prompt>$ </prompt><userinput> nova suspend $id_de_instancia</userinput></screen>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">Reanudar una instancia suspendida:</emphasis></para>
+        <screen><prompt>$ </prompt><userinput> nova resume $id_de_instancia</userinput></screen>
+      </listitem>
+      <listitem>
+        <para><emphasis role="bold">Borrar una instancia (debe estar activa):</emphasis></para>
+        <screen><prompt>$ </prompt><userinput> nova delete $id_de_instancia</userinput></screen>
+      </listitem>
+    </itemizedlist>
+</section>
+
+<section xml:id="id_admin_plantillas">
+  <title>Gestión de plantillas</title>
+  <para>En desarrollo</para>
+</section>
+
+
+<section xml:id="id_admin_usuarios">
+  <title>Gestión de usuarios</title>
+  <para>Por hacer</para>
+</section>
+
+<section xml:id="id_admin_proyectos">
+  <title>Gestión de proyectos y quotas </title>
+<para>Por hacer</para>
+</section>
+
+
+<section xml:id="id_monitor_nodos">
+  <title>Monitorización de nodos</title>
+  <para>Por hacer</para>
+</section>
+
 
   <section>
     <title>Gestión de volúmenes</title>
@@ -17,5 +270,6 @@
 <!-- Muy buen enlace!!!  Como la gestión de volúmenes se ha incluido en un
 capítulo aparte incluyo allí el enlace y el código :) -->
   </para>
+ <para>Esto es una prueba</para>
   </section>
 </chapter>
