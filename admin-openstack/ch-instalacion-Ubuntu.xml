@@ -55,9 +55,11 @@
     </orderedlist>
 
     <para>El proceso de instalación y configuración de OpenStack es un proceso
-    complejo y muy propenso a errores, ya que se trata de un proyecto muy joven
-    y bajo un desarrollo muy activo. Para obtener más información más allá de
-    este documento se ruega visitar las páginas oficiales:</para>
+    complejo y propenso a errores por lo que es muy importante conocer todos los
+    elementos y comprender cómo interactúan unos con otros. OpenStack es un
+    proyecto muy joven y bajo un desarrollo muy activo, para obtener información
+    más allá de este documento se recomienda visitar las páginas
+    oficiales:</para>
 
     <itemizedlist>
       <listitem>
@@ -130,9 +132,8 @@
       <listitem>
 	<para>El sistema deberá estar actualizado antes de empezar con el
 	proceso de instalación/configuración:</para>
-	<para><command>apt-get update</command></para>
-	<para><command>apt-get upgrade</command></para>
-	<para><command>apt-get dist-upgrade</command></para>
+	<screen><prompt>$ </prompt><userinput>sudo apt-get update</userinput></screen>
+	<screen><prompt>$ </prompt><userinput>sudo apt-get upgrade</userinput></screen>
       </listitem>
       
     </itemizedlist>
@@ -175,7 +176,7 @@
 	  independiente. En este equipo todavía no está definido el software que
 	  se instalará, pero lo más  probable es que sea una distribución
 	  especializada en infraestructuras SAN/NAS como
-	  <literal>OpenFiler</literal> ó <literal>FreeNAS</literal>. Este nodo
+	  <literal>OpenFiler</literal> o <literal>FreeNAS</literal>. Este nodo
 	  ofrecerá espacio de almacenamiento extra a través de los protocolos
 	  iSCSI y NFS.</para>
 	</listitem>
