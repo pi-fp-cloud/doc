@@ -26,8 +26,10 @@
 	  hechas en las instalaciones de los centros implicados.</para> 
         </abstract>
     </info>
-<!--    <xi:include href="salas.xml"/>-->
+    <xi:include href="ch_salas.xml"/>
     <xi:include href="ch_servidores.xml"/>
+    <xi:include href="ch_redes.xml"/>
+    <xi:include href="ch_sai.xml"/>
     <preface>
       <title>sdf</title>
       <para>asd</para>

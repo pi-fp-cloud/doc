@@ -3,109 +3,167 @@
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es">
   <title>Servidores</title>
-  <para>En este capítulo se describen las principales características de los servidores.</para>
-  <section xml:id="serv-gest">
-    <title>Supermicro-1012C-MRF</title> 
-    <para>Este equipo es el encargado de gestionar y organizar todo el cloud, es el que precisa una 
-    mayor configuración del software pero a su vez no requiere unas prestaciones elevadas. Se ha 
-    optado por un servidor de una unidad de armario bastante convencional, en el que se configurarán 
-    los dos discos duros en modo RAID 1, para guardar los datos replicados en previsión de futuros
-    fallos de disco.</para>
-    <para>En una mejora posterior del cloud, se podría plantear poner este equipo en alta disponibilidad
-    con otro equipo de características similares.</para>
-    <para>Especificaciones técnicas del equipo:</para>
+  <para>Los componentes principales de la infraestructura del cloud de
+  infraestructura son los servidores que van a formar parte del
+  mismo. Para implantar una infraestructura de estas características
+  hay que hacer una inversión importante por lo que es necesario
+  conocer bien las necesidades antes de adquirir los equipos.</para>
+  <section xml:id="tipo-servidores">
+    <title>Tipos de servidores</title>
+    <para>En una infraestructura más compleja se pueden diferenciar
+    muchas funciones diversas para cada servidor, pero en una
+    infraestructura sencilla para pequeña organización como es nuestro
+    caso, podemos distinguir entre tres tipos de servidores para el
+    cloud, dependiendo de se función dentro del cloud:</para>
     <itemizedlist>
-      <listitem><para>Chasis 
-      <link xlink:href="http://www.supermicro.com/products/chassis/1U/512/SC512F-350.cfm">SC512F-350</link>. 
-      Altura: 1U, anchura: 19", profundidad: 369 mm.</para></listitem> 
-      <listitem><para>Placa base <link xlink:href="http://www.supermicro.com/Aplus/motherboard/Opteron4000/SR56x0/H8SCM-F.cfm">
-      Supermicro H8SCM-F</link>.
-      </para></listitem>
-      <listitem><para>Fuente de alimentación de 350W (80+ Gold).</para></listitem>
-      <listitem><para>1 procesador <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=779&amp;f1=AMD+Opteron%E2%84%A2+4200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=1000&amp;f6=C32&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD
-      4226</link> de 6 cores a 2700 MHz.</para></listitem>
-      <listitem><para>4 GB de RAM DDR3/1333 ECC registrada</para></listitem>
-      <listitem><para>Dos interfaces de red Gigabit integradas Intel 82574L</para></listitem>
-      <listitem><para>Controladora Raid <link 
-      xlink:href="http://www.lsi.com/products/storagecomponents/Pages/3ware9650SE-2LP.aspx">LSI
-      3 Ware 9650 SE – 2LP de 128Mb PCI-E Raid 0,1 hardware</link>.</para></listitem>
-      <listitem><para>2 Discos duros internos de 500 GB <link xlink:href="http://edgekey.seagate.com/files/staticfiles/docs/pdf/es-ES/datasheet/disc/Constellation-2-fips-data-sheet-ds1719-3-1111-es.pdf">SATA Seagate Constellation a 7200 rpm, 64MB de caché e 
-      interfaz de 6G/s</link>.</para></listitem>
-      <listitem><para>Interfaz de gestión IPMI 2.0</para></listitem>
+      <listitem>
+	<para>Nodo controlador: Equipo en el que se instalarán la mayor
+	parte de los servicios de gestión del cloud (autenticación,
+	planificador, gestión de volúmenes, APIs, etc.)</para>
+	<para>El nodo controlador no precisa ninguna característica
+	especial y puede utilizarse cualquier equipo de
+	características básicas. Sí sería importante, quizás en una
+	segunda fase o como primera ampliación, tener dos nodos
+	controladores funcionando en alta disponibilidad porque
+	cualquier problema de funcionamiento de este equipo deja el
+	cloud completamente inoperativo.</para>
+      </listitem>
+      <listitem>
+	<para>Nodo de computación: Equipos en los que se ejecutarán
+	las instancias y que por tanto necesitan procesadores potentes
+	y mucha memoria RAM.</para>
+	<para>Cualquier cloud de infraestructura contará con varios
+	nodos de computación, tantos más cuantas más instancias sea
+	necesario ejecutar simultáneamente. La cantidad de memoria RAM
+	consumida por cada instancia depende mucho del sistema
+	operativo que estén ejecutando, pero en el caso de un uso
+	educativo y no de servidores en producción, sería suficiente
+	con contar entre 0,5 y 2 GiB de RAM por instancia.</para>	
+      </listitem>
+      <listitem>
+	<para>Nodo de almacenamiento: Equipo encargado de guardar las
+	imágenes de los sistemas, las instantáneas
+	(<emphasis>snapshots</emphasis>) y los volúmenes persisitentes
+	de las instancias que se ejecuten. Obviamente en un equipo que
+	necesitará tener varios discos duros configurados en algún
+	modo de RAID (RAID5, RAID6 o RAIDZ).</para>
+      </listitem>
     </itemizedlist>
   </section>
-  <section xml:id="serv-doble-twin">
-    <title>Supermicro-2022TG-H6RF</title>
-    <para>Este equipo realmente son 4 equipos en 1, que comparten un mismo chasis y 2 fuentes de 
-    alimentación. Los 4 nodos de este equipo son totalmente independientes y cualquier fallo en 
-    uno de ellos no afecta al funcionamiento de los demás.</para>
-    <para>Estos 4 nodos son los equipos que realmente van a soportar la mayor parte del trabajo del 
-    cloud, ya que en ellos se ejecutan todas las instancias del cloud (máquinas virtuales), por lo
-    que es necesario que sean equipos de altas prestaciones, con procesadores muy potentes y gran
-    cantidad de memoria RAM, además se ha optado por un modelo con bus SAS y discos SAS de 15.000
-    rpm para conseguir altas velocidades de E/S a disco local. Para la comunicación con la red de
-    almacenamiento y el <link linkend="serv-gest">servidor de gestión</link> se han incluido varias
-    interfaces de red Gigabit configuradas en modo <emphasis>bonding</emphasis> IEEE 802.3ad 
-    (<emphasis>link aggregation</emphasis>) para aumentar el ancho de banda total y redundancia del
-    canal.</para>
-    <para>Especificaciones técnicas del equipo:</para>
-    <itemizedlist>
-      <listitem><para>Chasis 
-      <link xlink:href="http://www.supermicro.com/products/chassis/2u/827/sc827hq-r1620.cfm">
-      827HQ-R1620B</link>. Altura: 2U, anchura: 19", profundidad: 724 mm.</para></listitem>
-      <listitem><para>12 bahías de 3.5" para discos duros extraíbles en caliente.</para></listitem>
-      <listitem><para>4 placas base <link xlink:href="http://www.supermicro.com/Aplus/motherboard/Opteron6000/SR56x0/H8DGT-HLF.cfm">
-      Supermicro H8DGT-HLF</link> de doble socket AMD G34 y chipset AMD SR5690 + SP5100.</para></listitem>
-      <listitem><para>2 fuentes de alimentación redundantes de 1620W (80+ Platinum).</para></listitem>
-      <listitem><para>4 procesadores <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=762&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD 6238</link> de 12 cores a 2600 MHz y 4 procesadores <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=764&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD 6220</link> de 8 cores a 3000 MHz (2 en cada nodo).</para></listitem>
-      <listitem><para>192 GB de RAM DDR3/1333 ECC registrada (64 GB en dos nodos y 32 GB en otros dos).
-      </para></listitem>
-      <listitem><para>Dos interfaces de red Gigabit integradas Intel 82576 en cada nodo.</para></listitem>
-      <listitem><para>4 tarjetas de red PCI-E de doble puerto Gigabit (1 por nodo).</para></listitem>
-      <listitem><para>8 Discos duros 350 GB <link xlink:href="http://www.seagate.com/files/docs/pdf/datasheet/disc/cheetah-15k.7-ds1677.3-1007us.pdf">
-      SAS Seagate Cheetah a 15000 rpm, 16MB de caché e interfaz de 6G/s</link>.</para></listitem>
-      <listitem><para>4 interfaces de gestión IPMI 2.0 (1 por nodo)</para></listitem>
-    </itemizedlist>
-    <mediaobject>
-      <imageobject>
-	<imagedata fileref="figures/AS-2022TG-HLIBQRF.jpg" width="10cm" format="JPG"/>
-      </imageobject>
-      <caption>
-	<para>Imagen posterior del equipo Supermicro 2022TG-H6RF en la que se observa los 4 nodos que lo componen 
-	y las fuentes de alimentación redundantes y extraíbles.</para>
-      </caption>
-    </mediaobject>
+  <section xml:id="nodo-controlador">
+    <title>Nodo controlador</title>
+    <section xml:id="supero-1012c">
+      <title>Supermicro-1012C-MRF</title> 
+      <para>Este equipo es el encargado de gestionar y organizar todo el
+      cloud, es el que precisa una mayor configuración del software pero
+      a su vez no requiere unas prestaciones elevadas. Se ha optado por
+      un servidor de una unidad de armario bastante convencional, en el
+      que se configurarán los dos discos duros en modo RAID 1, para
+      guardar los datos replicados en previsión de futuros fallos de
+      disco.</para> 
+      <para>En una mejora posterior del cloud, se podría plantear poner
+      este equipo en alta disponibilidad con otro equipo de
+      características similares.</para>
+      <para>Especificaciones técnicas del equipo:</para>
+      <itemizedlist>
+	<listitem><para>Chasis 
+	<link xlink:href="http://www.supermicro.com/products/chassis/1U/512/SC512F-350.cfm">SC512F-350</link>. 
+	Altura: 1U, anchura: 19", profundidad: 369 mm.</para></listitem> 
+	<listitem><para>Placa base <link xlink:href="http://www.supermicro.com/Aplus/motherboard/Opteron4000/SR56x0/H8SCM-F.cfm">
+	Supermicro H8SCM-F</link>.
+	</para></listitem>
+	<listitem><para>Fuente de alimentación de 350W (80+ Gold).</para></listitem>
+	<listitem><para>1 procesador <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=779&amp;f1=AMD+Opteron%E2%84%A2+4200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=1000&amp;f6=C32&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD
+	4226</link> de 6 cores a 2700 MHz.</para></listitem>
+	<listitem><para>4 GB de RAM DDR3/1333 ECC registrada</para></listitem>
+	<listitem><para>Dos interfaces de red Gigabit integradas Intel 82574L</para></listitem>
+	<listitem><para>Controladora Raid <link 
+	xlink:href="http://www.lsi.com/products/storagecomponents/Pages/3ware9650SE-2LP.aspx">LSI
+	3 Ware 9650 SE – 2LP de 128Mb PCI-E Raid 0,1 hardware</link>.</para></listitem>
+	<listitem><para>2 Discos duros internos de 500 GB <link xlink:href="http://edgekey.seagate.com/files/staticfiles/docs/pdf/es-ES/datasheet/disc/Constellation-2-fips-data-sheet-ds1719-3-1111-es.pdf">SATA Seagate Constellation a 7200 rpm, 64MB de caché e 
+	interfaz de 6G/s</link>.</para></listitem>
+	<listitem><para>Interfaz de gestión IPMI 2.0</para></listitem>
+      </itemizedlist>
+    </section>
   </section>
-  <section xml:id="serv-alm">
-    <title>Intel-SR2612UR</title>
-    <para>Este equipo es el que se va a utilizar para almacenamiento secundario y permanente de las 
-    instancias del cloud, por lo que su principal característica es tener varios discos duros de
-    gran capacidad.</para>
-    <para>Especificaciones técnicas del equipo:</para>
-    <itemizedlist>
-      <listitem><para>Chasis SR2612. Altura 2U, anchura: 19" y profundidad: 781 mm.</para></listitem>
-      <listitem><para>2 fuentes de alimentación redundantes de 760W.</para></listitem>
-      <listitem><para>12 bahías de 3.5" para discos duros extraíbles en caliente.</para></listitem>
-      <listitem><para>Placa base <link xlink:href="http://www.intel.com/content/www/us/en/motherboards/server-motherboards/server-board-s5520ur.html?wapkw=intel+server+board+s5520ur">Intel S5520UR</link> de doble socket LGA 1366 (socket B) y chipset Intel 5520/ICH10R.</para></listitem>
-      <listitem><para>1 procesador <link xlink:href="http://ark.intel.com/products/47925?wapkw=intel+xeon+e5620">
-      Intel Xeon E5620</link>de 4 cores a 2.4 GHz</para></listitem>
-      <listitem><para>24 GB de RAM DDR3 a 1333 MHz ECC registrada</para></listitem>
-      <listitem><para>Dos interfaces de red integradas Intel 82575EB.</para></listitem>
-      <listitem><para>1 tarjeta de red adicional PCI-E de doble puerto Gigabit.</para></listitem>
-      <listitem><para>6 discos duros de 2 TB <link xlink:href="http://edgekey.seagate.com/files/staticfiles/docs/pdf/es-ES/datasheet/disc/Constellation-2-fips-data-sheet-ds1719-3-1111-es.pdf">SATA Seagate Constellation a 7200 rpm, 64MB de caché e interfaz de 6G/s</link> 
-      extraíbles en caliente.</para></listitem>
-      <listitem><para>1 disco duro interno SSD de 120 GB <link xlink:href="http://www.kingston.com/datasheets/SH100S3_us.pdf">
-      Kingston HyperX</link></para></listitem>
-      <listitem><para>1 controladora de disco <link xlink:href="http://www.lsi.com/channel/products/storagecomponents/Pages/LSISAS9211-8i.aspx">
-      LSI SAS 9211-8i</link>.</para></listitem>
-    </itemizedlist>
-        <mediaobject>
-      <imageobject>
-	<imagedata fileref="figures/intel-sr2612.png" width="10cm" format="JPG"/>
-      </imageobject>
-      <caption>
-	<para>Imagen equipo Intel SR2612UR.</para>
-      </caption>
-    </mediaobject>
+  <section xml:id="nodo-computacion">
+    <title>Nodo de computación</title>
+    <section xml:id="serv-doble-twin">
+      <title>Supermicro-2022TG-H6RF</title>
+      <para>Este equipo realmente son 4 equipos en 1, que comparten un mismo chasis y 2 fuentes de 
+      alimentación. Los 4 nodos de este equipo son totalmente independientes y cualquier fallo en 
+      uno de ellos no afecta al funcionamiento de los demás.</para>
+      <para>Estos 4 nodos son los equipos que realmente van a soportar la mayor parte del trabajo del 
+      cloud, ya que en ellos se ejecutan todas las instancias del cloud (máquinas virtuales), por lo
+      que es necesario que sean equipos de altas prestaciones, con procesadores muy potentes y gran
+      cantidad de memoria RAM, además se ha optado por un modelo con bus SAS y discos SAS de 15.000
+      rpm para conseguir altas velocidades de E/S a disco local. Para la comunicación con la red de
+      almacenamiento y el <link linkend="serv-gest">servidor de gestión</link> se han incluido varias
+      interfaces de red Gigabit configuradas en modo <emphasis>bonding</emphasis> IEEE 802.3ad 
+      (<emphasis>link aggregation</emphasis>) para aumentar el ancho de banda total y redundancia del
+      canal.</para>
+      <para>Especificaciones técnicas del equipo:</para>
+      <itemizedlist>
+	<listitem><para>Chasis 
+	<link xlink:href="http://www.supermicro.com/products/chassis/2u/827/sc827hq-r1620.cfm">
+	827HQ-R1620B</link>. Altura: 2U, anchura: 19", profundidad: 724 mm.</para></listitem>
+	<listitem><para>12 bahías de 3.5" para discos duros extraíbles en caliente.</para></listitem>
+	<listitem><para>4 placas base <link xlink:href="http://www.supermicro.com/Aplus/motherboard/Opteron6000/SR56x0/H8DGT-HLF.cfm">
+	Supermicro H8DGT-HLF</link> de doble socket AMD G34 y chipset AMD SR5690 + SP5100.</para></listitem>
+	<listitem><para>2 fuentes de alimentación redundantes de 1620W (80+ Platinum).</para></listitem>
+	<listitem><para>4 procesadores <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=762&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD 6238</link> de 12 cores a 2600 MHz y 4 procesadores <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=764&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD 6220</link> de 8 cores a 3000 MHz (2 en cada nodo).</para></listitem>
+	<listitem><para>192 GB de RAM DDR3/1333 ECC registrada (64 GB en dos nodos y 32 GB en otros dos).
+	</para></listitem>
+	<listitem><para>Dos interfaces de red Gigabit integradas Intel 82576 en cada nodo.</para></listitem>
+	<listitem><para>4 tarjetas de red PCI-E de doble puerto Gigabit (1 por nodo).</para></listitem>
+	<listitem><para>8 Discos duros 350 GB <link xlink:href="http://www.seagate.com/files/docs/pdf/datasheet/disc/cheetah-15k.7-ds1677.3-1007us.pdf">
+	SAS Seagate Cheetah a 15000 rpm, 16MB de caché e interfaz de 6G/s</link>.</para></listitem>
+	<listitem><para>4 interfaces de gestión IPMI 2.0 (1 por nodo)</para></listitem>
+      </itemizedlist>
+      <mediaobject>
+	<imageobject>
+	  <imagedata fileref="figures/AS-2022TG-HLIBQRF.jpg" width="10cm" format="JPG"/>
+	</imageobject>
+	<caption>
+	  <para>Imagen posterior del equipo Supermicro 2022TG-H6RF en la que se observa los 4 nodos que lo componen 
+	  y las fuentes de alimentación redundantes y extraíbles.</para>
+	</caption>
+      </mediaobject>
+    </section>
+  </section>
+  <section xml:id="nodo-almacenamiento">
+    <title>Nodo de almacenamiento</title>
+    <section xml:id="serv-alm">
+      <title>Intel-SR2612UR</title>
+      <para>Este equipo es el que se va a utilizar para almacenamiento secundario y permanente de las 
+      instancias del cloud, por lo que su principal característica es tener varios discos duros de
+      gran capacidad.</para>
+      <para>Especificaciones técnicas del equipo:</para>
+      <itemizedlist>
+	<listitem><para>Chasis SR2612. Altura 2U, anchura: 19" y profundidad: 781 mm.</para></listitem>
+	<listitem><para>2 fuentes de alimentación redundantes de 760W.</para></listitem>
+	<listitem><para>12 bahías de 3.5" para discos duros extraíbles en caliente.</para></listitem>
+	<listitem><para>Placa base <link xlink:href="http://www.intel.com/content/www/us/en/motherboards/server-motherboards/server-board-s5520ur.html?wapkw=intel+server+board+s5520ur">Intel S5520UR</link> de doble socket LGA 1366 (socket B) y chipset Intel 5520/ICH10R.</para></listitem>
+	<listitem><para>1 procesador <link xlink:href="http://ark.intel.com/products/47925?wapkw=intel+xeon+e5620">
+	Intel Xeon E5620</link>de 4 cores a 2.4 GHz</para></listitem>
+	<listitem><para>24 GB de RAM DDR3 a 1333 MHz ECC registrada</para></listitem>
+	<listitem><para>Dos interfaces de red integradas Intel 82575EB.</para></listitem>
+	<listitem><para>1 tarjeta de red adicional PCI-E de doble puerto Gigabit.</para></listitem>
+	<listitem><para>6 discos duros de 2 TB <link xlink:href="http://edgekey.seagate.com/files/staticfiles/docs/pdf/es-ES/datasheet/disc/Constellation-2-fips-data-sheet-ds1719-3-1111-es.pdf">SATA Seagate Constellation a 7200 rpm, 64MB de caché e interfaz de 6G/s</link> 
+	extraíbles en caliente.</para></listitem>
+	<listitem><para>1 disco duro interno SSD de 120 GB <link xlink:href="http://www.kingston.com/datasheets/SH100S3_us.pdf">
+	Kingston HyperX</link></para></listitem>
+	<listitem><para>1 controladora de disco <link xlink:href="http://www.lsi.com/channel/products/storagecomponents/Pages/LSISAS9211-8i.aspx">
+	LSI SAS 9211-8i</link>.</para></listitem>
+      </itemizedlist>
+      <mediaobject>
+	<imageobject>
+	  <imagedata fileref="figures/intel-sr2612.png" width="10cm" format="JPG"/>
+	</imageobject>
+	<caption>
+	  <para>Imagen equipo Intel SR2612UR.</para>
+	</caption>
+      </mediaobject>
+    </section>
   </section>
 </chapter>

@@ -7,7 +7,7 @@
   cloud y cómo se integran tanto en las redes locales de los centros como en la
   conexión con el exterior.</para>
   <section xml:id="red-elementos">
-    <title>Elmentos de la red</title>
+    <title>Elementos de la red</title>
     <para>Se van a configurar varias redes con los siguientes elementos:</para>
     <itemizedlist>
       <listitem><para><link linkend="serv-gest">Servidor de gestión</link>, que
