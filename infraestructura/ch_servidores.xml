@@ -4,17 +4,32 @@
 	 version="5.0" xml:lang="es">
   <title>Servidores</title>
   <para>Los componentes principales de la infraestructura del cloud de
-  infraestructura son los servidores que van a formar parte del
+  infraestructura son los servidores que van a formar parte del 
   mismo. Para implantar una infraestructura de estas características
   hay que hacer una inversión importante por lo que es necesario
-  conocer bien las necesidades antes de adquirir los equipos.</para>
+  conocer de forma precisa las características necesarias para estos
+  equipos.</para>
   <section xml:id="tipo-servidores">
     <title>Tipos de servidores</title>
-    <para>En una infraestructura más compleja se pueden diferenciar
-    muchas funciones diversas para cada servidor, pero en una
-    infraestructura sencilla para pequeña organización como es nuestro
-    caso, podemos distinguir entre tres tipos de servidores para el
-    cloud, dependiendo de se función dentro del cloud:</para>
+    <para>Dependiendo del tamaño de la organización y por tanto del número de
+    equipos que se va a utilizar, se podrá asignar una función a cada servidor,
+    tal como aparece en <link linkend="esquema-grande">ejemplo de
+    arquitectura</link>.</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/NOVA_compute_nodes.png" width="10cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Ejemplo de esquema de nodos de una infraestructura con varios
+	nodos controladores y diferentes redes de computación, más información
+	en la <link
+	xlink:href="http://docs.openstack.org/trunk/openstack-compute/admin/content/example-installation-architecture.html">documentación
+	oficial de OpenStack</link>.</para>
+      </caption>
+    </mediaobject>
+    <para>Para una organización pequeña, como es nuestro caso, el esquema es
+    mucho más sencillo y distinguiremos sólo entre tres tipos de nodos,
+    dependiendo de la función que tendrán que realizar dentro del cloud:</para>
     <itemizedlist>
       <listitem>
 	<para>Nodo controlador: Equipo en el que se instalarán la mayor
@@ -41,17 +56,40 @@
 	con contar entre 0,5 y 2 GiB de RAM por instancia.</para>	
       </listitem>
       <listitem>
-	<para>Nodo de almacenamiento: Equipo encargado de guardar las
-	imágenes de los sistemas, las instantáneas
-	(<emphasis>snapshots</emphasis>) y los volúmenes persisitentes
-	de las instancias que se ejecuten. Obviamente en un equipo que
-	necesitará tener varios discos duros configurados en algún
-	modo de RAID (RAID5, RAID6 o RAIDZ).</para>
+	<para>Nodo de almacenamiento: Equipo encargado de guardar las imágenes
+	de los sistemas, las instantáneas (<emphasis>snapshots</emphasis>) y los
+	volúmenes persisitentes de las instancias que se ejecuten. Obviamente en
+	un equipo que necesitará tener varios discos duros configurados
+	apropiadamente.</para>
       </listitem>
     </itemizedlist>
   </section>
   <section xml:id="nodo-controlador">
     <title>Nodo controlador</title>
+    <para>Este es el equipo más importante del cloud, ya que de su buen
+    funcionamiento depende que el cloud esté operativo o no, es por eso por lo
+    que es aconsejable disponer de dos nodos similares con todos los servicios
+    del cloud configurados en alta disponibilidad (<emphasis>high availability
+    (HA)</emphasis>), sin embargo es un equipo que no tiene importantes demandas
+    en cuanto a las características de hardware, por lo que podemos utilizar un
+    equipo con unas características elementales:</para>
+    <itemizedlist>
+      <listitem>
+	<para>Procesador x86_64 (no son necesarias extensiones de
+	virtualización por hardware).</para>
+      </listitem>
+      <listitem>
+	<para>4 GiB de RAM ECC registrada</para>
+      </listitem>
+      <listitem>
+	<para>1 interfaz de red 1 Gbps</para>
+      </listitem>
+      <listitem>
+	<para>30 GiB de disco duro</para>
+      </listitem>
+    </itemizedlist>
+    <para>De acuerdo a estas características, en este proyecto se eligió el
+    servidor <link linkend="supero-1012c">SuperMicro 1012-MRF</link>.</para>
     <section xml:id="supero-1012c">
       <title>Supermicro-1012C-MRF</title> 
       <para>Este equipo es el encargado de gestionar y organizar todo el
@@ -84,10 +122,86 @@
 	interfaz de 6G/s</link>.</para></listitem>
 	<listitem><para>Interfaz de gestión IPMI 2.0</para></listitem>
       </itemizedlist>
+            <mediaobject>
+	<imageobject>
+	  <imagedata fileref="figures/supermicro-as-1012c-mrf.jpg" width="10cm" format="JPG"/>
+	</imageobject>
+	<caption>
+	  <para>Imagen del equipo Supermicro 1012C-MRF.</para>
+	</caption>
+      </mediaobject>
     </section>
   </section>
   <section xml:id="nodo-computacion">
     <title>Nodo de computación</title>
+    <para>Los nodos de computación (ya que lo lógico es que sean varios) sí son
+    muy exigentes en cuanto a las características del hardware, porque tienen
+    sólo una función que es la de ejecutar las instancias del cloud, pero como
+    cada uno de ellos podrá ejecutar simultáneamente varias de ellas, cuantas
+    más altas sean sus prestaciones, tantas más instancias podrán ejecutarse en
+    él.</para>
+    <section xml:id="procesadores">
+      <title>Procesadores</title>
+      <para>Por relación calidad/precio se ha considerado que los procesadores
+      que se ajustaban mejor a las necesidades del cloud son los AMD Interlagos
+      (AMD 62XX) con socket G34, procesadores que disponen de hasta 16
+      cores.</para>
+    </section>
+    <section xml:id="ram">
+      <title>RAM</title>
+      <para>En este tipo de equipos, es recomendable utilizar memoria ECC
+      (<emphasis>Error-correcting code</emphasis>) y registrada
+      (<emphasis>registered</emphasis> o <emphasis>buffered</emphasis>), que
+      ofrece funcionalidades adicionales a la de la RAM convencional.</para>
+      <para>Puesto que la ejecución de instancias consume mucha RAM, estos
+      equipos requerirán gran cantidad de ella (en nuestro caso hemos utilizado
+      hasta 64 GiB por nodo).</para>
+    </section>
+    <section xml:id="hd">
+      <title>Discos duros</title>
+      <para>Hay tres opciones para los discos duros actualmente:</para>
+      <itemizedlist>
+	<listitem>
+	  <para>SATA (7200 ó 10000 rpm): Hasta 3 TiB de almacenamiento, bus de 3
+	  Gbps y hasta 100 IOPS</para>
+	</listitem>
+	<listitem>
+	  <para>SAS 10000 ó 15000 rpm): Hasta 900 GiB de almacenamiento, bus de
+	  6 Gbps y hasta 150 IOPS</para>
+	</listitem>
+	<listitem>
+	  <para>SSD: Hasta 1 TiB de almacenamiento, bus de 3 ó 6 Gbps y hasta
+	  100.000 IOPS (!).</para>
+	</listitem>
+      </itemizedlist>
+      <para>El único factor que falta en la relación anterior es el precio, que
+      es directamente proporcional al orden anterior y en nuestro caso ha hecho
+      que tengamos que descartar los discos SSD por estar fuera de nuestras
+      posibilidades.</para>
+      <para>A la hora de elegir entre discos SAS o SATA, es necesario determinar
+      la cantidad total de almacenamiento necesaria y en este caso no es
+      demasiada, los nodos de computación almacenarán provisionalmente los
+      discos principales de las instancias que se estén ejecutando (un máximo de
+      50 instancias por nodo y hasta 10 GiB de disco por instancia (en muchos
+      casos es menos)), resulta que no es necesario en cada nodo más de 500 GiB
+      de almacenamiento, por lo que hemos considerado como la mejor opción 2
+      discos SAS 15000 rpm de 300 GiB en modo RAID0 por nodo.</para>
+    </section>
+    <section>
+      <title>Interfaces de red</title>
+      <para>Las instancias que se ejecutan en los nodos de computación pueden
+      tener volúmenes para almacenamiento permanente disponibles en el nodo de
+      almacenamiento, por lo que el tráfico entre los nodos de computación y el
+      nodo de almacenamiento puede ser alto. Teniendo en cuenta esta
+      circunstancia es conveniente disponer de varias interfaces de red Gigabit
+      Ethernet en cada nodo para configurarlas como una sola interfaz virtual
+      mediante el mecanismo conocido como <emphasis>bonding</emphasis> que
+      permite hacer balanceo de carga y a la vez tener redundancia en la
+      conexión.</para>
+      <para>De acuerdo a estas características, en este proyecto se eligió el
+      servidor <link linkend="serv-doble-twin">SuperMicro
+      2022TG-H6RF</link>.</para>
+    </section>
     <section xml:id="serv-doble-twin">
       <title>Supermicro-2022TG-H6RF</title>
       <para>Este equipo realmente son 4 equipos en 1, que comparten un mismo chasis y 2 fuentes de 
@@ -98,10 +212,11 @@
       que es necesario que sean equipos de altas prestaciones, con procesadores muy potentes y gran
       cantidad de memoria RAM, además se ha optado por un modelo con bus SAS y discos SAS de 15.000
       rpm para conseguir altas velocidades de E/S a disco local. Para la comunicación con la red de
-      almacenamiento y el <link linkend="serv-gest">servidor de gestión</link> se han incluido varias
-      interfaces de red Gigabit configuradas en modo <emphasis>bonding</emphasis> IEEE 802.3ad 
-      (<emphasis>link aggregation</emphasis>) para aumentar el ancho de banda total y redundancia del
-      canal.</para>
+      almacenamiento y el <link linkend="nodo-controlador">servidor de
+      gestión</link> se han incluido varias interfaces de red Gigabit
+      configuradas en modo <emphasis>bonding</emphasis> IEEE 802.3ad
+      (<emphasis>link aggregation</emphasis>) para aumentar el ancho de banda
+      total y redundancia del canal.</para>
       <para>Especificaciones técnicas del equipo:</para>
       <itemizedlist>
 	<listitem><para>Chasis 
@@ -111,14 +226,20 @@
 	<listitem><para>4 placas base <link xlink:href="http://www.supermicro.com/Aplus/motherboard/Opteron6000/SR56x0/H8DGT-HLF.cfm">
 	Supermicro H8DGT-HLF</link> de doble socket AMD G34 y chipset AMD SR5690 + SP5100.</para></listitem>
 	<listitem><para>2 fuentes de alimentación redundantes de 1620W (80+ Platinum).</para></listitem>
-	<listitem><para>4 procesadores <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=762&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD 6238</link> de 12 cores a 2600 MHz y 4 procesadores <link xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=764&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD 6220</link> de 8 cores a 3000 MHz (2 en cada nodo).</para></listitem>
-	<listitem><para>192 GB de RAM DDR3/1333 ECC registrada (64 GB en dos nodos y 32 GB en otros dos).
+	<listitem><para>2 procesadores <link
+	xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=762&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD
+	6238</link> de 12 cores a 2600 MHz o <link
+	xlink:href="http://products.amd.com/en-us/OpteronCPUDetail.aspx?id=764&amp;f1=AMD+Opteron%E2%84%A2+6200+Series+Processor&amp;f2=&amp;f3=Yes&amp;f4=&amp;f5=&amp;f6=G34&amp;f7=B2&amp;f8=32nm&amp;f9=&amp;f10=6400&amp;f11=&amp;">AMD
+	6220</link> de 8 cores a 3000 MHz por nodo.</para></listitem>
+	<listitem><para>32 ó 64 GiB de RAM 1333 ECC registrada por nodo.
 	</para></listitem>
 	<listitem><para>Dos interfaces de red Gigabit integradas Intel 82576 en cada nodo.</para></listitem>
-	<listitem><para>4 tarjetas de red PCI-E de doble puerto Gigabit (1 por nodo).</para></listitem>
-	<listitem><para>8 Discos duros 350 GB <link xlink:href="http://www.seagate.com/files/docs/pdf/datasheet/disc/cheetah-15k.7-ds1677.3-1007us.pdf">
-	SAS Seagate Cheetah a 15000 rpm, 16MB de caché e interfaz de 6G/s</link>.</para></listitem>
-	<listitem><para>4 interfaces de gestión IPMI 2.0 (1 por nodo)</para></listitem>
+	<listitem><para>1 tarjetas de red PCI-E de doble puerto Gigabit por nodo.</para></listitem>
+	<listitem><para>2 Discos duros 350 GB <link
+	xlink:href="http://www.seagate.com/files/docs/pdf/datasheet/disc/cheetah-15k.7-ds1677.3-1007us.pdf">
+	SAS Seagate Cheetah a 15000 rpm, 16MB de caché e interfaz de 6G/s por
+	nodo</link>.</para></listitem>
+	<listitem><para>1 interfaz de gestión IPMI 2.0 por nodo.</para></listitem>
       </itemizedlist>
       <mediaobject>
 	<imageobject>
@@ -133,6 +254,10 @@
   </section>
   <section xml:id="nodo-almacenamiento">
     <title>Nodo de almacenamiento</title>
+    <para>Obviamente debe ser un equipo que pueda alojar varios discos duros de
+    alta capacidad de almacenamiento (SATA) y con un procesador y RAM
+    adecuadamente dimensionados. En este proyecto nos decantamos por el <link
+    linkend="serv-alm">Intel SR2612UR</link>.</para>
     <section xml:id="serv-alm">
       <title>Intel-SR2612UR</title>
       <para>Este equipo es el que se va a utilizar para almacenamiento secundario y permanente de las 
@@ -164,6 +289,7 @@
 	  <para>Imagen equipo Intel SR2612UR.</para>
 	</caption>
       </mediaobject>
-    </section>
+    <para><link xlink:href="http://docs.openstack.org/trunk/openstack-compute/admin/content/compute-system-requirements.html"/></para>
+    </section>    
   </section>
 </chapter>
