@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Introducción</title>
+  <para>Hay varios aspectos de infraestructura a considerar, algunos
+  de ellos serán demasiado obvios para la mayoría de los lectores,
+  pero los incluímos pensando en la implantación partiendo de cero,
+  los aspectos que veremos a continuación son:</para>
+  <itemizedlist>
+    <listitem>
+      <para><link linkend="salas">Adecuación de las salas de los servidores</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="servidores">Servidores</link></para>
+    </listitem>
+    <listitem>
+      <para><link linkend="redes">Redes</link></para>
+    </listitem>
+  </itemizedlist>  
+</chapter>

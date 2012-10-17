@@ -6,7 +6,7 @@
     xmlns:html="http://www.w3.org/1999/xhtml"
     version="5.0"
     xml:id="infraestructura">
-    <title>Infraestructura</title>
+    <title>Infraestructura para el cloud</title>
     <info>
         <author>
             <personname>
@@ -21,18 +21,21 @@
             <year>2012</year>
         </copyright>
         <abstract>
-	  <para>En este documento se describen las principales características
-	  de los equipos utilizados en el proyecto, así como las adaptaciones
-	  hechas en las instalaciones de los centros implicados.</para> 
+	  <para>Una de las primeras cuestiones a resolver cuando se
+	  quiere implantar un cloud de infraestructura es adquirir el
+	  equipamiento adecuado y en este documento se va a describir
+	  de forma esquemática las características del mismo.</para>
+	  <para>El cloud se configurará utilizando el software
+	  OpenStack, por lo que algunas configuraciones están
+	  ajustadas a las necesidades del mismo.</para>
         </abstract>
     </info>
+    <xi:include href="ch_intro.xml"/>
     <xi:include href="ch_salas.xml"/>
     <xi:include href="ch_servidores.xml"/>
     <xi:include href="ch_redes.xml"/>
-    <xi:include href="ch_sai.xml"/>
-    <preface>
-      <title>sdf</title>
-      <para>asd</para>
-    </preface>
-    
+    <!-- <preface> -->
+    <!--   <title>sdf</title> -->
+    <!--   <para>asd</para> -->
+    <!-- </preface> -->
 </book>
