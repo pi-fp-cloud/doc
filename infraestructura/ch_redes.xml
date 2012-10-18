@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Redes</title>
+  <para>En este capítulo se detallan las diferentes redes que van a formar el
+  cloud y cómo se integran tanto en las redes locales de los centros como en la
+  conexión con el exterior.</para>
+  <section xml:id="red-elementos">
+    <title>Elementos de la red</title>
+    <para>Se van a configurar varias redes con los siguientes equipos:</para>
+    <itemizedlist>
+      <listitem>
+	<para><link linkend="nodo-controlador">Nodo controlador</link>, que
+      tiene una interfaz de red IPMI y dos interfaces de red Gigabit Ethernet,
+      que irán conectadas, una a la red privada y otra a la pública.</para>
+      </listitem>
+      <listitem>
+	<para><link linkend="nodo-computacion">Nodo de
+	computación</link>, que tiene una interfaz de red IPMI y
+	cuatro interfaces de red Gigabit Ethernet, que irán: una
+	conectada a la red pública y tres conectadas en forma de
+	<emphasis>bonding</emphasis> a la red privada.</para>
+      </listitem>
+      <listitem>
+	<para><link linkend="nodo-almacenamiento">Nodo de
+	almacenamiento</link>, que tiene una interfaz de red IPMI y
+	cuatro interfaces de red Gigabit Ethernet, que irán: una
+	conectada a la red pública y tres conectadas en forma de
+	<emphasis>bonding</emphasis> a la red privada.</para>
+      </listitem>
+    </itemizedlist>
+    <para>Obviamente estos equipos habrá que interconectarlos entre sí
+    con diversos conmutadores (<emphasis>switches</emphasis>), en
+    principio supondremos que utilizamos tres diferentes, uno para
+    cada uno de las tres redes que vamos a utilizar.</para>
+  </section>
+  <section xml:id="red-ipmi">
+    <title>Red de gestión IPMI</title>
+    <para>Todos los servidores del cloud incluyen una interfaz de red dedicada
+    IPMI <emphasis>Intelligent Platform Management Interface</emphasis> que
+    permite administrar los equipos de forma remota.</para>
+    <para>Es muy conveniente disponer de una interfaz IPMI en
+    servidores, ya que esto permite administrar completamente el
+    servidor de forma remota (es posible encenderlo, apagarlo,
+    comprobar la temperatura y otras acciones que sólo sería posible
+    realizar estando "físicamente" delante del equipo.</para>
+    <para>La red de gestión debe ser una red independiente, al menos desde el
+    punto de vista lógico, por lo que o bien se configura con un
+    switch propio o se configura una VLAN específica para estos
+    dispositivos</para>
+  </section>
+  <section xml:id="red-publica">
+    <title>Red "pública"</title>
+    <para>En la terminología de OpenStack, la red pública es la que permite
+    acceder a las instancias desde fuera, no necesariamente tiene que
+    se una red de direcciones IP públicas, tal como se entienden éstas
+    en IPv4, ya que esta red pública puede ser una red local de
+    direcciones IPv4 privadas en el sentido de la RFC 1918
+    (192.168.0.0/16, 172.16.0.0/12 ó 10.0.0.0/8).</para>
+    <para>La razón de ser de esta red pública es permitir que un
+    equipo cualquiera (un cliente) acceda remotamente a una instancia
+    del cloud. En el caso de una organización que utilice un cloud
+    privado que no sea accesible desde Internet, esta red pública
+    puede ser la propia red local o una VLAN dentro de la misma. Por
+    contra, si las instancias deben ser completamente accesibles desde
+    Internet, las direcciones públicas, lo serán también en el sentido
+    de dirección IPv4 pública.</para>
+    <para>En nuestro caso la red pública se va a corresponder con una
+    VLAN dentro de la red local de la organización y utilizaremos la
+    172.22.0.0/16, por lo que todos los nodos del cloud tendrán su
+    interfaz de red pública con una dirección dentro del rango
+    anterior.</para>
+  </section>
+  <section xml:id="red-privada">
+    <title>Red "privada"</title>
+    <para>En la terminología de OpenStack, la red privada es una red
+    independiente de interconexión de los nodos del cloud, a través de
+    esta red privada se produce la mayor parte del tráfico del cloud
+    (se comunica el nodo controlador con los nodos de computación, se
+    transfieren los volúmenes, las imágenes o las instantáneas al nodo
+    de almacenamiento).</para>
+    <para>El hecho de disponer de una red privada independiente de la
+    red pública, permite configurar la mayor parte de los servicios
+    internos del Cloud en las interfaces de red privadas, añadiendo un
+    importante grado de seguridad al cloud y simultáneamente quitando
+    mucho tráfico de red de la red local de la organización.</para>
+    <para>En configuraciones más avanzadas se podría separar la red
+    privada y la red de almacenamiento, pero en nuestro caso se ha
+    optado por utilizar la misma, convirtiéndose realmente la red
+    privada en una SAN (<emphasis>Storage Area
+    Network</emphasis>).</para>
+    <para>En nuestro caso la red privada se va a corresponder con una
+    red independiente del rango 192.168.222.0/24, por lo que todos los
+    nodos del cloud tendrán su interfaz de red privada (o el
+    <emphasis>bonding</emphasis> de varias de ellas) con una dirección
+    dentro del rango anterior.</para>
+  </section>
+  <section>
+    <title>Esquema de red</title>
+    <para>Teniendo en cuenta las consideraciones anteriores, podemos
+    representar esquemáticamente la configuración en la siguiente
+    figura, en la que aparece un nodo controlador (jupiter), cuatro
+    nodos de computación (europa, io, calisto y ganimedes) y un nodo
+    de almacenamiento (saturno):</para>
+    <mediaobject>
+      <imageobject>
+	<imagedata fileref="figures/esquema_red.png" width="10cm" format="PNG"/>
+      </imageobject>
+      <caption>
+	<para>Esquema de red para el Cloud que representa los nodos de
+	la red conectados a las redes pública y privada (se ha obviado
+	la red IPMI en esta figura).</para>
+      </caption>
+    </mediaobject>
+  </section>
+</chapter>
