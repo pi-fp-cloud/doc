@@ -239,7 +239,41 @@ c4cfd12e74d001411d189ab076248cd268b2b7cfda5017cf67376682 |
 
 <section xml:id="id_admin_plantillas">
   <title>Gestión de plantillas</title>
-  <para>En desarrollo</para>
+  <para>Las plantillas o flavors describen la CPU, memoria y tamaño de
+  almacenamiento que van a poder ocupar las distintas instancias en nova.</para>
+  <para>Así cada instancia va a poder ocupar el máximo de estos recursos una
+  vez levantada.</para>
+  <para>En nova se van a poder utilizar las plantillas que vienen por defecto y
+  también se pueden crear nuevas plantillas en caso de que sea necesario.</para>
+  <para>Las siguientes acciones se pueden realizar con las plantillas:</para>
+  <itemizedlist>
+    <listitem>
+      <para><emphasis role="bold">Listar las distintas plantillas
+      existentes:</emphasis></para>
+      <screen><prompt>$</prompt><userinput>nova-manage flavor list</userinput>
+
+m1.medium: Memory: 4096MB, VCPUS: 2, Root: 10GB, Ephemeral: 40Gb, FlavorID: 3, Swap: 0MB, RXTX Factor: 1.0
+m1.asir: Memory: 256MB, VCPUS: 1, Root: 5GB, Ephemeral: 0Gb, FlavorID: 6, Swap: 0MB, RXTX Factor: 1.0
+m1.small: Memory: 2048MB, VCPUS: 1, Root: 10GB, Ephemeral: 20Gb, FlavorID: 2, Swap: 0MB, RXTX Factor: 1.0
+m1.large: Memory: 8192MB, VCPUS: 4, Root: 10GB, Ephemeral: 80Gb, FlavorID: 4,Swap: 0MB, RXTX Factor: 1.0
+m1.tiny: Memory: 512MB, VCPUS: 1, Root: 0GB, Ephemeral: 0Gb, FlavorID: 1, Swap: 0MB, RXTX Factor: 1.0
+m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 Swap: 0MB, RXTX Factor: 1.0
+      </screen>
+    </listitem>
+    <listitem>
+    <para><emphasis role="bold">Crear una nueva plantilla</emphasis></para>
+    <screen><prompt>$</prompt><userinput>nova-manage flavor create --name=m1.xxlarge
+    --memory=16384 --cpu=16 --local_gb=20 --flavor=7 --swap=0 --rxtx_quota=0
+    --rxtxcap=0
+	</userinput>
+    </screen>
+    </listitem>
+    <listitem>
+      <para><emphasis role="bold">Borrar una plantilla
+      existente</emphasis></para>
+      <screen><prompt>$</prompt><userinput>nova-manage flavor delete --name=m1.xxlarge</userinput></screen>
+    </listitem>
+  </itemizedlist>
 </section>
 
 
