@@ -3,4 +3,69 @@
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es" xml:id="salas">
   <title>Salas</title>
+  <para>Para la implantación y localización de los distintos servidores        
+se ha elegido en cada uno de los centros participantes una sala adecuada para su
+    puesta en funcionamiento. La característica principal de estas salas es que
+    están interconectadas con cableado estructurado a cada una de las aulas
+    donde se imparte docencia y donde se explota por parte de profesores y
+    alumnos las distintas funcionalidades ofrecidas por el Cloud Privado. 
+  </para>
+  <para>Salvo diferencias mínimas entre los distintos centros, las salas cuentan
+  principalmente con: 
+  <itemizedlist>
+    <listitem><para>Armario Rack para servidores y conmutadores</para></listitem>
+    <listitem><para>Cableado estructurado de interconexión con aulas de
+    docencia</para></listitem>
+    <listitem><para>Sistema de refrigeración para temperatura
+    constante</para></listitem>
+    <listitem><para>Sistema SAI para normalización de fluido eléctrico</para></listitem>
+  </itemizedlist>
+  </para>
+  <section xml:id="armario-rack">
+    <title>Armario Rack</title>
+    <para>Armario rack de 46 U para albergar tanto los distintos conmutadores,
+    paneles de parcheo y servidores del proyecto del Cloud Privado</para>
+    <para>En este armario se instalan el o los switches necesarios para la
+    conectividad del Cloud con las aulas así como el nodo controlador y los
+    nodos de computación. Además se instala también el nodo de almacenamiento
+    que dependiendo de cada centro puede ser o un servidor dedicado a NAS/SAN o
+    una NAS/SAN propiamente dicha.</para>
+    <para>Debido a las características de los servidores se hace una
+    recomendación por parte del proveedor de que el armario esté localizado en
+    frente del sistema de refrigeración para proporcionar una corriente de aire
+    frío desde la parte delantera del armario hacia la parte trasera del
+    mismo.</para>
+  </section>
+  <section xml:id="cableado-estructurado">
+    <title>Cableado estructurado</title>
+    <para>Para la conectividad de las aulas con el Cloud Privado se cuenta con
+    cable CAT 6 desde cada una de las aulas a la sala de servidores.</para>
+    <para>En los centros en los que cada aula contaba con su switch se procede a
+    conectar éste con el panel de parcheo de la sala de servidores. En uno de
+    los centros se procede a cablear directamente desde cada punto de red de aula hasta
+    la sala de servidores.</para>    
+  </section>
+  <section xml:id="sistema-refrigeracion">
+  <title>Sistema de refrigeración</title>
+  <para>Cada una de las salas de servidores cuenta con un sistema de
+  refrigeración para mantener temperatura constante de los servidores. Debido a
+  las especificaciones técnicas de los servidores esta temperatura se mantiene
+  entre 21 y 23 grados centígrados.</para>
+  <para>Uno de los aspectos a destacar es que el proveedor de los servidores
+  recomienda que además del sistema de refrigeración del tipo aire acondicionado
+  se añada un extractor de aire de forma que no solo se refrigere a través del
+  aire acondicionado sino que además se proceda a extraer el aire caliente de la
+  sala de servidores conllevando así un ahorro energético.</para>
+  <section xml:id="sistema-sai">
+  <title>Sistema SAI</title>
+  <para>Para la normalización y continuidad del fluido eléctrico se decide instalar para cada
+  una de los centros en la sala de servidores un SAI.</para>
+  <para>Las características de cada uno de los SAI adquiridos resultan un tanto
+  diferentes pero como ejemplo para la infraestructura que se está utilizando se
+  ha optado por SAI de entre 3000 VA y 4000 VA para soportar la carga de los
+  distintos servidores y equipos de conectividad dedicados al proyecto.</para>
+</section>
+
+</section>
+
 </chapter>
