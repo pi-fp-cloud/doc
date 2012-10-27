@@ -279,14 +279,266 @@ m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 
 
 <section xml:id="id_admin_usuarios">
   <title>Gestión de usuarios</title>
-  <para>Por hacer</para>
+  <para>La gestión de usuarios para esta versión de Openstack se puede realizar
+  de forma ágil desde la interfaz gráfica de Horizon. Sin embargo si se desea
+  utilizar la interfaz de comandos deberemos utilizar <emphasis
+  role="bold">keystone</emphasis> para la creación y administración de
+  usuarios.</para>
+
+  <para>Atención: en versiones anteriores se podía crear usuarios a través de
+  <emphasis role="bold">nova-manage</emphasis>, método a extinguir desde que
+  existe keystone. 
+  </para>
+
+  <itemizedlist>
+  <listitem>
+    <para>Listar los usuarios existentes</para>
+    <screen><prompt>$</prompt><userinput>keystone user-list</userinput>
++----------------------------------+---------+--------------------+--------+
+|                id                | enabled |       email        |  name  |
++----------------------------------+---------+--------------------+--------+
+| 05743001bbf14700bcdf2ecc43edbf9b | True    | alex@iescierva.net | admin  |
+| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | alex@iescierva.net | swift  |
+| 291c58f7258747758d109ecee2eb4a69 | True    | alex@iescierva.net | glance |
+| 404dafc53b364a7e9f1476aa98082966 | True    | alex@iescierva.net | nova   |
++----------------------------------+---------+--------------------+--------+
+    </screen>
+  </listitem>
+  <listitem>
+  <para>Crear un usuario nuevo asociado a un proyecto (sabiendo el id de proyecto-tenant)</para>
+<screen><prompt>$</prompt><userinput> keystone user-create --name alumno
+--tenant_id e7b1868b24a742318f1d73f612ecfe1d --pass curso12-13 --email correo@gmail.com 
+</userinput>
++----------+-------------------------------------------------------------------------------------------------------------------------+
+| Property |                                                          Value
+|
++----------+-------------------------------------------------------------------------------------------------------------------------+
+| email    | correo@gmail.com
+|
+| enabled  | True
+|
+| id       | d0bfed18cce3460892ae99ee812d8aa3
+|
+| name     | alumno
+|
+| password |
+$6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiOwVSHtLU5HvkZBXrqXEmU0dvqjgNhfBc6eK6HZbatJ.CQDgQvkUNVrIBAjY1
+|
+| tenantId | e7b1868b24a742318f1d73f612ecfe1d
+|
++----------+-------------------------------------------------------------------------------------------------------------------------+
+<prompt>$</prompt><userinput> keystone user-list </userinput>
++----------------------------------+---------+--------------------+--------+
+|                id                | enabled |       email        |  name  |
++----------------------------------+---------+--------------------+--------+
+| 05743001bbf14700bcdf2ecc43edbf9b | True    | alex@iescierva.net | admin  |
+| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | alex@iescierva.net | swift  |
+| 291c58f7258747758d109ecee2eb4a69 | True    | alex@iescierva.net | glance |
+| 404dafc53b364a7e9f1476aa98082966 | True    | alex@iescierva.net | nova   |
+| d0bfed18cce3460892ae99ee812d8aa3 | True    | correo@gmail.com   | alumno |
++----------------------------------+---------+--------------------+--------+
+</screen>     
+</listitem>
+<listitem>
+<para>Borrar un usuario sabiendo su id (ejemplo borrar usuario alumno)</para>
+<screen><prompt>$</prompt><userinput> keystone user-delete d0bfed18cce3460892ae99ee812d8aa3 </userinput>
+<prompt>$</prompt><userinput> keystone user-list</userinput>
++----------------------------------+---------+--------------------+--------+
+|                id                | enabled |       email        |  name  |
++----------------------------------+---------+--------------------+--------+
+| 05743001bbf14700bcdf2ecc43edbf9b | True    | alex@iescierva.net | admin  |
+| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | alex@iescierva.net | swift  |
+| 291c58f7258747758d109ecee2eb4a69 | True    | alex@iescierva.net | glance |
+| 404dafc53b364a7e9f1476aa98082966 | True    | alex@iescierva.net | nova   |
++----------------------------------+---------+--------------------+--------+
+</screen>
+</listitem>
+<listitem>
+<para>Obtener información detallada de un usuario</para>
+<screen><prompt>$</prompt><userinput> keystone user-get 05743001bbf14700bcdf2ecc43edbf9b</userinput>
++----------+----------------------------------+
+| Property |              Value               |
++----------+----------------------------------+
+| email    | alex@iescierva.net               |
+| enabled  | True                             |
+| id       | 05743001bbf14700bcdf2ecc43edbf9b |
+| name     | admin                            |
+| tenantId | None                             |
++----------+----------------------------------+
+</screen>
+</listitem>
+<listitem>
+<para>Cambiar password de usuario</para>
+<screen><prompt>$</prompt><userinput>keystone user-password-update --pass nuevopass 05743001bbf14700bcdf2ecc43edbf9b</userinput>
+</screen>
+</listitem>
+
+
+
+
+</itemizedlist>
 </section>
 
 <section xml:id="id_admin_proyectos">
-  <title>Gestión de proyectos y quotas </title>
-<para>Por hacer</para>
+  <title>Gestión de proyectos </title>
+<para>Al igual que con los usuarios la administración de proyectos se puede
+realizar de forma gráfica a través de Horizon. Para realizarla en modo comando
+se debe utilizar <emphasis role="bold">keystone.</emphasis>
+</para>
+<itemizedlist>
+<listitem>
+  <para>Listar proyectos (tenant)</para>
+  <screen><prompt>$</prompt><userinput> keystone tenant-list</userinput>
++----------------------------------+---------+---------+
+|                id                |   name  | enabled |
++----------------------------------+---------+---------+
+| 634675c752634b53879656c81da70a83 | service | True    |
+| e7b1868b24a742318f1d73f612ecfe1d | admin   | True    |
++----------------------------------+---------+---------+
+  </screen>
+</listitem>
+<listitem>
+  <para>Crear un proyecto</para>
+<screen><prompt>$</prompt><userinput>keystone tenant-create --name asir1 --description "1 curso asir" </userinput>
++-------------+----------------------------------+
+|   Property  |              Value               |
++-------------+----------------------------------+
+| description | 1 curso asir                     |
+| enabled     | True                             |
+| id          | 8c6d42b3e339448fb3068ec512df7802 |
+| name        | asir1                            |
++-------------+----------------------------------+
+</screen>
+</listitem>
+<listitem>
+<para>Listar información detallada de un proyecto</para>
+<screen><prompt>$</prompt><userinput>keystone tenant-get 8c6d42b3e339448fb3068ec512df7802 </userinput>
++-------------+----------------------------------+
+|   Property  |              Value               |
++-------------+----------------------------------+
+| description | 1 curso asir                     |
+| enabled     | True                             |
+| id          | 8c6d42b3e339448fb3068ec512df7802 |
+| name        | asir1                            |
++-------------+----------------------------------+
+</screen>
+</listitem>
+<listitem>
+<para>Borrar un proyecto</para>
+<screen><prompt>$</prompt><userinput>keystone tenant-delete 8c6d42b3e339448fb3068ec512df7802</userinput>
+</screen>           
+</listitem>
+</itemizedlist>
+
 </section>
 
+<section xml:id="id_gestion_roles">
+<title>Gestión de roles y asignación a usuarios</title>
+<para>A los usuarios una vez asignados de forma predeterminada a un
+proyecto se les debe asignar uno o varios roles</para> 
+<para>La gestión de los roles se realiza a través de <emphasis role="bold">keystone</emphasis>
+</para>
+<itemizedlist>
+<listitem>
+  <para><emphasis role="bold">Listar roles existentes</emphasis></para>
+  <screen><prompt>$</prompt><userinput>keystone role-list</userinput>
++----------------------------------+--------+
+|                id                |  name  |
++----------------------------------+--------+
+| 2a716d669ce349eb88e44049723e0cb7 | admin  |
+| 622c78f77bbe4a298452783f25cb4635 | Member |
++----------------------------------+--------+
+  </screen>
+  <para>Por defecto al instalar el sistema se crearon dos roles: <emphasis
+  role="bold">admin</emphasis> y <emphasis role="bold">Member</emphasis>. 
+</para>
+</listitem>
+<listitem>
+  <para><emphasis role="bold">Asignación de rol a usuario</emphasis>
+</para>
+ <screen><prompt>$</prompt><userinput>keystone user-role-add
+ --user=4ca77dc4d8a448219b1c6ae7a208ff47 --tenant=e7b1868b24a742318f1d73f612ecfe1d
+ --role=622c78f77bbe4a298452783f25cb4635
+</userinput>
+</screen>
+<para>Se le ha asignado el rol <emphasis role="bold">Member</emphasis>al usuario <emphasis role="bold">alumno</emphasis>
+en el proyecto <emphasis role="bold">asir1</emphasis></para>
+<para>Para verificarlo se puede ver con:</para>
+<screen><prompt>$</prompt><userinput>keystone role-list
+--user=4ca77dc4d8a448219b1c6ae7a208ff47
+--tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput>
++----------------------------------+--------+
+|                id                |  name  |
++----------------------------------+--------+
+| 622c78f77bbe4a298452783f25cb4635 | Member |
++----------------------------------+--------+
+</screen>
+</listitem>
+<listitem>
+  <para><emphasis role="bold">Desasignación de rol a usuario</emphasis></para>
+<screen><prompt>$</prompt><userinput>keystone user-role-remove --user=4ca77dc4d8a448219b1c6ae7a208ff47
+--tenant=e7b1868b24a742318f1d73f612ecfe1d
+--role=622c78f77bbe4a298452783f25cb4635</userinput>
+</screen>
+<screen><prompt>$</prompt><userinput>keystone role-list
+--user=4ca77dc4d8a448219b1c6ae7a208ff47
+--tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput> 
++----+------+
+| id | name |
++----+------+
++----+------+
+</screen>
+</listitem>
+</itemizedlist>
+</section>
+
+<section xml:id="id_gestion_cuotas">
+<title>Gestión de cuotas</title>
+<para>La gestión de cuotas se realiza para cada proyecto concreto. Se pueden
+fijar cuotas para parámetros como CPU's(cores), memoria, volúmenes,
+instancias,numero de ip's, tamaño de disco, grupos de seguridad y ficheros
+injectados(injected files)</para>
+<para>Se puede realizar de forma gráfica con Horizon y de modo comando a través
+de <emphasis role="bold">nova-manage</emphasis>
+</para>
+<itemizedlist>
+<listitem>
+  <para><emphasis role="bold">Obtener cuotas actuales de proyecto</emphasis></para>
+<screen><prompt>$</prompt><userinput>nova-manage project quota
+--project=e7b1868b24a742318f1d73f612ecfe1d</userinput>
+metadata_items: 128
+volumes: 10
+gigabytes: 1000
+ram: 51200
+security_group_rules: 20
+instances: 10
+security_groups: 10
+injected_file_content_bytes: 10240
+floating_ips: 10
+injected_files: 5
+cores: 20
+</screen>
+</listitem>
+<listitem>
+ <para><emphasis role="bold">Modificar parámetro de cuota de
+ proyecto (ej:ampliar num de cores a 50)</emphasis></para>
+<screen><prompt>$</prompt><userinput>nova-manage project quota
+--project=e7b1868b24a742318f1d73f612ecfe1d --key=cores --value=50</userinput>
+metadata_items: 128
+volumes: 40
+gigabytes: 1000
+ram: 51200
+security_group_rules: 20
+instances: 40
+security_groups: 10
+injected_file_content_bytes: 10240
+floating_ips: 10
+injected_files: 5
+cores: 50
+</screen>
+</listitem>
+</itemizedlist>
+</section>
 
 <section xml:id="id_monitor_nodos">
   <title>Monitorización de nodos</title>
