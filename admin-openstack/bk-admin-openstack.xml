@@ -159,6 +159,7 @@ Título: Administración de OpenStack
         <Nosotros también, es suficientemente iomportante como para que así sea>
 -->
 
+    <xi:include href="ch-intro-OpenStack.xml" />
     <xi:include href="ch-prerrequisitos.xml" />
     <xi:include href="../infraestructura/ch_servidores.xml"/>
     <xi:include href="../instalacion_debian_wheezy/ch_pasos_previos.xml"/>
