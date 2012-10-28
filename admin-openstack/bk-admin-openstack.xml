@@ -159,7 +159,7 @@ Descripción de VNC Proxy.
 <Nosotros también, es suficientemente iomportante como para que así sea>
   -->
 
-  <xi:include href="ch-introduccion.xml" />
+  <xi:include href="ch-intro-OpenStack.xml" />
   <xi:include href="../instalacion_debian_wheezy/ch_instalacion_debian_wheezy.xml"/>
   <xi:include href="ch-instalacion-Ubuntu.xml" />
   <xi:include href="ch-gest-identidad.xml" />
