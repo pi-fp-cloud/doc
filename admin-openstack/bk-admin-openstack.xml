@@ -94,7 +94,7 @@
         </abstract>
         <revhistory>
             <revision>
-                <date>2-07-2012</date>
+                <date>28-10-2012</date>
                 <revdescription>
                     <itemizedlist spacing="compact">
                         <listitem>
@@ -159,8 +159,6 @@ Título: Administración de OpenStack
         <Nosotros también, es suficientemente iomportante como para que así sea>
 -->
 
-    <xi:include href="ch-prerrequisitos.xml" />
-    <xi:include href="../infraestructura/ch_servidores.xml"/>
     <xi:include href="../instalacion_debian_wheezy/ch_pasos_previos.xml"/>
     <xi:include href="../instalacion_debian_wheezy/ch_keystone.xml"/> 
     <xi:include href="../instalacion_debian_wheezy/ch_glance.xml"/> 
