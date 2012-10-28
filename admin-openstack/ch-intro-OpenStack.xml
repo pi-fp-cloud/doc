@@ -591,8 +591,107 @@
 
   <section>
     <title>Introducción a OpenStack Keystone</title>
-    <para>Manual del administrador, capítulo 6.</para>
-    
+        <para>Este capítulo describe la instalación y configuración del
+    módulo de OpenStack, Keystone. Este módulo es el encargado del
+    sistema de autentificación y autorización de los distintos módulos
+    que conforman el sistema.</para>
+    <section>
+      <title>Introducción al módulo keystone</title>
+      <para>Keystone, es el componente de OpenStack encargado de la
+      autentificación y la autorización de los distintos componentes
+      desde la versión Essex y tiene dos funciones principales:</para>
+      <itemizedlist>
+	<listitem><para>Gestión de usuarios: Keystone es el encargado de
+	mantener un registro de usuarios y los permisos que tienen cada 
+	uno de ellos.</para></listitem>
+	<listitem><para>Registro los servicios ofrecidos: Keystone
+	ofrece un catálogo de los servicios ofrecidos, así como la forma
+	de acceder a sus APIs.</para></listitem>
+      </itemizedlist>
+      <para>Los conceptos fundamentales de la <emphasis>gestión de
+      usuarios</emphasis> son:</para>
+      <itemizedlist>
+	<listitem><para>Usuario: Podemos guardar su nombre, 
+	correo electrónico y contraseña.</para></listitem>
+	<listitem><para>Proyecto (<emphasis>tenant</emphasis> en la jerga de
+	OpenStack): En un proyecto podemos ejecutar un conjunto de
+	instancias con características en común, por ejemplo pueden estar
+	todas las instancias en el misma red, pueden utilizar una serie de
+	imágenes de sistemas o tener limitado el uso de recursos del
+	cloud.</para></listitem>
+	<listitem><para>Rol: Nos indica qué operaciones puede realizar
+	cada usuario. A un usuario se le pueden asignar diferentes roles
+	en cada proyecto.</para></listitem>
+      </itemizedlist>
+      <para>Los conceptos fundamentales del <emphasis>registro de
+      servicio</emphasis> son:</para>
+      <itemizedlist>
+	<listitem><para>Servicio: Corresponde a un componente de
+	OpenStack que puede utilizar el módulo de
+	autentificación.</para></listitem>
+	<listitem><para>Endpoints: Representa las URL que nos permiten
+	acceder a las API de cada uno de los servicios o componentes de
+	OpenStack</para></listitem>
+      </itemizedlist>
+    </section>
+      <section>
+	<title>¿Qué es el ADMIN_TOKEN y para qué se utiliza?</title>
+	<para>Keystone introduce en OpenStack un sistema de
+	autenticación basado en tokens, de manera que todos los
+	elementos del cloud (usuarios y servicios principalmente), no se
+	autentican directamente unos a otros, sino que lo hace con un
+	actor intermedio mediante tokens, este actor intermedio
+	encargado de verificar la autenticidad de cada uno de los
+	elementos es Keystone. Un proceso típico de autenticación en
+	OpenStack puede verse en la siguiente imagen, en la que se
+	muestran los pasos que se dan desde que el usuario se acredita
+	frente a Keystone hasta que lanza una instancia.</para>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="figures/keystone.png" scalefit="1" width="100%"
+		       contentdepth="100%"/> 
+	  </imageobject>
+	  <caption>
+	    <para>Diagrama que describe el funcionamiento típico de
+	    keystone.</para>
+	  </caption>
+	</mediaobject>
+	<para>Con Keystone recién instalado no tenemos ningún usuario
+	con privilegios de administración en la base de datos de
+	keystone, por lo no podríamos hacer ninguna modificación. El
+	mecanismo que proporciona keystone para solventar esta situación
+	es definir en el fichero de configuración un token con
+	privilegios de administración, que recibe el nombre de
+	ADMIN_TOKEN, que puede definirse directamente en la instalación
+	o cuando queramos en el fichero
+	<filename>/etc/keystone/keystone.conf</filename>, el ADMIN_TOKEN
+	puede tener cualquier valor, pero hay que custodiarlo
+	adecuadamente mientras esté activo, ya que otorga privilegios de
+	administración sobre Keystone a quien lo
+	conozca. Posteriormente, una vez definidos los usuarios en  
+	keystone y los demás elementos, podemos borrar este campo del
+	fichero de configuración de keystone y no volver a
+	utilizarlo.</para>
+      </section>
+      <section>
+	<title>Uso del ADMIN_TOKEN</title>
+	<para>De forma general en Keystone, un usuario deberá tener algo
+	con que demostrar su autenticidad (una contraseña o un token) y
+	la URL de un API con la que desea interaccionar, en este caso
+	vamos a definir con dos variables de entorno el token con
+	privilegios de administrador y la URL del servicio de
+	administración de keystone:</para>
+	<screen><userinput>export SERVICE_ENDPOINT=http://127.0.0.1:35357/v2.0/</userinput></screen>
+	<screen><userinput>export SERVICE_TOKEN=12345678</userinput></screen>
+	<para>donde 12345678 representa el valos que hayamos elegido para
+	nuestro ADMIN_TOKEN y tendrá el mismo valor que el parámetro
+	ADMIN_TOKEN que tenemos guardado en el fichero de
+	configuración. Una vez realizado esto el usuario de esa sesión
+	actúa como administrador de keystone, por lo que los pasos
+	siguientes serán crear usuarios, darles roles, definir los
+	servicios, etc.</para>      
+      </section>
+<!--    <para>Manual del administrador, capítulo 6.</para>-->    
   </section>
 
   <section>

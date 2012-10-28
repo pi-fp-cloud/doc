@@ -1,0 +1,1078 @@
+<chapter xmlns="http://docbook.org/ns/docbook"
+         xmlns:xi="http://www.w3.org/2001/XInclude"
+         xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
+         xml:id="ch-instalacion-debian">
+  <title>Instalación de OpenStack en Debian GNU/Linux Wheezy</title>
+  <para>Para la realización de esta sección se han tomado como referencias
+  principales las siguientes referencias:</para>
+  <itemizedlist>
+    <listitem>
+      <para><link xlink:href="http://wiki.debian.org/OpenStackHowto">OpenStack
+      on Debian GNU/Linux testing</link> de la wiki de Debian, que es la
+      referencia "oficial" para la instalación en Debian Wheezy y que está
+      mantenida por el grupo de desarrolladores debian encargados del
+      empaquetamiento del proyecto OpenStack y cuya actividad puede seguirse a
+      través de <link
+      xlink:href="http://alioth.debian.org/projects/openstack/">alioth</link>.</para>
+    </listitem>
+    <listitem>
+      <para><link
+		xlink:href="http://docs.openstack.org/essex/openstack-compute/install/apt/content/">OpenStack
+      Install and Deploy Manual</link> del proyecto OpenStack, pero pensado para
+      la instalación en Ubuntu 12.04.</para>
+    </listitem>
+  </itemizedlist>
+  <para>El documento de la wiki de Debian es correcto, pero describe muchos
+  aspectos de forma demasiado breve por lo que no es adecuado para personas que
+  comienzan en OpenStack, mientras que la segunda referencia es específica para
+  la instalación en Ubuntu, por lo que hay algunas diferencias en la instalación
+  en Debian.</para>
+  <section>
+    <title>Pasos previos</title>
+    <para>Antes de comenzar con la instalación de paquetes en sí, hay que
+    plantear claramente la estructura de red y los componentes que se
+    instalarán en cada equipo. La descripción física de los equipos que
+    componen el cloud ya se realizó en el documento que describe la
+    infraestructura para el cloud de este mismo proyecto, por lo que nos
+    centraremos ahora en la instalación en sí.</para>
+    <section>
+      <title>Nombres de los equipos</title>
+      <para>Se han elegido los siguientes nombres para los equipos en los que se
+      va a realizar la instalación del Cloud:</para>
+      <itemizedlist>
+	<listitem>
+	  <para>jupiter: para el nodo controlador, que será el encargado
+	  de gestionar todos los recursos del cloud, interaccionar con los clientes
+	  y ordenar a los nodos de virtualización que ejecuten las instancias, pero
+	  en el que no se ejecutarán máquinas virtuales. La mayor parte de
+	  componentes del Cloud y configuración se realizará en este
+	  equipo, pero comparado con los <emphasis>nodos de
+	  computación</emphasis> la carga de trabajo será pequeña, por lo
+	  que no es necesario un equipo con mucha memoria RAM o gran
+	  capacidad de procesamiento.</para>
+	  <para>En jupiter instalaremos los siguientes componentes:</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para>nova-api</para>
+	    </listitem>
+	    <listitem>
+	      <para>nova-cert</para>
+	    </listitem>
+	    <listitem>
+	      <para>nova-console</para>
+	    </listitem>
+	    <listitem>
+	      <para>nova-scheduler</para>
+	    </listitem>
+	    <listitem>
+	      <para>nova-volume</para>
+	    </listitem>
+	    <listitem>
+	      <para>keystone</para>
+	    </listitem>
+	    <listitem>
+	      <para>glance</para>
+	    </listitem>
+	    <listitem>
+	      <para>horizon</para>
+	    </listitem>
+	  </itemizedlist>
+	</listitem>
+	<listitem>
+	  <para>io, europa, ganimedes y calisto (son las 4 lunas
+	  principales de júpiter): para los 4 nodos de virtualización o
+	  nodos de computación, como se les denomina habitualmente en la
+	  jerga propia de OpenStack. En estos equipos se instalarán
+	  sólo los componentes necesarios para que se ejecuten las
+	  instancias en ellos y estarán esperando las órdenes de
+	  jupiter, en concreto se instalarán los componentes:</para>
+	  <itemizedlist>
+	    <listitem>
+	      <para>nova-api</para>
+	    </listitem>
+	    <listitem>
+	      <para>nova-cert</para>
+	    </listitem>
+	    <listitem>
+	      <para>nova-compute</para>
+	    </listitem>
+	    <listitem>
+	      <para>nova-network</para>
+	    </listitem>
+	  </itemizedlist>
+	</listitem>
+	<listitem><para>saturno: para el nodo de almacenamiento, ya que es tan
+	importante como júpiter y a la vez independiente. En este equipo se
+	instalará software independiente del proyecto OpenStack para el manejo
+	de volúmenes persistentes a través del protocolo iSCSI.</para>
+	</listitem>
+	<listitem><para>venus: un equipo convencional en el que se instalarán los
+	paquetes necesarios para usar el cliente nova con el que podemos
+	gestionar el cloud desde línea de comandos sin la necesidad de
+	realizar las operaciones desde jupiter.</para></listitem>
+      </itemizedlist>
+    </section>
+    <section>
+      <title>Esquema de red</title>
+      <para>Cada uno de estos equipos está conectado a dos redes (salvo venus), lo
+      que en terminología de OpenStack se conoce como una red
+      <emphasis>pública</emphasis> y una red <emphasis>privada</emphasis>, 
+      términos a los que no se debe dar el sentido habitual que tienen en redes
+      IPv4, ya que en OpenStack la red pública se refiere a la que interaccionará
+      con los clientes y la privada la que se utiliza para la intercomunicación de
+      los componentes del cloud y en nuestro caso muy destacadamente, de la
+      transferencia de imágenes a los nodos en los que se deben ejecutar las
+      instancias. La red privada es una red aislada que no está conectada con
+      otras redes, mientras que la red pública sí lo está, bien a una
+      red local bien a Internet. Las transferencias de datos más
+      importante se realizan a través de la red privada, por lo que se
+      ha optado por conectar cada equipo (salvo jupiter) mediante tres
+      interfaces de red Gigabit Ethernet, para que configurándolas
+      adecuadamente en modo <emphasis>link aggregation</emphasis> 
+      de acuerdo al estándar 802.3ad, puedan aumentar las tasas de
+      transferencia en la red privada.</para>
+      <para>En la siguiente imagen, se puede ver de forma esquemática los equipos
+      y las redes a las que están conectados:</para>
+      <mediaobject>
+	<imageobject>
+	  <imagedata fileref="figures/esquema_red_iesgn.png" scalefit="1"
+		     width="100%" contentdepth="100%"/>
+	</imageobject>
+	<caption>
+	  <para>Esquema de red del Cloud, en la que aparecen los 6 equipos
+	  conectados a las redes privada y pública del cloud.</para>
+	</caption>
+      </mediaobject>
+    </section>
+    <section>
+      <title>Direcciones IP de los equipos</title>
+      <para>En la siguiente tabla aparecen las direcciones IPv4 privadas
+      y públicas elegidas para los nodos del cloud.</para>
+      <table xml:id="tabla_ips">
+	<title>Direcciones IP de los equipos del cloud</title>
+	<tgroup cols='3' align='left' colsep='1' rowsep='1'>
+	  <thead>
+	    <row>
+	      <entry align="center"></entry>
+	      <entry align="center">IP pública</entry>
+	      <entry align="center">IP privada</entry>
+	    </row>
+	  </thead>
+	  <tbody>
+	    <row>
+	      <entry align="center">jupiter</entry>
+	      <entry align="center">172.22.222.1</entry>
+	      <entry align="center">192.168.222.1</entry>
+	    </row>
+	    <row>
+	      <entry align="center">saturno</entry>
+	      <entry align="center">172.22.222.2</entry>
+	      <entry align="center">192.168.222.2</entry>
+	    </row>
+	    <row>
+	      <entry align="center">venus</entry>
+	      <entry align="center"></entry>
+	      <entry align="center">192.168.222.10</entry>
+	    </row>
+	    <row>
+	      <entry align="center">io</entry>
+	      <entry align="center">172.22.222.11</entry>
+	      <entry align="center">192.168.222.11</entry>
+	    </row>
+	    <row>
+	      <entry align="center">europa</entry>
+	      <entry align="center">172.22.222.12</entry>
+	      <entry align="center">192.168.222.12</entry>
+	    </row>
+	    <row>
+	      <entry align="center">ganimedes</entry>
+	      <entry align="center">172.22.222.13</entry>
+	      <entry align="center">192.168.222.13</entry>
+	    </row>
+	    <row>
+	      <entry align="center">calisto</entry>
+	      <entry align="center">172.22.222.14</entry>
+	      <entry align="center">192.168.222.14</entry>
+	    </row>
+	  </tbody>
+	</tgroup>
+      </table>
+    </section>
+    <!-- <section> -->
+    <!--   <title>Instalación de jupiter</title> -->
+    <!--   <section> -->
+    <!-- 	<title>Configuración previa de RAID</title> -->
+    <!-- 	<para>jupiter incluye dos discos duros SATAII de 500 GiB y una -->
+    <!-- 	controladora de disco 3ware 9650SE. Se ha optado por configurar esta -->
+    <!-- 	controladora de disco en modo RAID 1, para incluir un nivel elemental de -->
+    <!-- 	seguridad y consistencia de datos, aunque obviamente esto no descarta la -->
+    <!-- 	utilización adicional de otros mecanismos de copias de seguridad que se -->
+    <!-- 	configurarán posteriormente. Al tratarse de una controladora RAID -->
+    <!-- 	hardware y estar configurado previamente, el sistema operativo que -->
+    <!-- 	arranque en el equipo sólo verá un disco duro en <code>/dev/sda</code> -->
+    <!-- 	de 500GB aproximadamente.</para> -->
+    <!--   </section> -->
+    <!--   <section> -->
+    <!-- 	<title>Instalación de Debian Wheezy</title> -->
+    <!-- 	<para>El sistema operativo elegido para los equipos del cloud -->
+    <!-- 	es la versión de pruebas <emphasis>(testing)</emphasis> de Debian -->
+    <!-- 	GNU/Linux (amd64), que actualmente se conoce con el nombre de código -->
+    <!-- 	<emphasis>wheezy</emphasis> y que cuando finalmente se estabilice se -->
+    <!-- 	conocerá como Debian 7. Pensamos que es la mejor opción en el caso de -->
+    <!-- 	Debian, ya que <emphasis>squeeze</emphasis>, la versión estable -->
+    <!-- 	actualmente, no incluye paquetes de OpenStack y la opción de instalar -->
+    <!-- 	directamente desde los ficheros fuente o bien utilizar repositorios no -->
+    <!-- 	oficiales, no nos parece tan acertada. La -->
+    <!-- 	<emphasis>inestabilidad</emphasis> que comporta utilizar una versión no -->
+    <!-- 	estabilizada de Debian, nos parece en este momento asumible, más teniendo -->
+    <!-- 	en cuenta que vamos a implementar un cloud privado y no -->
+    <!-- 	crítico, que se utilizará a partir del curso próximo con fines -->
+    <!-- 	formativos.</para> -->
+    <!-- 	<para>Durante la instalación realizamos el siguiente esquema de -->
+    <!-- 	particionado:</para> -->
+    <!-- 	<programlisting> -->
+    <!-- 	  Disposit. Inicio    Comienzo      Fin      Bloques  Id Sistema -->
+    <!-- 	  /dev/sda1   *        2048     1953791      975872   83 Linux -->
+    <!-- 	  /dev/sda2         1953792   976539647   487292928   8e Linux LVM -->
+    <!-- 	</programlisting> -->
+    <!-- 	<para>Es decir, reservamos una pequeña partición de 1G en la -->
+    <!-- 	que ubicaremos el directorio /boot y el resto lo gestionamos -->
+    <!-- 	con LVM. Inicialmente creamos sólo dos volúmenes -->
+    <!-- 	lógicos (uno para el sistema raíz y otro para el área de -->
+    <!-- 	intercambio):</para> -->
+    <!-- 	<programlisting> -->
+    <!-- 	  LV           VG   Attr   LSize -->
+    <!-- 	  jupiter-root vg   -wi-ao 18,62g -->
+    <!-- 	  jupiter-swap vg   -wi-ao  1,86g -->
+    <!-- 	</programlisting> -->
+    <!-- 	<section> -->
+    <!-- 	  <title>Gestión del RAID desde el sistema operativo</title> -->
+    <!-- 	  <para>Aunque la controladora RAID es hardware y el sistema -->
+    <!-- 	  operativo no la gestiona, es importante que se pueda controlar -->
+    <!-- 	  su estado a través de algún módulo del kernel. En este caso el -->
+    <!-- 	  módulo 3w-9xxx que se carga automáticamente y nos envía estos -->
+    <!-- 	  mensajes al log del sistema:</para> -->
+    <!-- 	  <programlisting> -->
+    <!-- 	    [    2.381798] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014. -->
+    <!-- 	    [    2.381841] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19 -->
+    <!-- 	    [    2.381849] 3w-9xxx 0000:01:00.0: setting latency timer to 64 -->
+    <!-- 	    [    2.612067] scsi0 : 3ware 9000 Storage Controller -->
+    <!-- 	    [    2.612128] 3w-9xxx: scsi0: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19. -->
+    <!-- 	    [    2.952039] 3w-9xxx: scsi0: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2. -->
+    <!-- 	  </programlisting>	     -->
+    <!-- 	  <para>Pendiente de hacer:</para> -->
+    <!-- 	  <para>http;//jonas.genannt.name/  Hay repositorio, con -->
+    <!-- 	  aplicaciones para manejar el RAID 3ware 9650SE</para> -->
+    <!-- 	</section> -->
+    <!--   </section> -->
+    <!--   <section> -->
+    <!-- 	<title>Configuración de red jupiter</title> -->
+    <!-- 	<para>La configuración de red de jupiter es muy sencilla, ya que es un -->
+    <!-- 	equipo con dos interfaces de red (eth0 y eth1), conectadas a la red -->
+    <!-- 	pública y a la red privada respectivamente, el contenido del fichero -->
+    <!-- 	<filename>/etc/network/interfaces</filename> incluye la configuración  -->
+    <!-- 	estática de las dos interfaces de red:</para> -->
+    <!-- 	<programlisting> -->
+    <!-- 	  auto lo -->
+    <!-- 	  iface lo inet loopback -->
+
+    <!-- 	  auto eth0 -->
+    <!-- 	  iface eth0 inet static -->
+    <!-- 	  address 172.22.222.1 -->
+    <!-- 	  netmask 255.255.0.0 -->
+    <!-- 	  network 172.22.0.0 -->
+    <!-- 	  broadcast 172.22.255.255 -->
+    <!-- 	  gateway 172.22.0.1 -->
+
+    <!-- 	  auto eth1 -->
+    <!-- 	  iface eth1 inet static -->
+    <!-- 	  address 192.168.222.1 -->
+    <!-- 	  netmask 255.255.255.0 -->
+    <!-- 	  network 192.168.222 -->
+    <!-- 	  broadcast 255.255.255.0 -->
+    <!-- 	</programlisting> -->
+    <!--   </section> -->
+      <section>
+	<title>Instalación y configuración inicial de MySQL</title>
+	<para>Todos los componentes de OpenStack (incluso glance y
+	keystone que por defecto utilizan sqlite) guardarán sus datos en
+	bases de datos MySQL. El servidor de bases de datos se instala
+	en jupiter, el nodo controlador:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>aptitude install mysql-server</userinput></screen>
+	<para>Introducimos la contraseña del usuario root de MySQL
+	cuando se requiera y esperamos a que finalice la instalación. Una vez
+	concluida, abrimos el fichero <filename>/etc/mysql/my.cnf</filename> y
+	realizamos la siguiente modificación:</para>
+	<screen><userinput>bind_address = 192.168.222.0/24</userinput></screen>
+	<para>para que la base de datos sea accesible sólo a través de la red
+	privada.</para>
+	<para>Entramos en MySQL con el usuario root que se crea durante la
+	instalación y creamos diferentes bases de datos para los componentes
+	keystone, glance y nova y un usuario para OpenStack, que tendrá todos
+	los permisos sobre  las bases de datos:</para>
+	<programlisting>
+	mysql> CREATE DATABASE keystone;
+	mysql> CREATE DATABASE glance;
+	mysql> CREATE DATABASE nova;
+	mysql> CREATE USER "usuario_admin_openstack" IDENTIFIED BY 'password';
+	mysql> GRANT ALL PRIVILEGES ON keystone.* TO 'openstackadmin'@'localhost' \
+	-> IDENTIFIED BY 'password';
+	mysql> GRANT ALL PRIVILEGES ON glance.* TO 'opentackadmin"'@'localhost';
+	mysql> GRANT ALL PRIVILEGES ON nova.* TO 'openstackadmin"'@'localhost';
+	</programlisting>
+      </section>
+      <section>
+	<title>Instalación de otros paquetes</title>
+	<para>Antes de instalar propiamente los paquetes relacionados
+	con los diferentes componentes de Openstack, es recomendable
+	instalar los siguientes paquetes:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install rabbitmq-server memcached</userinput></screen>
+	<para>rabbitmq-server se encarga de la gestión de mensajes entre los
+	diferentes componentes de OpenStack (es un paquete obligatorio que si no
+	instalamos ahora se instalará por dependencias) y memcached se encarga
+	de cachear en memoria peticiones a bases de datos o a APIs</para>
+      </section>
+    </section>
+    <!-- <section xml:id="instalacion_4_lunas"> -->
+    <!--   <title>Instalación de io, europa, ganimedes y calisto</title> -->
+    <!--   <para>La instalación de estos cuatro nodos es idéntica, por lo que -->
+    <!--   sólo explicaremos la instalación de uno de ellos.</para> -->
+    <!--   <section xml:id="configuracion_raid_4_lunas"> -->
+    <!-- 	<title>Configuración previa de RAID</title> -->
+    <!-- 	<para>Cada uno de estos equipos incluye dos discos duros SAS -->
+    <!-- 	de 300 GiB a 15000 rpm y una controladora LSI MegaRAID SAS que se -->
+    <!-- 	configura en modo RAID 0 al iniciar el equipo por primera -->
+    <!-- 	vez. Se opta por RAID 0 ya que en estos equipos la -->
+    <!-- 	configuración es muy sencilla y no hay datos persistentes, -->
+    <!-- 	sólo los discos volátiles de las instancias que se estén -->
+    <!-- 	ejecutando en ese momento, por lo que es más conveniente -->
+    <!-- 	utilizar RAID 0 para conseguir mayor rendimiento en el proceso -->
+    <!-- 	de lectura/escritura a disco. Una vez configurado el raid, el -->
+    <!-- 	sistema operativo que arranque en el equipo sólo ve un disco duro en -->
+    <!-- 	<code>/dev/sda</code> de 600GB aproximadamente.</para> -->
+    <!--   </section> -->
+    <!--   <section xml:id="instalacion_debian_4_lunas"> -->
+    <!-- 	<title>Instalación de Debian Wheezy</title> -->
+    <!-- 	<para>Al igual que para el nodo controlador, para los nodos de -->
+    <!-- 	computación, se va a utilizar la versión wheezy de Debian -->
+    <!-- 	GNU/Linux (amd64), durante la instalación realizamos el -->
+    <!-- 	siguiente sencillo esquema de particionado:</para> -->
+    <!-- 	<programlisting> -->
+    <!-- 	  Disposit. Inicio    Comienzo      Fin      Bloques  Id  Sistema -->
+    <!-- 	  /dev/sda1   *        2048     1953791      975872   83  Linux -->
+    <!-- 	  /dev/sda2         1955838  1167964159   583004161    5  Extendida -->
+    <!-- 	  /dev/sda5      1164060672  1167964159     1951744   82  Linux swap / Solaris -->
+    <!-- 	  /dev/sda6         1955840  1164060671   581052416   83  Linux -->
+    <!-- 	</programlisting> -->
+    <!-- 	<para>Es decir, a parte de dos pequeñas particiones para el -->
+    <!-- 	área de intercambio y /boot, se utiliza prácticamente todo el -->
+    <!-- 	disco para el sistema raíz.</para> -->
+    <!-- 	<section> -->
+    <!-- 	  <title>Configuración de red</title> -->
+    <!-- 	  <para></para> -->
+    <!-- 	</section> -->
+    <!--   </section> -->
+    <!-- </section> -->
+    <section>
+      <title>Sincronización de la hora de los equipos con ntp</title>
+      <para>Es muy importante que todos los equipos del cloud tengan
+      sus relojes sincronizados, por lo que lo más sencillo es
+      configurar un servidor local como servidor ntp, que se
+      sincronice con los servidores de hora públicos que hay
+      disponibles en Internet y ofrezca la hora a todos los equipos
+      del cloud. Realmente no es fundamental que la hora de los
+      equipos del cloud sea muy exacta, pero sí que estén siempre
+      sincronizados.</para>
+      <para>Ya que en la red local existía previamente un servidor ntp,
+      simplemente hay que instalar el paquete ntp en <emphasis>todos los
+      nodos</emphasis>, comentar todas las líneas que empiecen por
+      server en el fichero <filename>/etc/ntp.conf</filename> y añadir
+      una línea del tipo:</para>
+      <screen>server ntp.your-provider.example</screen>
+      <para>Podemos comprobar el funcionamiento correcto tras
+      reiniciar el servicio ntp y realizar una consulta:</para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>ntpq -np</userinput></screen>
+      <para>De forma paulatina, el reloj del equipo se irá sincronizanco
+      con el del servidor de hora de la red.</para>
+    </section>
+    <section xml:id="pretty-table">
+      <title>Instalación manual de python-prettytable</title>
+      <para>Uno de los paquetes que se instalan por dependencias
+      (python-prettytable), tiene abierto el <link
+      xlink:href="http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=673790">
+      bug 673790</link> en la versión 0.6 que actualmente está
+      en Debian Wheezy, por lo que es necesario instalar la versión 0.5
+      de forma manual y ponerla en estado <emphasis>hold</emphasis> para
+      que no se actualice, mientras persista este bug:</para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>wget http://ftp.es.debian.org/debian/pool/main/p/prettytable/python-prettytable_0.5-1_all.deb</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>apt-get install python-prettytable=0.5-1</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>echo python-prettytable hold |  dpkg --set-selections</userinput></screen>
+      <para>Este paso hay que realizarlo en jupiter y en los cuatro nodos de
+      computación.</para>
+    </section>
+    <section>
+      <title>Keystone</title>
+    <section xml:id="instalación_keystone">
+      <title>Instalación de keystone</title>
+      <para>Vamos a instalar Keystone utilizando el paquete del repositorio
+      oficial de Debian Wheezy. Para ello ejecutamos la siguiente instrucción
+      como administrador del sistema:</para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>aptitude install keystone</userinput></screen>
+      <para>Durante la instalación nos pide el ADMIN_TOKEN, que nos servirá
+      durante la configuración inicial y que se guarda en la directiva
+      admin_token del fichero de configuración
+      <filename>/etc/keystone/keystone.conf.</filename></para>
+    </section>
+    <section xml:id="configuración_keystone">
+      <title>Configuración de keystone</title>
+      <para>El fichero de configuración de keystone lo encontramos en
+      <filename>/etc/keystone/keystone.conf</filename>. La primera configuración
+      que realizamos será la conexión con la base de datos, ya que como dijimos
+      anteriormente, vamos a utilizar bases de datos en MySQL para cada uno de
+      los componentes de OpenStack:</para>
+      <screen><userinput>connection = mysql://"usuario":"password"@127.0.0.1:3306/keystone</userinput></screen>
+      <para>Reiniciamos keystone y ejecutamos el comando que sincroniza la BBDD
+      de keystone, es decir, crea la tablas necesarias para el funcionamiento de
+      Keystone:</para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>keystone-manage db_sync</userinput></screen>
+      <para>Esto simplemente crea las tablas necesarias en la base de datos que
+      hemos llamado keystone, pero no añade ningún registro, este procedimiento
+      todavía no está automatizado y lo haremos en las siguientes
+      secciones.</para>
+    </section>
+    <section>
+      <title>Creación de proyectos, usuarios y roles</title>
+      <section>
+	<title>Creación de proyectos (tenants)</title>
+	<para>Comenzamos creando los dos proyectos (tenants) inciales
+	con los que vamos a trabajar: admin y service. Para ello
+	ejecutamos las siguientes intrucciones:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone tenant-create --name admin</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone tenant-create --name service</userinput></screen>
+	<para>Los valores de los id resultantes de cada instrucción, los
+	asociamos a las variables de entorno ADMIN_TENANT y SERVICE_TENANT
+	(podría hacerse en un solo paso utilizando la función get_id que
+	recomiendan en la wiki de Debian), para que sea más cómodo utilizarlo
+	luego:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>export ADMIN_TENANT="id del tenant admin"</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>export SERVICE_TENANT="id del tenant service"</userinput></screen>
+      </section>
+      <section>
+	<title>Creación de usuarios</title>
+	<para>A diferencia de la documentación de OpenStack, vamos a crear dos
+	usuarios (uno que tendrá el rol de admin sobre el tenant admin y otro
+	que tendrá el rol de admin sobre el tenant service que utilizan el resto
+	de componentes de OpenStack):</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone user-create --name "nombre gran jefe" --pass "contraseña" --email "correo-e" </userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone user-create --name "nombre jefe" --pass "contraseña" --email "correo-e"</userinput></screen>
+	<para>De nuevo asociamos los id resultantes de ambas instrucciones a
+	variables de entorno que utilizaremos después (ADMIN_USER y
+	SERVICE_USER):</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>export ADMIN_USER="id del usuario gran jefe"</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>export SERVICE_USER="id del usuario jefe"</userinput></screen>
+      </section>
+      <section>
+	<title>Creación de roles</title>
+	<para>Creamos los roles admin y Member que tendrán diferentes
+	privilegios. De momento sólo utilizaremos el rol admin, aunque el rol
+	más habitual para trabajar en el cloud será el de Member:</para> 
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone role-create --name admin</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone role-create --name
+	Member</userinput></screen>
+	<para>Listamos los roles y asignamos el rol de admin a la variable
+	ADMIN_ROLE:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>ADMIN_ROLE=$(keystone role-list|awk '/ admin / { print $2 }')</userinput></screen>
+      </section>
+      <section xml:id="asignacion-roles-usuarios-proyectos">
+	<title>Asignación de los roles</title>
+	<para>Asignamos el rol admin en el tenant admin al usuario que queremos
+	que sea el administrador:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone user-role-add --user $ADMIN_USER --role $ADMIN_ROLE --tenant_id $ADMIN_TENANT</userinput></screen>
+	<para>Asignamos el rol admin en el tenant service al otro usuario:</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone user-role-add --user $SERVICE_USER --role $ADMIN_ROLE --tenant_id $SERVICE_TENANT</userinput></screen>
+      </section>
+      <section>
+	<title>Configuración de las políticas de autorización</title>
+	<para>Es posible ajustar los privilegios de cada rol, realizando ajustes
+	en el fichero <filename>/etc/keystone/policy.json</filename>, tal como
+	se explica en <link
+	xlink:href="http://docs.openstack.org/essex/openstack-compute/admin/content/keystone-concepts.html">basics
+      concepts</link> de la documentación oficial de OpenStack.</para>
+      </section>
+    </section>
+    <section>
+      <title>Configuración de los servicios</title>
+      <para>En Debian Wheezy inicialmente, los "endpoints" se definen de
+      forma estática en el fichero
+      <filename>/etc/keystone/default_catalog.templates</filename> y los 
+      servicios en ram, mientras que en la documentación oficial de
+      OpenStack, se explican los pasos para incluirlos en la base de
+      datos MySQL. Es lo que vamos a hacer nosotros, para lo que
+      editamos el fichero
+      <filename>/etc/keystone/keystone.conf</filename>:</para>
+      <programlisting>
+[catalog]
+#driver = keystone.catalog.backends.templated.TemplatedCatalog
+#template_file = /etc/keystone/default_catalog.templates
+driver = keystone.catalog.backends.sql.Catalog
+      </programlisting>
+      <section>
+	<title>Creación de servicios</title>
+	<para>Creamos los servicios keystone, nova, volume y grance (de
+	momento obviamos swift y ec2):</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone service-create --name keystone --type identity --description 'OpenStack Identity Service'</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>keystone service-create --name nova --type compute --description 'OpenStack Compute Service'</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>keystone service-create --name volume --type volume --description 'OpenStack Volume Service'</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>keystone service-create --name glance --type image --description 'OpenStack Image Service'</userinput></screen>
+      </section>
+      <section>
+	<title>Creación de los "endpoints"</title>
+	<para>Los endpoints son las urls para el manejo de las diferentes
+	APIS. Para cada componente de OpenStack se definen tres URLs (la
+	pública, la de administración y la interna), en algunos casos el puerto
+	es el mismo, pero en otros no. Es necesario revisar muy bien este paso
+	porque es bastante propenso a errores. En nuestro caso, utilizaremos la
+	dirección IP pública de jupiter para la url pública y la IP privada para
+	la de administración e interna, además definimos una sola región con el
+	nombre iesgn (OpenStack permite crear cloud de gran tamaño en los que
+	pueden definirse regiones, cada una de ellas con parámetros propios,
+	pero no es nuestro caso):</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>keystone endpoint-create --region iesgn --service_id "id de keystone" --publicurl http://172.22.222.1:5000/v2.0 --adminurl http://192.168.222.1:35357/v2.0 --internalurl http://192.168.222.1:5000/v2.0</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>keystone endpoint-create --region iesgn --service_id "id de nova"  --publicurl 'http://172.22.222.1:8774/v2/$(tenant_id)s' --adminurl 'http://192.168.222.1:8774/v2/$(tenant_id)s' --internalurl 'http://192.168.222.1:8774/v2/$(tenant_id)s'</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>keystone endpoint-create --region iesgn --service_id "id de nova-volume" --publicurl 'http://172.22.222.1:8776/v1/$(tenant_id)s' --adminurl 'http://192.168.222.1:8776/v1/$(tenant_id)s'	--internalurl 'http://192.168.222.1:8776/v1/$(tenant_id)s'</userinput>
+	<prompt>root@jupiter:~# </prompt><userinput>keystone endpoint-create --region iesgn --service_id "id de glance" --publicurl 'http://172.22.222.1:9292/v1' --adminurl 'http://192.168.222.1:9292/v1' --internalurl	'http://192.168.222.1:9292/v1'</userinput></screen>
+      </section>
+    </section>
+    <section>
+      <title>Método de autentificación</title>
+      <para>Un vez que tenemos añadidos nuestros usuarios, con sus respectivos
+      roles en los distintos proyectos, la forma normal de acceder es
+      autentificándose con algunos de estos usuarios.</para>
+      <para>Para ello creamos dos ficheros de configuración de las
+      variables de entorno de los dos usuarios creados, lo llamamos por
+      ejemplo /root/.granjefe:</para>
+      <programlisting>
+#!/bin/bash
+export OS_AUTH_URL=http://172.22.222.1:5000/v2.0
+export OS_TENANT_NAME=admin
+export OS_USERNAME="usuario gran jefe"
+export OS_VERSION=1.1
+
+# With Keystone you pass the keystone password.
+echo "Please enter your OpenStack Password: "
+read -s OS_PASSWORD_INPUT
+export OS_PASSWORD=$OS_PASSWORD_INPUT
+      </programlisting>
+      <para>Y para el otro usuario creamos /root/.jefe:</para>
+      <programlisting>
+	export OS_USERNAME="usuario jefe"
+	export OS_PASSWORD="password"
+	export OS_TENANT_NAME=service
+	export OS_AUTH_URL=http://192.168.222.1:5000/v2.0/
+	export OS_VERSION=1.1
+      </programlisting>
+      <para>Para que se Obviamente protegemos estos ficheros:</para>
+      <programlisting>
+	root@jupiter:~# chmod 600 /root/.granjefe
+	root@jupiter:~# chmod 600 /root/.jefe
+      </programlisting>
+    </section>
+    <section>
+      <title>Utilización de la API</title>
+      <para>Como hemos visto a lo largo de este manual, podemos utilizar
+      el cliente keystone para gestionar los usuarios, roles, proyectos,
+      servicios y endpoints. En concreto, hemos visto las instrucciones
+      que nos permiten crear nuevos elementos.</para>
+      <para>Otros comandos interesantes nos permiten listar los objetos
+      que hemos creado:</para>
+      <programlisting>
+	root@jupiter:~# keystone role-list
+	root@jupiter:~# keystone user-list
+	root@jupiter:~# keystone tenant-list
+	root@jupiter:~# keystone service-list
+	root@jupiter:~# keystone endpoint-list
+      </programlisting>
+      <para>Otro ejemplo de comando que podemos usar a menudo, es el que
+      nos permite cambiar la contraseña de un usuario:</para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>keystone user-password-update uuid --pass
+      nueva_contraseña</userinput></screen>
+      <para>Para encontrar una descripción detallada de todos los
+      comandos que podemos usar con el cliente keystone, podemos visitar
+      el siguiente enlace: <link
+      xlink:href="http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html">
+      http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html</link></para>
+    </section>
+  </section>
+  <section>
+    <title>Glance</title>
+    <para>Este capítulo describe la instalación y configuración del
+    módulo de OpenStack, Glance. Este módulo es el encargado de la
+    gestión y registro de las imágenes que posteriormente se van a poder
+    instanciar. </para>
+    <section>
+      <title>Introducción al módulo glance</title>
+      <para>El componente Glance de OpenStack es el responsable de la
+      localización, registro y gestión de las imágenes de máquinas
+      virtuales que vamos a poder instanciar.</para>
+      <para>Las imágenes gestionadas por Glance se pueden almacenar en
+      gran variedad de ubicaciones desde un simple sistema de ficheros
+      hasta un sistema de almacenamiento de objetos como puede ser el
+      proyecto OpenStack Swift.</para>
+      <para>El componente Glance posee una API REST que nos permite
+      hacer consultas sobre los metadatos de las imágenes, así como la
+      recuperación de la imagen real.</para>
+    </section>
+    <section xml:id="instlación">
+      <title>Instalación de Glance</title>
+      <para>Antes de realizar la instalación de Glance, vamos a repasar
+      la configuración de Keystone para que podemos usarlo para realizar
+      la autentificación:</para>
+      <itemizedlist>
+	<listitem><para>El usuario que va a administrar Glance será el
+	usuario jefe, al que se le asignó el rol "admin" en el tenant
+	"service".</para></listitem>
+	<listitem><para>El servicio Glance ya fue creado en
+	Keystone.</para></listitem>
+	<listitem><para>Los endpoints de Glance también fueron definidos
+	durante la instalación de Keystone.</para></listitem>
+	
+      </itemizedlist>
+      <para>Por lo tanto ya tenemos todo preparado para la instalación de
+      Glance:</para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>aptitude install glance</userinput></screen>
+      <para>Seleccionamos Keystone como servicio de autenticación,
+      introducimos la dirección del servicio de Keystone (esto se puede
+      cambiar más adelante, de momento dejaremos localhost), definimos
+      el admin_token (Glance) y esperamos a que finalice la
+      instalación.</para>
+    </section>
+    <section xml:id="configuración">
+      <title>Configuración de Glance</title>
+      <para>Una vez terminada la instalación de Glance realizamos los
+      siguientes cambios en los ficheros de configuración:</para>
+      <para><emphasis>etc/glance/glance-api-paste.ini</emphasis></para>
+      <programlisting>
+	admin_tenant_name = service
+	admin_user = "usuario jefe"
+	admin_password = "password"
+      </programlisting>
+      <para><emphasis>/etc/glance/glance-registry-paste.ini</emphasis></para>
+      <programlisting>
+	admin_tenant_name = service
+	admin_user = "usuario jefe"
+	admin_password = "password"
+      </programlisting>
+      <para><emphasis>/etc/glance/glance-registry.conf</emphasis></para>
+      <programlisting>
+	sql_connection =
+	mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/"base de datos de glance"
+	[paste_deploy]
+	flavor = keystone
+      </programlisting>
+      <para><emphasis>/etc/glance/glance-api.conf</emphasis></para>
+      <programlisting>
+	[paste_deploy]
+	flavor = keystone
+      </programlisting>
+      <para>A continuación creamos el modelo de datos de glance e
+      reiniciamos los servicios, para ello:</para>
+      <programlisting>
+	root@jupiter:~#glance-manage version_control 0
+	root@jupiter:~#glance-manage db_sync
+	root@jupiter:~#service glance-api restart
+	root@jupiter:~#service glance-registry restart
+      </programlisting>
+    </section>
+    <section>
+      <title>Método de autentificación y prueba de
+      funcionamiento</title>
+      <para>Para que el usuario jefe administre el servicio Glance
+      vamos a utilizar las variables que habíamos definido en el fichero
+      /root/.jefe:</para>
+      <programlisting>
+	export OS_USERNAME="usuario jefe"
+	export OS_PASSWORD="password"
+	export OS_TENANT_NAME=service
+	export OS_AUTH_URL=http://192.168.222.1:5000/v2.0/
+	export OS_VERSION=1.1
+      </programlisting>
+      <para>Para finalizar podemos ejecutar la siguiente
+      instrucción:</para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>glance index</userinput></screen>
+    </section>
+  </section>
+  <section>
+    <title>Nova en el nodo controlador</title>
+    <para>Este capítulo describe la instalación y configuración del
+    módulo nova de OpenStack. Este módulo es el encargado de gestionar
+    las instancias del cloud y por tanto es el elemento central para un
+    cloud de infraestructura como el nuestro.</para>
+    <section>
+      <title>Introducción al módulo nova</title>
+      <para>Se explica posteriormente.</para>
+    </section>
+    
+    <section xml:id="instalación_nova">
+      <title>Instalación</title>
+      <para>Instalamos desde el repositorio de Debian:</para>
+      <screen>
+	<prompt>#</prompt><userinput>aptitude install nova-api
+	nova-scheduler nova-cert nova-console</userinput>
+      </screen> 
+      <para>Durante la configuración de los paquetes se nos pregunta si queremos
+      configurar la base de datos con <command>dbconfig-common</command>, a lo que
+      respondemos que no, posteriormente configuraremos la base de datos
+      directamente sobre los ficheros de configuración de nova.</para>
+      <para>Además de los paquetes del repositorio Debian anteriormente
+      indicado, debemos instalar los siguientes paquetes, cuyas
+      versiones actuales que se encuentran en el repositorio testing de
+      Debian no funcionan correctamente. Además se debe activar la
+      propiedad "hold" para que estos paquetes no se actualicen en
+      futuras actualizaciones:</para>
+      <para><prompt>#</prompt><userinput>dpkg -i
+      novnc_2012.1~e3+dfsg-1_amd64.deb
+      dpkg -i python-novnc_2012.1~e3+dfsg-1_all.deb
+      echo novnc hold |  dpkg --set-selections
+      echo python-novnc hold |  dpkg --set-selections
+      </userinput></para>
+
+    </section>
+    <section xml:id="configuración_nova">
+      <title>Configuración</title>
+      
+      <para>El fichero de configuración lo encontramos en el fichero 
+      <filename>/etc/nova/nova.conf</filename> cuyo
+      contenido inicial es el siguiente:</para>
+      <programlisting>
+	[DEFAULT]
+	logdir=/var/log/nova
+	state_path=/var/lib/nova
+	lock_path=/var/lock/nova
+	connection_type=libvirt
+	root_helper=sudo nova-rootwrap
+	auth_strategy=keystone
+	dhcpbridge_flagfile=/etc/nova/nova.conf
+	dhcpbridge=/usr/bin/nova-dhcpbridge
+	iscsi_helper=tgtadm
+	sql_connection=mysql://usuario:pass@127.0.0.1/nova
+      </programlisting>
+      <para>Veamos las modificaciones necesarias en la configuración de
+      nova para que funcione nuestro sistema adecuadamente:</para>
+      <para><filename>/etc/nova/nova.conf</filename></para>
+      <programlisting>
+	<xi:include href="nova.conf.controlador"  parse="text"/> 
+      </programlisting>
+      <para>Veamos detalladamente algunos de los parámetros que hemos
+      indicado en el fichero de configuración:</para>
+      <itemizedlist>
+	<listitem><para>En la sección LOGS/STATE configuramos algunos
+	directorios de trabajo: donde guardamos los logs del sistema
+	(logdir), el directorio base donde podemos encontrado el
+	contenido del cloud (state_path) y el directorio donde podemos
+	encontrar los ficheros de bloqueo (lock_path). Los logs que
+	generan cada uno de los distintos subcomponentes de nova se
+	guardan en ficheros separados dentro del directorio donde hemos
+	indicado en la configuración, además el nivel de explicación de
+	los logs se indica con el parámetro verbose. </para></listitem>
+	<listitem><para>En la sección AUTHENTICATION con el parámetro
+	auth_strategy indicamos el módulo que vamos a usar para el
+	servicio de autentificación y autorización, en nuestro caso
+	vamos a usar Keystone.</para></listitem>
+	<listitem><para>En la sección SCHEDULER con el parámetro
+	scheduler_driver indicamos el mecanismo de planificación que
+	vamos a seguir para instanciar las máquinas virtuales en nuestro
+	caso vamos a utilizar el simple.</para></listitem>
+	<listitem><para>En la sección DATABASE con el parámetro
+	sql_connection configuramos la cadena de conexión para acceder
+	a la base de datos nova.</para></listitem>
+	<listitem><para>En la sección COMPUTE configuramos el sistema de
+	virtualización que vamos a utilizar con el parámetro
+	libvirt_type, en nuestro caso kvm, vamos a utilizar libvirt
+	(parámetro connection_type), la plantilla que vamos a usar para
+	crear el nombre de las instancias (parámetro
+	instance_name_template) y por último indicamos donde se
+	encuentra el fichero de configuración api-paste.ini
+	(api_paste_config). </para></listitem>
+	<listitem><para>En la sección RABBITMQ indicamos, en el
+	parámetro  rabbit_host donde se encuentra el servidor Rabbit
+	responsable de la mensajería interna de los distintos
+	componentes.</para></listitem>
+	<listitem><para>En la sección GLANCE se indica que aplicación va
+	a gestionar las imágenes, en nuestro caso será Glance y el
+	parámetro donde se indica es image_service, además se indica
+	donde se encuentra el servicio glance
+	(glance_api_servers).</para></listitem>
+	<listitem><para>En la sección NOVNC CONSOLE se configura el
+	acceso por la consola vnc, para ello indicamos la URL donde se
+	encuentra el servicio novnc (novncproxy_base_url) y la dirreción
+	del cliente vnc (vncserver_proxyclient_address y
+	vncserver_listen).</para></listitem>
+	<listitem><para>Con el parámetro root_helper indicamos un
+	comando que internamente va a usar el sistema para ejecutar
+	ciertas instrucciones con privilegio de superusuario. Por
+	defecto es <command>sudo nova-rootwrap</command>
+	</para></listitem>
+	<listitem><para>En la sección QUOTAS podemos configurar las
+	cuotas generales del sistema, aunque posteriormente se podrán
+	sobreescribir para cada uno de los proyectos.Veamos que
+	significan algunos de estos parámetros:</para></listitem>
+      </itemizedlist>
+      <orderedlist>
+	<listitem><para>
+	  quota_gigabytes: Tamaño máximo del disco por proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_instances: Número máximo de instancias por proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_ram: Memoria RAM máxima utilizable por proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_security_group_rules: Número máximo de reglas por grupo de
+	  seguridad.
+	</para></listitem>
+	<listitem><para>
+	  quota_security_group: Número máximo de grupos de seguridad por
+	  proyecto.
+	</para></listitem>
+	<listitem><para>
+	  quota_volumes: Número máximo de volúmenes asociables a un proyecto.
+	</para></listitem>
+      </orderedlist>
+      
+      <itemizedlist>
+	<listitem><para>En la sección NETWORK se indica la configuración
+	de red, que será explicada con detalle posteriormente. Veamos
+	los parámetros que se deben indicar: el tipo de configuración de
+	red (network_manager) en nuestro caso VLAN, la interfaz de red
+	por la que se va a gestionar la vlna (vlan_interface) en nuestro
+	caso es la privada eth1, la interfaz de red pública
+	(public_interface), la dirección ip privada del nodo (my_ip), la
+	dirección ip pública del nodo (routing_source_ip), utilización
+	de varios nodos (multi_host) e información sobre el bridge
+	(dhcpbridge_flagfile y dhcpbridge).</para></listitem>
+	<listitem><para>Queda por configurar el uso de las APIS y el
+	componente nova-volumen.</para></listitem>
+      </itemizedlist>
+      <para>Veamos otro fichero de configuración.</para>
+      <para><filename>/etc/nova/api-paste.ini</filename></para>
+      <para>En este fichero se añaden las mismas líneas que pusimos en la
+      configuración de glance, donde se indica el usuario, la contraseña y
+      el tenant con el que nos vamos a autentificar.</para>
+      <programlisting>
+	admin_tenant_name = service
+	admin_user = "usuario jefe"
+	admin_password = "password de usuario jefe"
+      </programlisting>
+      <para>Una vez definida la configuración es momento de reiniciar los
+      servicios:</para>
+      <programlisting>
+	service nova-api restart
+	service nova-cert restart
+	service nova-console restart
+	service nova-consoleauth restart
+	service nova-scheduler restart
+      </programlisting>
+
+      <para>Para finalizar el proceso de configuración y después de
+      habernos autentificado, debemos crear la tablas necesarias en la
+      base de datos, para ello ejecutamos el siguiente comando:</para>
+      <programlisting>jupiter:~#nova-manage db sync</programlisting>
+      <para>Para ver que los servicios están activos podemos ejecutar el
+      comando siguiente:</para>
+      <programlisting>
+	jupiter:~#nova-manage service list
+      </programlisting>
+      <para>Que nos debe ofrecer una salida parecida a la
+      siguiente:</para>
+      <programlisting>
+	Binary           Host                                 Zone             Status     State Updated_At
+	nova-scheduler   jupiter                              nova             enabled    :-)   2012-06-20 18:10:24
+	nova-console     jupiter                              nova             enabled    :-)   2012-06-20 18:10:24
+	nova-cert        jupiter                              nova             enabled    :-)   2012-06-20 18:10:25
+	nova-consoleauth jupiter                              nova             enabled    :-)   2012-06-20 18:10:22
+      </programlisting>
+      <section>
+	<title>Configuración de red: VLAN</title>
+	<para>Como hemos vistos en puntos anteriores, los usuarios
+	organizan sus recursos en el cloud en proyectos. Un royecto es un
+	conjunto de instancias o máquinas virtuales creadas por el
+	usuario. A cada instancia se le asigna una ip privada.</para>
+	<para>Actualmente podemos configurar la red de nuestra nube de
+	tres formas distintas:</para>
+	<itemizedlist>
+	  <listitem><para>Flat Network Manager</para></listitem>
+	  <listitem><para>Flat DHCP Network Manager</para></listitem>
+	  <listitem><para>VLAN Network Mananger</para></listitem>
+	</itemizedlist>
+	<para>Tenemos que señalar la diferencia entre ip fija o privada,
+	que es la dirección que se le asigna a la instancia desde su
+	creación hasta su destrucción, y las ip flotantes, que son
+	direcciones que dinámicamente se pueden asignar a una instancia y
+	que nos va a permitir acceder a ellas desde una red
+	pública.</para>
+	<para>En los dos primeros modos de red (Flat Mode) el administrador
+	debe indicar un conjunto de direcciones que serán asignadas como
+	ip fijas o privadas cuando se creen las instancias. La diferencia
+	entre los dos modos es, que mientras en el primero la ip se
+	intecta en la configuración de la máquina (es decir se escribe en
+	el fichero /etc/network/interfaces), en la segunda opción exite un
+	servidor DHCP que es el responsable de asignar las ip a las
+	distintas instancias.</para>
+	<para>En el modo VLAN, se crea una vlan y un bridge para cada
+	proyecto (tenant), de esta manera conseguimos que las máquinas
+	virtuales pertenecientes a un proyecto reciban direcciones
+	privadas de un rango que será sólo accesible desde la propia
+	vlan, se decir cada proyecto está relacionado con vlan, con lo que
+	conseguimos aislar las instancias de los diferentes
+	proyectos. Esta características es lo que nos ha decidido a
+	escoger este modo de red para nuestra infraestructura.</para>
+	<section>
+	  <title>Configuración del tipo de red VLAN</title>
+	  <para>Los requisitos para utilizar el modo VLAN como
+	  configuración de red son los siguientes:</para>
+	  <itemizedlist>
+	    <listitem><para>El ip forwading debe estar
+	    habilitado.</para></listitem>
+	    <listitem><para>Los nodos de computación (que tienen instalado
+	    nova-network y nova-compute) tienen que tener cargado el
+	    módulo del kernel 8021q.</para></listitem>
+	    <listitem><para>Los switches de la red deben soportar la
+	    configuración de vlan.</para></listitem>
+	    <listitem><para>Los switches de de la red deben estar
+	    configurados con las mismas vlan que hayamos
+	    creado.</para></listitem>
+	  </itemizedlist>
+	  <para>Para configurar este modo de red tenemos que añadir al
+	  fichero de configuración
+	  <filename>/etc/nova/nova.conf</filename>:</para>
+	  <programlisting>
+	    network_manager=nova.network.manager.VlanManager
+	    vlan_interface=eth1
+	    fixed_range=10.0.0.0/8
+	    network_size=256
+	  </programlisting>
+	  <para>En la primera línea se especifica que vamos a usar el modo
+	  de red VLAN. Con la directiva <command>vlan_interface</command>
+	  indicamos la interfaz de red con la que se va asociar el bridge
+	  que se ha creado. La directiva <command>fixed_range</command>
+	  indica el rango completo de ip que se va a dividir en subredes
+	  para cada vlan creada. Por último, la directiva
+	  <command>network_size</command> indica el tmaña de cada subred
+	  asociada a cada vlan. </para>
+	</section>
+	<section>
+	  <title>Creación de un VLAN</title>
+	  <para>Como cada proyecto (tenant) se asocia a una vlan, debemos
+	  crear el número de vlan suficientes para los proyectos que en el
+	  futuro vayamos a crear. Ahora mismo, vamos a crear una sola vlan
+	  que se asociará a un sólo proyecto, para ello usamos el comando
+	  <command>nova-manage network create</command>:</para>
+	  <programlisting>
+	    nova-manage network create --label=vlan1
+	    --fixed_range_v4=10.0.1.0/24 --vlan=1 --bridge=br1 
+	  </programlisting>
+	  <para>Con este comando hemos creado la vlan1 que tendrá la
+	  etiqueta vlan "1" y que posee como rango de ip la
+	  10.0.1.0/24. Todas las instancias que usen esta vlan estarán
+	  conectadas al bridge br1.</para>
+	  <para>Cuando creemos una instancia de un proyecto, dicho
+	  proyecto se asocia a una vlan que este libre, a partir de
+	  entonces todas las instancias de ese proyecto utilizarán la
+	  misma vlan.</para>
+	</section>
+	<section>
+	  <title>Creación de un rango de ip flotantes (ip
+	  públicas)</title>
+	  <para>Como indicábamos anteriormente a las instancias se le
+	  puede asignar dinámicamente una ip pública o flotante que nos
+	  permite el acceso a ella desde la red pública. En esta sección
+	  vamos a indicar como se crea el rango de ip flotantes.</para>
+	  <para> Nosotros vamos a crear un rango de ip flotante con el
+	  siguiente <command> nova-manage floating create</command> de
+	  la siguiente manera:</para>
+	  <programlisting>
+	    nova-manage floating create --ip_range=172.22.221.0/24
+	  </programlisting>
+	  <para> Posteriormente estudiaremos la utilización de estas ips
+	  en las distintas instancias.</para>
+	</section>
+      </section>
+    </section>
+  </section>
+  <section>
+    <title>Nova en los nodos de computación</title>
+    <para>Este capítulo describe la instalación y configuración de los
+    módulos de nova de OpenStack necesarios en los nodos de computación:
+    nova-network y nova-compute.</para>
+    <section>
+      <title>Instalación</title>
+      <para>Instalamos desde el repositorio de Debian:</para>
+      <programlisting>
+	# aptitude install nova-api nova-cert nova-network
+      nova-compute</programlisting>
+      <para>De la misma manera que encontramos descrito en la sección de "Nova
+      en el nodo controlador" instalamos en cada nodo de computación los
+      paquetes python-novnc y novnc.</para>
+      <para>Para continuar la instalación podemos copiar del nodo
+      controlador el fichero <filename>/etc/nova/nova.conf</filename>
+      haciendo las siguiente modificaciones:</para>
+      <itemizedlist>
+	<listitem><para>En el parámetro my_ip tenemos que indicar la ip
+	privada del nodo.</para></listitem>
+	<listitem><para>En el parámetro routing_source_ip tenemos que
+	indicar la ip pública del nodo.</para></listitem>
+	<listitem><para>Por último para configurar el acceso por vnc,
+	tenemos que indicar en los parámetros
+	vncserver_proxyclient_address y vncserver_listen la dirección ip
+	pública del servidor.</para></listitem>
+      </itemizedlist>
+      <para>El siguiente paso es sincronizar la base de datos:</para>
+      <programlisting>nova-manage db sync</programlisting>
+      <para>Y por último reiniciamos los servicios. Realizando un
+      nova-manage service list deberían aparecer los nuevos
+      servicios.</para>
+
+      
+    </section>
+  </section>
+  <section>
+    <title>Horizon (dashboard)</title>
+    <para>Este capítulo describe la instalación y configuración de la
+    aplicación web Horizon, que nos permite realizar distintas funciones
+    en nuestro cloud. Desde ella se pueden editar casi todo lo relativo
+    a la gestión de proyectos (creación, eliminación, gestión de cuotas
+    y usuarios, ...), usuarios, gestión de instancias, imágenes,
+    volúmenes, ...</para>
+
+    <section>
+      <title>Instalación</title>
+      <para>El dashboard Horizon lo vamos a instalar en el nodo
+      controlador Jupiter, para ello instalamos desde el repositorio de
+      Debian:</para>
+      <programlisting># aptitude install apache2
+      openstack-dashboard openstack-dashboard-apache</programlisting>
+      <para>Como podemos observar utilizamos el servidor web Apache2, en
+      el cual se configura un virtual host que podemos configurar en el
+      fichero
+      <emphasis>/etc/apache2/sites-availables/openstack-dashboard</emphasis>. Para
+      acceder a la aplicación web podemos acceder desde una navegador a
+      la URL: <uri>http://direccion_ip_jupiter:8080/</uri>.</para>
+      <para>Como observamos por defecto utiliza el puerto 8080 para el
+      acceso, si queremos utilizar el puerto 80, simplemente debemos
+      modificar el fichero
+      <emphasis>/etc/apache2/sites-availables/openstack-dashboard</emphasis>
+      y realizar las siguientes modificaciones en las dos primeras líneas:</para>
+      <programlisting>
+	Listen 80
+	&lt;VirtualHost *:80>
+      </programlisting>
+      <para>Y a continuación desactivamos el virtual host por defecto e
+      reiniciamos el servidor web.</para>
+      <programlisting>
+	# a2dissite default
+	# service apache2 restart
+      </programlisting>
+    </section>
+  </section>
+</chapter>
