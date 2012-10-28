@@ -1,174 +1,170 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <book xmlns="http://docbook.org/ns/docbook"
-    xmlns:xlink="http://www.w3.org/1999/xlink"
-    xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:svg="http://www.w3.org/2000/svg"
-    xmlns:html="http://www.w3.org/1999/xhtml"
-    version="5.0"
-    xml:id="AdminOpenStack">
-    <?rax pdf.url="../AdminOpenStack.pdf"?>
-    <title>Administración de OpenStack</title>
-    <info>
-      <author>
-             <personname>
-                <firstname>Carlos</firstname>
-                <surname>Álvarez Barba</surname>
-            </personname>
-            <affiliation>
-                <orgname>IES Gonzalo Nazareno</orgname>
-            </affiliation>
-        </author>
-	<author>
-            <personname>
-                <firstname>Miguel Ángel</firstname>
-                <surname>Ibáñez Mompeán</surname>
-            </personname>
-            <affiliation>
-                <orgname>IES Ingeniero de la Cierva</orgname>
-            </affiliation>
-        </author>
-        <author>
-            <personname>
-                <firstname>Alberto</firstname>
-                <surname>Molina Coballes</surname>
-            </personname>
-            <affiliation>
-                <orgname>IES Gonzalo Nazareno</orgname>
-            </affiliation>
-        </author>
-        <author>
-            <personname>
-                <firstname>Jesús</firstname>
-                <surname>Moreno León</surname>
-            </personname>
-            <affiliation>
-                <orgname>IES Gonzalo Nazareno</orgname>
-            </affiliation>
-        </author>
-        <author>
-            <personname>
-                <firstname>José Domingo</firstname>
-                <surname>Muñoz Rodríguez</surname>
-            </personname>
-            <affiliation>
-                <orgname>IES Gonzalo Nazareno</orgname>
-            </affiliation>
-        </author>
-        <author>
-            <personname>
-                <firstname>Cayetano</firstname>
-                <surname>Reinaldos Duarte</surname>
-            </personname>
-            <affiliation>
-                <orgname>IES Los Albares</orgname>
-            </affiliation>
-        </author>
-        <author>
-            <personname>
-                <firstname>Alejandro</firstname>
-                <surname>Roca Alhama</surname>
-            </personname>
-            <affiliation>
-                <orgname>IES Ingeniero de la Cierva</orgname>
-            </affiliation>
-        </author>
-        <copyright>
-            <year>2012</year>
-            <holder>Proyecto Cloud Computing</holder>
-        </copyright>
-        <releaseinfo>1.0</releaseinfo>
-        <productname>Documentación Proyecto Cloud</productname>
-        <pubdate>25-06-2012</pubdate>
-        <legalnotice role="apache2">
-            <annotation>
-                <remark>Copyright details are filled in by the template.</remark>
-            </annotation>
-        </legalnotice>
-        <legalnotice role="cc-by-sa">
-            <annotation>
-                <remark>Remaining licensing details are filled in by the template.</remark>
-            </annotation>
-        </legalnotice>
-        <abstract>
-            <para>Guía de introdución a la instalación, configuración y explotación de OpenStack.</para>
-        </abstract>
-        <revhistory>
-            <revision>
-                <date>28-10-2012</date>
-                <revdescription>
-                    <itemizedlist spacing="compact">
-                        <listitem>
-                            <para>Versión preliminar.</para>
-                        </listitem>
-                    </itemizedlist>
-                </revdescription>
-            </revision>
-        </revhistory>
-    </info>
-<!--Indice a seguir (provisional)
-Título: Administración de OpenStack
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xmlns:svg="http://www.w3.org/2000/svg"
+      xmlns:html="http://www.w3.org/1999/xhtml"
+      version="5.0"
+      xml:id="AdminOpenStack">
+  <?rax pdf.url="../AdminOpenStack.pdf"?>
+  <title>Administración de OpenStack</title>
+  <info>
+    <author>
+      <personname>
+	<firstname>Carlos</firstname>
+	<surname>Álvarez Barba</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Gonzalo Nazareno</orgname>
+      </affiliation>
+    </author>
+    <author>
+      <personname>
+	<firstname>Miguel Ángel</firstname>
+	<surname>Ibáñez Mompeán</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Ingeniero de la Cierva</orgname>
+      </affiliation>
+    </author>
+    <author>
+      <personname>
+	<firstname>Alberto</firstname>
+	<surname>Molina Coballes</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Gonzalo Nazareno</orgname>
+      </affiliation>
+    </author>
+    <author>
+      <personname>
+	<firstname>Jesús</firstname>
+	<surname>Moreno León</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Gonzalo Nazareno</orgname>
+      </affiliation>
+    </author>
+    <author>
+      <personname>
+	<firstname>José Domingo</firstname>
+	<surname>Muñoz Rodríguez</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Gonzalo Nazareno</orgname>
+      </affiliation>
+    </author>
+    <author>
+      <personname>
+	<firstname>Cayetano</firstname>
+	<surname>Reinaldos Duarte</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Los Albares</orgname>
+      </affiliation>
+    </author>
+    <author>
+      <personname>
+	<firstname>Alejandro</firstname>
+	<surname>Roca Alhama</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Ingeniero de la Cierva</orgname>
+      </affiliation>
+    </author>
+    <copyright>
+      <year>2012</year>
+      <holder>Proyecto Cloud Computing</holder>
+    </copyright>
+    <releaseinfo>1.0</releaseinfo>
+    <productname>Documentación Proyecto Cloud</productname>
+    <pubdate>25-06-2012</pubdate>
+    <legalnotice role="apache2">
+      <annotation>
+	<remark>Copyright details are filled in by the template.</remark>
+      </annotation>
+    </legalnotice>
+    <legalnotice role="cc-by-sa">
+      <annotation>
+	<remark>Remaining licensing details are filled in by the template.</remark>
+      </annotation>
+    </legalnotice>
+    <abstract>
+      <para>Guía de introdución a la instalación, configuración y explotación de OpenStack.</para>
+    </abstract>
+    <revhistory>
+      <revision>
+	<date>28-10-2012</date>
+	<revdescription>
+	  <itemizedlist spacing="compact">
+	    <listitem>
+	      <para>Versión preliminar.</para>
+	    </listitem>
+	  </itemizedlist>
+	</revdescription>
+      </revision>
+    </revhistory>
+  </info>
+  <!--Indice a seguir (provisional)
+      Título: Administración de OpenStack
 
-	Documentos base:
-		OpenStack Compute. Administration Manual (OCAM)
-		OpenStack Compute. Starter Guide (OCSG)
+Documentos base:
+OpenStack Compute. Administration Manual (OCAM)
+OpenStack Compute. Starter Guide (OCSG)
 
 1.- Prerrequisitos.
-	Prerrequisitos previos.
-		<Todo lo que se necesita para empezar.>
-	Instalación y configuración de Ubuntu.
-		<Cómo instalar Ubuntu, particiones, NTP, red, etc.>
-		<Hablar también de SAN, iSCSI, etc...>.
-	Configuración de red.
-		<Configuración del bonding, VLAN, etc.>
+Prerrequisitos previos.
+<Todo lo que se necesita para empezar.>
+Instalación y configuración de Ubuntu.
+<Cómo instalar Ubuntu, particiones, NTP, red, etc.>
+<Hablar también de SAN, iSCSI, etc...>.
+Configuración de red.
+<Configuración del bonding, VLAN, etc.>
 
 2.- Instalación y configuración de OpenStack.
-	<Aquí vendría toda la parte de instalación y configuración de OpenStack.>
-	<Lo tengo bastante avanzado, con mis notas y la documentación oficial tengo suficiente para redactarlo.>
-	<En principio asumiendo modo de red FlatDHCP>
+<Aquí vendría toda la parte de instalación y configuración de OpenStack.>
+<Lo tengo bastante avanzado, con mis notas y la documentación oficial tengo suficiente para redactarlo.>
+<En principio asumiendo modo de red FlatDHCP>
 
 3.- Gestión de la identidad.
-	<Administration Manual, chapter 6>.
+<Administration Manual, chapter 6>.
 
 4.- Gestión de imágenes.
-	<Administration Manual, chapter 7>.
-	<Tengo algo documentado, pero muy poco.>
-	<Aquí se explicaría cómo crear imágenes para la creación de VM, cómo crear instancias de prueba, instancias de Ubuntu, Fedora, Windows, etc.>
-	<Pensaba hacerlo yo>
+<Administration Manual, chapter 7>.
+<Tengo algo documentado, pero muy poco.>
+<Aquí se explicaría cómo crear imágenes para la creación de VM, cómo crear instancias de prueba, instancias de Ubuntu, Fedora, Windows, etc.>
+<Pensaba hacerlo yo>
 
 5.- Gestión de volúmenes.
-	<En el manual de OpenStack lo han sacado como capítulo independiente>.
-        <Nosotros también, es suficientemente iomportante como para que así sea>
+<En el manual de OpenStack lo han sacado como capítulo independiente>.
+<Nosotros también, es suficientemente iomportante como para que así sea>
 
 6.- Networking.
-	<Todo lo referente a la red de OpenStack>.
-	<Está claro de quién es, ¿no?>
-	
+<Todo lo referente a la red de OpenStack>.
+<Está claro de quién es, ¿no?>
+
 7.- Administración (OCAM capítulos 11 y 12).
-	<Descripción de las tareas más usuales>.
-	<Por detallar completamente>
-	Arquitectura de los servicios de computación.
-	Gestión de usuarios.
-	Gestión del Cloud.
-	Gestión de volúmenes.
-	Live Migrations.
-	Introducción al DashBoard.
-	Descripción de VNC Proxy.
+<Descripción de las tareas más usuales>.
+<Por detallar completamente>
+Arquitectura de los servicios de computación.
+Gestión de usuarios.
+Gestión del Cloud.
+Gestión de volúmenes.
+Live Migrations.
+Introducción al DashBoard.
+Descripción de VNC Proxy.
 
 5.- Gestión de volúmenes.
-	<En el manual de OpenStack lo han sacado como capítulo independiente>.
-        <Nosotros también, es suficientemente iomportante como para que así sea>
--->
+<En el manual de OpenStack lo han sacado como capítulo independiente>.
+<Nosotros también, es suficientemente iomportante como para que así sea>
+  -->
 
-    <xi:include href="../instalacion_debian_wheezy/ch_pasos_previos.xml"/>
-    <xi:include href="../instalacion_debian_wheezy/ch_keystone.xml"/> 
-    <xi:include href="../instalacion_debian_wheezy/ch_glance.xml"/> 
-    <xi:include href="../instalacion_debian_wheezy/ch_nova_en_controlador.xml"/>
-    <xi:include href="../instalacion_debian_wheezy/ch_nova_en_nodos.xml"/> 
-    <xi:include href="../instalacion_debian_wheezy/ch_horizon.xml"/> 
-    <xi:include href="ch-instalacion-Ubuntu.xml" />
-    <xi:include href="ch-gest-identidad.xml" />
-    <xi:include href="ch-gest-imagenes.xml" />
-    <xi:include href="ch-networking.xml" />
-    <xi:include href="ch-gest-volumenes.xml" />
-    <xi:include href="ch-admin-openstack.xml" />
+  <xi:include href="ch-introduccion.xml" />
+  <xi:include href="../instalacion_debian_wheezy/ch_instalacion_debian_wheezy.xml"/>
+  <xi:include href="ch-instalacion-Ubuntu.xml" />
+  <xi:include href="ch-gest-identidad.xml" />
+  <xi:include href="ch-gest-imagenes.xml" />
+  <xi:include href="ch-networking.xml" />
+  <xi:include href="ch-gest-volumenes.xml" />
+  <xi:include href="ch-admin-openstack.xml" />
 </book>
