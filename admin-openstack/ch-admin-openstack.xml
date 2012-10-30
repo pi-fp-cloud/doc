@@ -61,7 +61,7 @@ Swap: 0MB, RXTX Factor: 1.0
     <para>Vemos que por defecto el sistema viene con 5 plantillas de
     ejecución</para>
 
-    <para>En nuestro ejenplo vamos a instanciar la imagen de Ubuntu con la plantilla
+    <para>En nuestro ejemplo vamos a instanciar la imagen de Ubuntu con la plantilla
     <emphasis>m1.small</emphasis></para>
 
     <screen><prompt>$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small ubuntuserver1</userinput></screen>
@@ -130,7 +130,8 @@ Swap: 0MB, RXTX Factor: 1.0
 
     <para>Una vez creadas varias instancias podemos ver su estado:</para>
 
-    <screen><prompt>$ </prompt><userinput>nova list</userinput>
+    <screen><prompt>$ </prompt><userinput>nova list</userinput></screen>
+    <screen>
 +--------------------------------------+---------------+--------+------------------+
 |                  ID                  |      Name     | Status |     Networks
 |
@@ -153,8 +154,9 @@ private=10.0.0.2 |
 	<para><emphasis role="bold">Lanzar instancia en un nodo:</emphasis>si
 	se desea lanzar una instancia en un nodo en concreto se tiene que forzar
 	con los flags <emphasis>--hint force_hosts=</emphasis></para>
-	<screen><prompt>$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small --hint force_hosts=trinity ubuntuserver5</userinput>
+	<screen><prompt>$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small --hint force_hosts=trinity ubuntuserver5</userinput></screen>
 
+<screen>
 +-------------------------------------+----------------------------------------------------------+
 |               Property              |                          Value
 |
@@ -250,8 +252,8 @@ c4cfd12e74d001411d189ab076248cd268b2b7cfda5017cf67376682 |
     <listitem>
       <para><emphasis role="bold">Listar las distintas plantillas
       existentes:</emphasis></para>
-      <screen><prompt>$</prompt><userinput>nova-manage flavor list</userinput>
-
+      <screen><prompt>$</prompt><userinput>nova-manage flavor list</userinput></screen>
+      <screen>
 m1.medium: Memory: 4096MB, VCPUS: 2, Root: 10GB, Ephemeral: 40Gb, FlavorID: 3, Swap: 0MB, RXTX Factor: 1.0
 m1.asir: Memory: 256MB, VCPUS: 1, Root: 5GB, Ephemeral: 0Gb, FlavorID: 6, Swap: 0MB, RXTX Factor: 1.0
 m1.small: Memory: 2048MB, VCPUS: 1, Root: 10GB, Ephemeral: 20Gb, FlavorID: 2, Swap: 0MB, RXTX Factor: 1.0
@@ -293,7 +295,8 @@ m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 
   <itemizedlist>
   <listitem>
     <para>Listar los usuarios existentes</para>
-    <screen><prompt>$</prompt><userinput>keystone user-list</userinput>
+    <screen><prompt>$</prompt><userinput>keystone user-list</userinput></screen>
+    <screen>
 +----------------------------------+---------+--------------------+--------+
 |                id                | enabled |       email        |  name  |
 +----------------------------------+---------+--------------------+--------+
@@ -308,7 +311,9 @@ m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 
   <para>Crear un usuario nuevo asociado a un proyecto (sabiendo el id de proyecto-tenant)</para>
 <screen><prompt>$</prompt><userinput> keystone user-create --name alumno
 --tenant_id e7b1868b24a742318f1d73f612ecfe1d --pass curso12-13 --email correo@gmail.com 
-</userinput>
+</userinput></screen>
+
+<screen>
 +----------+-------------------------------------------------------------------------------------------------------------------------+
 | Property |                                                          Value
 |
@@ -342,7 +347,8 @@ $6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiOwVSHtLU5HvkZBXrqXEmU
 <listitem>
 <para>Borrar un usuario sabiendo su id (ejemplo borrar usuario alumno)</para>
 <screen><prompt>$</prompt><userinput> keystone user-delete d0bfed18cce3460892ae99ee812d8aa3 </userinput>
-<prompt>$</prompt><userinput> keystone user-list</userinput>
+<prompt>$</prompt><userinput> keystone user-list</userinput></screen>
+<screen>
 +----------------------------------+---------+--------------------+--------+
 |                id                | enabled |       email        |  name  |
 +----------------------------------+---------+--------------------+--------+
@@ -355,7 +361,9 @@ $6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiOwVSHtLU5HvkZBXrqXEmU
 </listitem>
 <listitem>
 <para>Obtener información detallada de un usuario</para>
-<screen><prompt>$</prompt><userinput> keystone user-get 05743001bbf14700bcdf2ecc43edbf9b</userinput>
+<screen><prompt>$</prompt><userinput> keystone user-get 05743001bbf14700bcdf2ecc43edbf9b</userinput></screen>
+
+<screen>
 +----------+----------------------------------+
 | Property |              Value               |
 +----------+----------------------------------+
@@ -372,10 +380,6 @@ $6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiOwVSHtLU5HvkZBXrqXEmU
 <screen><prompt>$</prompt><userinput>keystone user-password-update --pass nuevopass 05743001bbf14700bcdf2ecc43edbf9b</userinput>
 </screen>
 </listitem>
-
-
-
-
 </itemizedlist>
 </section>
 
@@ -412,7 +416,9 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 </listitem>
 <listitem>
 <para>Listar información detallada de un proyecto</para>
-<screen><prompt>$</prompt><userinput>keystone tenant-get 8c6d42b3e339448fb3068ec512df7802 </userinput>
+<screen><prompt>$</prompt><userinput>keystone tenant-get 8c6d42b3e339448fb3068ec512df7802 </userinput></screen>
+
+<screen>
 +-------------+----------------------------------+
 |   Property  |              Value               |
 +-------------+----------------------------------+
@@ -441,7 +447,8 @@ proyecto se les debe asignar uno o varios roles</para>
 <itemizedlist>
 <listitem>
   <para><emphasis role="bold">Listar roles existentes</emphasis></para>
-  <screen><prompt>$</prompt><userinput>keystone role-list</userinput>
+  <screen><prompt>$</prompt><userinput>keystone role-list</userinput></screen>
+<screen>
 +----------------------------------+--------+
 |                id                |  name  |
 +----------------------------------+--------+
@@ -466,7 +473,8 @@ en el proyecto <emphasis role="bold">asir1</emphasis></para>
 <para>Para verificarlo se puede ver con:</para>
 <screen><prompt>$</prompt><userinput>keystone role-list
 --user=4ca77dc4d8a448219b1c6ae7a208ff47
---tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput>
+--tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput></screen>
+<screen>
 +----------------------------------+--------+
 |                id                |  name  |
 +----------------------------------+--------+
@@ -482,7 +490,8 @@ en el proyecto <emphasis role="bold">asir1</emphasis></para>
 </screen>
 <screen><prompt>$</prompt><userinput>keystone role-list
 --user=4ca77dc4d8a448219b1c6ae7a208ff47
---tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput> 
+--tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput></screen>
+<screen>
 +----+------+
 | id | name |
 +----+------+
@@ -505,7 +514,8 @@ de <emphasis role="bold">nova-manage</emphasis>
 <listitem>
   <para><emphasis role="bold">Obtener cuotas actuales de proyecto</emphasis></para>
 <screen><prompt>$</prompt><userinput>nova-manage project quota
---project=e7b1868b24a742318f1d73f612ecfe1d</userinput>
+--project=e7b1868b24a742318f1d73f612ecfe1d</userinput></screen>
+<screen>
 metadata_items: 128
 volumes: 10
 gigabytes: 1000
@@ -541,21 +551,284 @@ cores: 50
 </section>
 
 <section xml:id="id_monitor_nodos">
-  <title>Monitorización de nodos</title>
-  <para>Por hacer</para>
+  <title>Monitorización de instancias y nodos</title>
+  <para>La monitorización de instancias y nodos se puede realizar a través de comandos
+    de <emphasis role="bold">nova</emphasis>.
+ </para>
+ <itemizedlist>
+ <listitem>
+   <para><emphasis role="bold">Listar instancias existentes en
+   nova</emphasis></para>
+   <screen><prompt>$</prompt><userinput>nova list</userinput></screen>
+   <screen>
++--------------------------------------+---------------+--------+-------------------+
+|                  ID                  |      Name     | Status |      Networks
+|
++--------------------------------------+---------------+--------+-------------------+
+| 0167eee1-9cbe-4bf2-a1b1-7d88b8259423 | UbuntuServer  | ACTIVE | private=10.0.0.17 |
+| 0cf6b815-d7d5-4a0d-af3f-c45468eab6b5 | UbuntuServer1 | ACTIVE | private=10.0.0.9  |
+| 11dada1d-90a5-46d5-b855-bbb447e48e65 | UbuntuServer2 | ACTIVE | private=10.0.0.30 |
+| 1a8bba78-65fd-4ac5-96bb-8538d39f4825 | UbuntuServer3 | ACTIVE | private=10.0.0.32 |
+| 1a8d14fb-39b1-4c9c-8501-fd81d0d59f01 | UbuntuServer4 | ACTIVE | private=10.0.0.21 |
+| 32d9aa7c-3e94-4d73-afd8-f441ab7a00b7 | UbuntuServer5 | ACTIVE | private=10.0.0.24 |
+| 3a4f4e81-48be-486a-82e8-ddec95aa6c40 | UbuntuServer6 | ACTIVE | private=10.0.0.22 |
+-------------------------------------------------------------------------------------
+   </screen>
+ </listitem>
+ <listitem>
+ <para>Mostrar información de una instancia determinada</para>
+ <screen><prompt>$</prompt><userinput>nova show
+ 0167eee1-9cbe-4bf2-a1b1-7d88b8259423</userinput></screen>
+<screen>
++-------------------------------------+----------------------------------------------------------+
+|               Property              |                          Value
+|
++-------------------------------------+----------------------------------------------------------+
+| OS-DCF:diskConfig                   | MANUAL
+|
+| OS-EXT-SRV-ATTR:host                | trinity
+|
+| OS-EXT-SRV-ATTR:hypervisor_hostname | None
+|
+| OS-EXT-SRV-ATTR:instance_name       | instance-0000004b
+|
+| OS-EXT-STS:power_state              | 1
+|
+| OS-EXT-STS:task_state               | None
+|
+| OS-EXT-STS:vm_state                 | active
+|
+| accessIPv4                          |
+|
+| accessIPv6                          |
+|
+| config_drive                        |
+|
+| created                             | 2012-09-24T09:06:40Z
+|
+| flavor                              | m1.medium
+|
+| hostId                              |
+bcc6c02ce3eeaf89b869048bdf5039817b7c989be5e6ef7498dd09f9 |
+| id                                  | 0167eee1-9cbe-4bf2-a1b1-7d88b8259423
+|
+| image                               | windows7plantilla
+|
+| key_name                            |
+|
+| metadata                            | {}
+|
+| name                                | UbuntuServer
+|
+| private network                     | 10.0.0.17
+|
+| progress                            | 0
+|
+| status                              | ACTIVE
+|
+| tenant_id                           | a70373bf297a42eb9203645d84476c23
+|
+| updated                             | 2012-09-24T09:06:38Z
+|
+| user_id                             | 4c249654613e41208b2d03169ef29580
+|
++-------------------------------------+----------------------------------------------------------+
+ </screen>
+</listitem>
+<listitem>
+<para>Mostrar estado de los servicios de nova</para>
+<screen><prompt>$</prompt><userinput>nova-manage service list</userinput></screen>
+
+<screen>
+Binary           Host                                 Zone             Status
+State Updated_At
+nova-cert        neo                                  nova             enabled :-)   2012-10-28 17:26:22
+nova-network     neo                                  nova             enabled :-)   2012-10-28 17:26:22
+nova-scheduler   neo                                  nova             enabled :-)   2012-10-28 17:26:22
+nova-consoleauth neo                                  nova             enabled :-)   2012-10-28 17:26:22
+nova-compute     trinity                              nova             enabled XXX   2012-10-28 17:25:11
+nova-compute     cifra                                nova             enabled XXX   2012-09-28 15:12:00
+nova-compute     tanque                               nova             enabled XXX   2012-09-28 15:12:27
+nova-compute     dozer                                nova             enabled XXX   2012-09-28 15:12:50
+</screen>
+</listitem>
+<listitem>
+<para>Mostrar estado de recursos en un determinado nodo</para>
+<screen><prompt>$</prompt><userinput>nova-manage service describe_resource trinity</userinput></screen>
+<screen>
+HOST                              PROJECT     cpu mem(mb)     hdd
+trinity         (total)                        24   64414     824
+trinity         (used_now)                     15    5995     101
+trinity         (used_max)                     15   30720     300
+trinity                  a70373bf297a42eb9203645d84476c23      15   30720 300
+</screen>
+</listitem>
+</itemizedlist>
+</section>
+<section xml:id="id_servicios_vnc">
+<title>Servicios VNC y VNCProxy</title>
+<para><emphasis role="bold">VNC Proxy</emphasis></para>
+<para>VNC Proxy es un componente de OpenStack que permite a los usuarios de los
+servicios de Computación acceder a sus instancias a través clientes VNC. En Essex
+y versiones posteriores viene soportado tanto por libvirt como por XenServer
+utilizando tanto clientes Java como clientes de websocket.</para>
+<para>La conexión VNC a través de consola funciona como sigue:</para>
+<orderedlist>
+<listitem>
+  <para>El usuario se conecta a la API y recupera un acceso_url del tipo
+  http://ip:port/?token=xyz</para>
+</listitem>
+<listitem>
+<para>El usuario copia la URL en un navegador o como un parámetro de cliente</para>
+</listitem>
+<listitem>
+  <para>El navegador o cliente se conecta al proxy</para>
+</listitem>
+<listitem>
+  <para>El Proxy habla con nova-consoleauth para autorizar el token de usuario,
+  entonces asocia el token al host privado y puerto de una instancia de VNC
+  Server. En el nodo de computación se especifica la dirección que debe utilizar
+  el proxy conectándose a través de la opción vncserver_proxy_client_address del
+  fichero nova.conf. Así el vnc proxy trabaja como un puente entre la red
+  pública y la red privada del host.</para>
+</listitem>
+<listitem>
+  <para>El proxy inicia una conexión con VNC Server que durará hasta que la
+  sesión finalice.</para>
+</listitem>
+</orderedlist>
+<para>El proxy también puede realizar la función de tunelizar el protocolo VNC a
+través de Websockets para que el cliente noVNC tenga una forma de hablar VNC. En
+general VNC-proxy desarrolla varias funciones</para>
+
+<itemizedlist>
+  <listitem>
+    <para>Puente entre la red pública (dónde están los clientes) y la red
+    privada (dónde están los servidores VNC)</para>
+  </listitem>
+<listitem>
+  <para>Facilita la authenticación vía token</para>
+</listitem>
+<listitem>
+  <para>Provee una conexión uniforme con el hypervisor específico para
+  homogeneizar la experiencia del usuario</para>
+</listitem>
+</itemizedlist>
+
+<para><emphasis role="bold">Despliegue típico de VNC Proxy</emphasis></para>
+<para>Un despliegue típico de VNC proxy consta de:</para>
+<itemizedlist>
+  <listitem>
+    <para>Un proceso <emphasis
+    role="bold">nova-consoleauth</emphasis>. Normalmente se instala en el nodo controlador.
+    </para>
+  </listitem>
+<listitem>
+  <para>Uno o varios servicios <emphasis
+  role="bold">nova-novncproxy</emphasis>. Para dar soporte a los clientes novnc
+  via navegador. En despliegues simples estos servicios pueden correr en el
+  mismo host  que <emphasis role="bold">nova-api</emphasis>. Estos servicios
+  actuan de proxies entre la red pública y la red privada de los hosts de computación.
+</para>
+</listitem>
+<listitem>
+  <para>Uno o varios servicios <emphasis
+  role="bold">nova-xvpvncproxy</emphasis>. Estos servicios dan soporte a clientes
+  Java especiales descritos más adelante. En despliegues simples estos servicios
+  también pueden correr en el mismo host que <emphasis
+  role="bold">nova-api</emphasis>. También actúan de proxies entre la red
+  pública y la red privada de los hosts de computación.
+ </para>
+</listitem>
+<listitem>
+  <para>Uno o más hosts de computación. Estos hosts deberán tener correctamente
+  configuradas las opciones para su correcto funcionamiento.</para>
+</listitem>
+</itemizedlist>
+<para><emphasis role="bold">Obteniendo una URL de acceso</emphasis></para>
+<para>Nova ofrece la posibilidad de crear URL's de acceso (access_urls) a través
+de utilidades de consola</para>
+<para>Se realiza a través de novaclient:</para>
+<screen><prompt>$</prompt><userinput>nova get-vnc-console [server_id] [novnc|xvpnc]</userinput></screen>
+<para>Si se especifíca "novnc" se obtiene una URL válida para utilizarla en un
+navegador web. Por el contrario si se especifíca "xvpnc" se obtiene una URL para
+utilizarla en un cliente Java.</para>
+<para><emphasis role="bold">Opciones importantes de nova-compute</emphasis></para>
+<para>Para activar vncproxy en el cloud, se tiene que tener instalado el
+servicio de nova-consoleauth (normalmente en el controlador) y se deben
+configurar las siguientes opciones en nova.conf en los nodos de
+computación</para>
+
+<itemizedlist>
+  <listitem>
+    <para>[no]vnc_enabled - Por defecto viene activado. Si se desactiva las
+    instancias arrancaran sin soporte VNC.</para>
+  </listitem>
+<listitem>
+  <para>vncserver_listen - Por defecto viene configurado a la 127.0.0.1. Es la
+  dirección a la que se asocian los vncservers y podría ser cambiada en entornos
+  de producción a una dirección privada. Se aplica solo a entornos libvirt. Para
+  despliegues multi-host libvirt debería cambiarse por una dirección IP de gestión
+  del nodo de computación. Dicha dirección IP estará en la misma red que los proxies</para>
+</listitem>
+<listitem>
+  <para>vncserver_proxyclient_address - Por defecto viene configurado a la
+  127.0.0.1. Esta es la dirección del nodo de computación que nova le pasa al
+  proxy cuando se va a realizar una conexión a las instancias de
+  vncservers. Para despliegues libvirt multi-host debe cambiarse por una
+  dirección IP de gestión del nodo de computación. Dicha dirección IP estará en
+  la misma red que los proxies.</para>
+</listitem>
+<listitem>
+<para>novncproxy_base_url=[url base para los clientes] - Es la URL base a la que
+los clientes se conectarán. A esta URL se le añadira "?token=abc" para propósito de
+autenticación. Un despliegue típico tendrá la siguiente URL base
+"http://$SERVICE_HOST:6080/vnc_auto.html" dónde SERVICE_HOST es el nombre
+público del host</para>
+</listitem>
+<listitem>
+  <para>xvpvncproxy_base_url=[url base para los clientes] - Es la URL base a la
+  que los clientes se conectarán. A esta URL se le añadira "?token=abc" para
+  propósito de autenticación. Un despliegue típico tendrá la siguiente URL base
+  "http://$SERVICE_HOST:6081/console" dónde SERVICE_HOST es el nombre público
+  del host.</para>
+</listitem>
+</itemizedlist>
+<para> <emphasis role="bold">Acceso a consolas VNC desde cliente
+Java</emphasis></para>
+<para>Para activar el soporte de Openstack a los clientes Java se dispone del
+servicios <emphasis role="bold">nova-xvpvncproxy</emphasis> que debe
+configurarse como sigue:</para>
+<itemizedlist>
+  <listitem>
+    <para>xvpvncproxy_port=[port] - puerto de escucha (por defecto 6081)</para>
+  </listitem>
+<listitem>
+  <para>xvpvncproxy_host=[host] - ip del host (por defecto 0.0.0.0)</para>
+</listitem>
+</itemizedlist>
+<para>Como cliente se necesita un cliente especial Java que es una versión
+especial de TightVNC modificada para soportar los token de autenticación.</para>
+<para>Para obtener ese cliente se puede hacer desde github</para>
+<screen><prompt>$</prompt><userinput>git clone https://github.com/cloudbuilders/nova-xvpvncviewer</userinput>
+<prompt>$</prompt><userinput>cd nova-xvpvncviewer</userinput>
+<prompt>$</prompt><userinput>make</userinput></screen>
+
+<para>Una vez que tengamos el cliente, para crear una conexión, debemos primero
+obtener la URL de acceso a través de novaclient, como se ha comentado
+anteriormente, y luego realizar la conexión a través del cliente</para>
+
+<para>Para obtener la URL de acceso:</para>
+<screen><prompt>$</prompt><userinput>nova get-vnc-console [server_id] xvpvnc</userinput></screen>
+
+<para>Para realizar la conexión al host desde el cliente:</para>
+<screen><prompt>$</prompt><userinput>java -jar VncViewer.jar [access_url]</userinput></screen>
+
+<para><emphasis role="bold">Acceso VNC a través de navegador web</emphasis></para>
+<para>Al igual que para el cliente Java, se debe obtener la URL de
+acceso:</para>
+<screen><prompt>$</prompt><userinput>nova get-vnc-console [server_id] novnc</userinput></screen>
+<para> Una vez obtenida se le pasa al navegador web para realizar la conexión</para> 
 </section>
 
-
-  <section>
-    <title>Gestión de volúmenes</title>
-  <!-- Aunque esta sección no está empezada, incluyo un enlace que me ha
-  parecido interesante sobre la destrucción de volúmenes en nova: -->
-  <para><link
-	    xlink:href="https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/">https://dijks.wordpress.com/2012/07/09/how-to-speedup-removal-of-a-volume/</link>
-
-<!-- Muy buen enlace!!!  Como la gestión de volúmenes se ha incluido en un
-capítulo aparte incluyo allí el enlace y el código :) -->
-  </para>
- <para>Esto es una prueba</para>
-  </section>
 </chapter>
