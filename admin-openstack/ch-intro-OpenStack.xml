@@ -43,19 +43,20 @@
     almacenamiento virtual.</para>
 
     <para>Desde el punto de vista de software, OpenStack es una colección de
-    proyectos Open Source mantenidos por la comunidad que incluyen a:</para>
-
+    proyectos de software libre mantenidos por la comunidad que incluyen varios
+    componentes, siendo los más importantes:</para>
     <itemizedlist>
       <listitem>
-	<para>OpenStack Compute, con nombre en clave <emphasis role="bold">Nova</emphasis>.</para>
+	<para>OpenStack Compute, con nombre en clave <emphasis
+	role="bold">Nova</emphasis>.</para>
       </listitem>
-
       <listitem>
-	<para>OpenStack Object Storage, con nombre en clave <emphasis role="bold">Swift</emphasis>.</para>
+	<para>OpenStack Object Storage, con nombre en clave <emphasis
+	role="bold">Swift</emphasis>.</para>
       </listitem>
-
       <listitem>
-	<para>OpenStack Image Service, con nombre en clave <emphasis role="bold">Glance</emphasis>.</para>
+	<para>OpenStack Image Service, con nombre en clave <emphasis
+	role="bold">Glance</emphasis>.</para>
       </listitem>
     </itemizedlist>
 
@@ -92,9 +93,10 @@
 
   <section xml:id="id-componentes-OpenStack">
     <title>Componentes de OpenStack</title>
-    <para>Actualmente, hay tres componentes principales de OpenStack:
-    <emphasis>Compute</emphasis>, <emphasis>Object Storage</emphasis>, e
-    <emphasis>Image Service</emphasis>.</para>
+    <para>Actualmente, hay cinco componentes principales de OpenStack:
+    <emphasis>Compute</emphasis>, <emphasis>Object Storage</emphasis>,
+    <emphasis>Identity</emphasis>, <emphasis>Image Service</emphasis> y
+    <emphasis>Dashboard</emphasis>.</para>
     
     <para><emphasis>OpenStack Compute</emphasis> es el controlador de la
     estructura básica del Cloud. Es el encargado de iniciar las instancias
@@ -109,6 +111,11 @@
     de seguridad, almacenamiento de streamings de audio/vídeo, almacenamiento
     secundario/terciario, desarrollo de nuevas aplicaciones con almacenamiento
     integrado, etc.</para>
+    
+    <para><emphasis>OpenStack Identity Service</emphasis> es un servicio usado
+    para la autenticación entre el resto de componentes. Este servicio utiliza
+    un sistema de autenticación basado en tokens y se incorporó en la versión
+    2012.1 de OpenStack.</para>
 
     <para><emphasis>OpenStack Image Service</emphasis> es un servicio para la
     búsqueda y recuperación de imágenes de máquinas virtuales. Este servicio
@@ -117,19 +124,26 @@
     Amazon's Simple Storage Solution (S3) directamente, ó usar Object Storage
     como almacenamiento intermedio de S3.</para>
 
-    <para>El siguiente diagrama muestra las relaciones entre los proyectos,
-    cómo están relacionados y cómo pueden cumplir los objetivos propuestos por
-    OpenStack para el despliegue de infraestructuras de cloud computing.</para>
+    <para><emphasis>OpenStack Dashboard</emphasis> es un panel web para el
+    manejo de instancias y volúmenes. Este servicio es realmente una aplicación
+    web desarrollada en django que permite comunicarse con las diferentes APIs
+    de OpenStack de una forma sencilla. OpenStack Dashboard es fundamental para
+    usuarios noveles y en general para realizar acciones sencillas sobre las
+    instancias.</para>
 
+    <para>El siguiente diagrama muestra las relaciones entre los componentes
+    principales (Nova, Glance y Swift), cómo están relacionados y cómo pueden
+    cumplir los objetivos propuestos por OpenStack para el despliegue de
+    infraestructuras de cloud computing.</para>
     <informalfigure>
       <mediaobject>
         <imageobject>
           <imagedata fileref="figures/OpenStackCore.png" />
         </imageobject>
-	<caption><para>(c) 2012. OpenStack Compute: Administration Manual. http://www.openstack.org</para></caption>
+	<caption><para>(c) 2012. OpenStack Compute: Administration
+	Manual. http://www.openstack.org</para></caption>
       </mediaobject>
     </informalfigure>
-
   </section>
 
   <section xml:id="id-arquitectura-OpenStack">
@@ -191,7 +205,7 @@
 
     <para>Estos dos proyectos adicionales, ya incluidos en la última versión de
     OpenStack, proporcionan una infraestructura adicional para los tres
-    proyectos originales. Básicamente servicios de autenticación y un frontend
+    proyectos originales. Básicamente servicios de autenticación y un frontal
     basado en web.</para>
 
     <section>
@@ -224,7 +238,7 @@
 
       <itemizedlist>
 	<listitem>
-	  <para><emphasis>Horizon</emphasis> proporciona un frontend gráfico
+	  <para><emphasis>Horizon</emphasis> proporciona un frontal gráfico
 	  basado en web para la gestión del resto de servicios de OpenStack</para>
 	</listitem>
 
@@ -317,14 +331,14 @@
 	<listitem>
 	  <para>Horizon normalmente se despliega a través del módulo de Apache
 	  <link xlink:href="http://code.google.com/p/modwsgi/">mod_wsgi</link>, el cual
-	  implementa la interfaz WSGI que permite al servidor Apache ejecutar aplicaciones
-	  Python.</para>
+	  implementa la interfaz WSGI que permite al servidor Apache ejecutar
+	  aplicaciones Python.</para>
 	  <para>El código de Horizon está separado en dos módulos Python
 	  reutilizables, uno de ellos mantiene toda la lógica de la aplicación y
 	  es el encargado de interactuar con varias de las APIs de OpenStack,
 	  mientras que el otro es el encargado de la presentación, permitiendo
-	  fácilmente la adaptabilidad e integración con el look&amp;feel del
-	  sitio web.</para> 
+	  fácilmente la adaptabilidad e integración con la apariencia del sitio
+	  web.</para>
 	</listitem>
 
 	<listitem>
@@ -399,11 +413,13 @@
 	</listitem>
 
 	<listitem>
-	  <para>El demonio <literal>nova-schedule</literal> es conceptualmente
-	  la pieza de código más simple de <emphasis>Nova</emphasis>. A partir de un
-	  mensaje de solicitud de creación de una instancia, determina qué nodo de
-	  OpenStack debe ejecutar dicha instancia. La elección se realiza entre todos los
-	  nodos que ejecutan el demonio <literal>nova-compute</literal>.</para>
+	  <para>El demonio <literal>nova-scheduler</literal> es conceptualmente
+	  la pieza de código más simple de <emphasis>Nova</emphasis>. A partir
+	  de un mensaje de solicitud de creación de una instancia, determina qué
+	  nodo de OpenStack debe ejecutar dicha instancia de acuerdo a un
+	  algoritmo previamente seleccionado. La elección se realiza entre todos
+	  los nodos que ejecutan el demonio
+	  <literal>nova-compute</literal>.</para>
 	</listitem>
 
 	<listitem>
@@ -558,40 +574,157 @@
     </section>
 
     <section>
-      <title>Proyectos futuros</title>
-      <para>Estos servicios enumerados son los que se encuentran en la actual
-      revisión de OpenStack, Essex, pero el desarrollo de OpenStack continua de
+      <title>Nuevos componentes</title>
+      <para>Estos servicios enumerados son los que se encuentran en la versión
+      de OpenStack utilizada en este proyecto (2012.1
+      (<emphasis>Essex</emphasis>)), pero el desarrollo de OpenStack continua de
       forma intensa. Para la siguiente revisión de OpenStack, con nombre en
-      clave <emphasis>Folsom</emphasis>, se añadirá al menos los siguientes
+      clave <emphasis>Folsom</emphasis>, se han añadido los siguientes nuevos
       servicios:</para>
-
       <itemizedlist>
 	<listitem>
 	  <para>Network. El servicio Network, con nombre
-	  <emphasis>Quantum</emphasis>, verá la luz probablemente a finales del año
-	  2012. El objetivo principal de Quantum es proporcionar "conectividad de red como
-	  servicio" entre las interfaces de red gestionadas por otros servicios como
-	  Nova. Esto permitirá una gran flexibilidad a la hora de que los usuarios finales
-	  puedan crear sus propias redes e interconectar entre sí sus máquinas
-	  virtuales.</para>
+	  <emphasis>Quantum</emphasis>. El objetivo principal de Quantum es
+	  proporcionar "conectividad de red como servicio" entre las interfaces
+	  de red gestionadas por otros servicios como Nova. Esto permitirá una
+	  gran flexibilidad a la hora de que los usuarios finales puedan crear
+	  sus propias redes e interconectar entre sí las instancias.</para>
 	</listitem>
-	
+	<listitem>
+	  <para>Block Storage. De forma complementaria al almacenamiento de
+	  objetos que realiza swift, este componente de nombre
+	  <emphasis>Cinder</emphasis> es el encargado del almacenamiento de
+	  bloques, que se utilizan en las instancias de OpenStack, es
+	  equivalente al servicio de pago Elastic Block Storage
+	  (EBS) de Amazon.</para>
+	</listitem>
       </itemizedlist>
-
     </section>
-
   </section>
 
   <section>
     <title>Introducción a OpenStack Compute</title>
-    <para><emphasis>OpenStack Compute, Nova, </emphasis>
-</para>
-    
+    <para>OpenStack Compute proporciona una herramienta para orquestar un cloud,
+    incluyendo la ejecución de instancias, administración de redes y control de
+    acceso a usuarios y proyectos. El nombre del proyecto es Nova y proporciona
+    el software que controla una plataforma de cloud computing de IaaS. Nova
+    tiene un ámbito similar a Amazon EC2 y Rackspace Cloud Servers. OpenStack
+    Compute no incluye ningún software de virtualización, en lugar de eso,
+    define controladores que interactúan hipervisores que se ejecutan en otros
+    equipos e interactúa a través de una API web.</para>    
+    <section xml:id="hypervisors">
+      <title>Hipervisores</title>
+    <para>OpenStack Compute necesita al menos un hipervisor para funcionar y lo
+    controla a través de una API. Hay varios hipervisores soportados, aunque los
+    más utilizados son KVM y Xen-based hypervisors. Puede utilizarse <link
+    xlink:href="http://wiki.openstack.org/HypervisorSupportMatrix"
+    >http://wiki.openstack.org/HypervisorSupportMatrix</link> para obtener una
+    lista detallada de los hipervisores soportados.</para>
+    <para>Con OpenStack Compute, se pueden organizar clouds con más de un
+    hipervisor a la vez. Los tipos de virtualización que se pueden utilizar con
+    OpenStack Compute son:</para>
+    <itemizedlist>
+      <listitem>
+	<para><link xlink:href="http://www.linux-kvm.org/page/Main_Page">KVM</link> -
+	Kernel-based Virtual Machine</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://lxc.sourceforge.net/">LXC</link> - Linux Containers
+	(through libvirt)</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://wiki.qemu.org/Manual">QEMU</link> - Quick
+	EMUlator</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://user-mode-linux.sourceforge.net/">UML</link> - User
+	Mode Linux</para>
+      </listitem>
+      <listitem>
+	<para><link
+		  xlink:href="http://www.vmware.com/products/vsphere-hypervisor/support.html"
+		  >VMWare ESX/ESXi</link> 4.1 update 1</para>
+      </listitem>
+      <listitem>
+	<para><link xlink:href="http://www.xen.org/support/documentation.html">Xen</link> -
+	Xen, Citrix XenServer and Xen Cloud Platform (XCP)</para>
+      </listitem>
+    </itemizedlist>
+    </section>
+    <section xml:id="users-and-projects">
+      <title>Usuarios y proyectos (Tenants)</title>
+      <para>OpenStack Compute está diseñado para que lo utilcen usuarios muy
+      diversos, a los que se les pueden asignar diferentes roles. Mediante el
+      rol de un usuario se puede controlar las acciones que esté puede
+      realizar. En la configuración por defecto, la mayoría de las acciones no
+      llevan asociadas ningún rol, pero es responsabilidad del administrador
+      del cloud, configurar apropiadamente estas reglas a través del fichero
+      <filename>policy.json</filename>. Por ejemplo, una regla puede limitar
+      al rol de administrador la solicitud de una dirección IP pública o el
+      acceso de un usuario a determinadas imágenes.<note>
+      <para>Las versiones anteriores de OpenStack utilizaban el
+      término "project" en lugar de "tenant", por lo que algunas
+      herramientas de línea de comandos todavía utilizan
+      <literal>--project_id</literal> en lugar de tenant.</para>
+      </note></para>
+      </section><section xml:id="images-and-instances">
+      <title>Imágenes e instancias</title>
+      <para>Las imágenes son imágenes de discos que son plantillas para las
+      máquinas virtuales que se van a crear. El servicios que proporciona las
+      imágenes, Glance, es el responsable de almacenar y gestionar las imágenes en
+      OpenStack.</para>
+      <para>Las instancias son las máquinas virtuales que se ejecutan en los nodos
+      de computación. El servicio de computación, Nova, gestiona estas
+      instancias. Se pueden lanzar cualquier número de instancias a partir de una
+      determinada imagen. Cada instancia se ejecuta de una copia de una imagen
+      base, por lo que las modificaciones que se realicen en la instancia no
+      alteran la imagen en la que se basa. Mediante el uso de instantáneas
+      (<emphasis>snapshots</emphasis>) de las instancias, se pueden crear nuevas
+      imágenes que sí guardan todas las modificaciones realizadas hasta ese
+      momento en la instancia.</para>
+      <para>Cuando se lanza una instancia, se debe seleccionar un conjunto de
+      recursos virtuales, conocido como sabor (<emphasis>flavor</emphasis>). Un
+      sabor define para una instancia el número de CPUs virtuales, la RAM, si
+      dispone o no de discos efímeros, etc. OpenStack preinstala una serie de
+      sabores, que el administrador puede modificar.</para>
+      <para>Recursos adicionales como volúmenes persistentes o direcciones IP se
+      pueden añadir o quitar a instancias que se estén ejecutando.</para>
+      <simplesect xml:id="running-instance-state">
+	<title>Lanzar una instancia</title>
+	<para>Para lanzar una instancia hay que elegir una imagen, un sabor y
+	opcionalmente otros atributos. OpenStack copia la imagen base al disco que
+	utilizará la instancia como primer disco (vda), cuanto más pequeña sea la
+	imagen, más rápido será el lanzamiento. Dependiendo del sabor, también se
+	crea un nuevo disco vacío (vdb). El nodo de computación conecta en su caso
+	mediante iSCSI con nova-volume y mapea el volumen escogido como vdc.</para>
+	<para>Obviamente hay posibles variaciones de este típico lanzamiento, sobre
+	todo con respecto al almacenamiento. Por ejemplo, es posible que los discos
+	vda y vdb del ejemplo anterior no estén alojados localmente sino en un
+	recurso en red.</para>    
+	<para>Una vez que decidimos terminar la instancia, todos los recursos
+	utilizados por la instancia son liberados (RAM, almacenamiento, etc.),
+	salvo los volúmenes persistentes que permanecen almacenados y es posible
+	asignarlos a otra instancia posteriormente.</para>
+      </simplesect>
+    </section>
+    <section xml:id="storage-and-openstack-compute">
+      <title>Almacenamiento de bloques y OpenStack Compute</title> 
+      <para>OpenStack proporciona dos tipos de almacenamiento de bloques:
+      almacenamiento efímero y volúmenes persistentes. El almacenamiento efímero
+      existe sólo mientras se ejecuta la instancia, se mantendrá cuando se
+      reinicie la instancia, pero se borrará en el momento que se borre la
+      instancia para la que se creó. Todas las instancias tienen almacenamiento
+      efímero y es posible, dependiendo del sabor, que tengan más de un disco
+      efímero a su disposición. Los volúmenes persistentes dispositivos de
+      bloques independientes de la instancia. Los volúmenes se pueden asociar a
+      una determinada instancia, pero posteriormente se pueden desasociar y
+      asociar a cualquier otra instancia manteniendo los datos, como si fuera
+      una unidad USB.</para>
+    </section>
   </section>
-
   <section>
     <title>Introducción a OpenStack Keystone</title>
-        <para>Este capítulo describe la instalación y configuración del
+    <para>Este capítulo describe la instalación y configuración del
     módulo de OpenStack, Keystone. Este módulo es el encargado del
     sistema de autentificación y autorización de los distintos módulos
     que conforman el sistema.</para>
