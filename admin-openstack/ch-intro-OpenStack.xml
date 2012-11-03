@@ -849,7 +849,17 @@
 
   <section>
     <title>Introducción a OpenStack Swift</title>
-    <para>¿De dónde?</para>
+    <para>OpenStack Object Storage, conocido como OpenStack Swift, es un sistema
+    de almacenamiento de objetos escalable - no es un sistema de ficheros en el
+    sentido tradicional. No es posible montar este sistema como volúmenes de
+    sistemas SAN o NAS.</para>
+    <para>OpenStack Swift es un sistema de almacenamiento conceptualmente
+    similar a Amazon Simple Storage Service (S3) y es un componente
+    prácticamente independiente del resto de OpenStack. Swift es un software
+    derivado del <emphasis>Cloud files</emphasis> de rackspace y se trata de un
+    software mucho más maduro y estable que otros componentes del proyecto. Sin
+    embargo, el almacenamiento masivo de objetos no está dentro del ámbito de
+    este proyecto, por lo que no utilizaremos este componente de OpenStack ni
+    haremos prácticamente referencia a él en el resto del documento.</para>
   </section>
-
 </chapter>
