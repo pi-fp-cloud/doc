@@ -829,8 +829,22 @@
 
   <section>
     <title>Introducción a OpenStack Glance</title>
-    <para>¿De dónde?</para>
-    
+    <para>El proyecto Glance proporciona los servicios necesarios para la
+    búsqueda, localización y obtención de imágenes para las máquinas virtuales
+    del cloud. Al igual que el resto de componentes de OpenStack, Glance posee
+    una API RESTful que permite solicitudes tanto de los metadatos de las
+    imágenes para las máquinas virtuales, como la solicitud en sí de una
+    imagen.</para>
+    <para>Las imágenes que están disponibles a través de Glance, se pueden
+    almacenar en diferentes ubicaciones, desde un simple sistema de ficheros que
+    es la opción por defecto a un sistema de almacenamiento de objetos como
+    OpenStack Swift.</para>
+    <para>Posiblemente glance sea el componente más sencillo de todo el conjunto
+    de proyectos de OpenStack y el ritmo de desarrollo y cambios no tiene nada
+    que ver con el de otros componentes. En el capítulo "Gestión de imágenes" se
+    explica de forma más precisa la manera de trabajar con Glance, para crear
+    imágenes de máquinas virtuales con sistemas operativos, formatos que deben
+    tener, etc.</para>
   </section>
 
   <section>
