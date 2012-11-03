@@ -31,7 +31,81 @@
 
   <section xml:id="id-intro-Cloud">
     <title>¿Qué es el "Cloud Computing"?</title>
-    <para></para>    
+    <para>El <emphasis>cloud computing</emphasis> abarca muchos aspectos
+    diferentes, por lo que pueden realizarse distintas clasificaciones
+    dependiendo de la característica que se considere, tradicionalmente se
+    pueden señalar los siguientes tipos de clouds:</para>
+    <itemizedlist>
+      <listitem>
+	<para><emphasis>Software as a Service (SaaS)</emphasis>. La forma más
+	conocida de cloud en la que todas las aplicaciones de software se
+	encuentran en la nube y el usuario suele acceder a ellas mediante un
+	simple navegador web. Hay un enorme número de aplicaciones en la nube,
+	muchas de ellas utilizadas por gran cantidad de personas a diario; son
+	muy conocidas y utilizadas aplicaciones web generales como redes
+	sociales, correo web, aplicaciones ofimáticas online; específicamente de
+	uso empresarial como ERP o CRM, o incluso instalando y configurando
+	aplicaciones propias como joomla, wordpress, drupal, moodle, ...</para>
+      </listitem>
+      <listitem>
+	<para><emphasis>Platform as a Service (PaaS)</emphasis>. Un nuevo
+	enfoque para el desarrollo de software, esta tecnología ofrece la
+	posibilidad de acceder a todas las herramientas de desarrollo de
+	aplicaciones sin instalar nada en el equipo propio. Las principales
+	compañías de software han desarrollado sus propios PaaS, entre las que
+	cabe mencionar Google App Engine, Microsoft Windows Azure y Oracle
+	Cloud.</para>
+      </listitem>
+      <listitem>
+	<para><emphasis>Infraestructure as a Service (IaaS)</emphasis>. La
+	evolución de la infraestructura clásica de servidores físicos en las
+	empresas, sustituyéndolos por servidores virtuales con ubicación en la
+	propia empresa o Internet. Destaca en este ámbito la implementación
+	comercial Amazon EC2 (Elastic Compute Cloud) y las implementaciones de
+	software libre Opennebula y Eucalyptus, que son compatibles con el API
+	de Amazon EC2, pero que permiten un control total sobre la
+	tecnología.</para>
+      </listitem>
+    </itemizedlist>
+    <para>Si por otro lado, atendemos a los modos de funcionamiento de los
+    clouds, podemos clasificarlos en:</para>
+    <itemizedlist>
+      <listitem>
+	<para><emphasis>Públicos</emphasis>. Cuando los servicios ofrecidos por
+	la nube son servidos por empresas externas.</para>
+      </listitem>
+      <listitem>
+	<para><emphasis>Privados</emphasis>. Cuando los servicios ofrecidos se
+	manejan por un sólo cliente que controla las aplicaciones que se
+	ejecutan.</para>
+      </listitem>
+      <listitem>
+	<para><emphasis>Híbridos</emphasis>. Que es un solución que combina las
+	dos anteriores.</para>
+      </listitem>
+    </itemizedlist>
+    <para>Desde el punto de vista del uso educativo del cloud, SaaS es adecuado
+    en planes formativos muy diversos y está ampliamente extendido y utilizado
+    en todos los niveles educativos, es  la base de lo que se conoce hoy en día
+    como Educación 2.0. Por su parte, el interés sobre los clouds PaaS proviene
+    fundamentalmente de los estudios relacionados con el desarrollo de
+    software. Por último, los estudios relacionados con el sistemas y redes
+    tienen un nuevo campo de acción con los clouds IaaS, principalmente privados
+    ya que permiten manejar y conocer todos los niveles de esta
+    tecnología.</para>
+    <para>En algunos casos la utilización de IaaS en el mundo empresarial se
+    plantea como una paulatina eliminación de los servidores físicos propios y
+    su sustitución por servidores virtuales ubicados en Centros de procesamiento
+    de datos (CPD) remotos. Esta solución redunda de forma inmediata en
+    importantes ahorros de costes, pero no se puede plantear para determinados
+    servicios ya que se asumirían importantes riesgos al no controlar
+    directamente sus equipos y se adquiría una gran dependencia de un
+    proveedor. Es por esto, por lo que utilizando la misma tecnología se pueden
+    implementar IaaS privadas, públicas o híbridas, en función de la ubicación
+    de los servidores sea en la propia empresa, en una empresa que ofrezca este
+    servicio o una combinación de ambas, además es posible la migración de
+    servicios de una a otra cuando sea necesario y de forma relativamente
+    sencilla.</para>
   </section>
 
   <section xml:id="id-intro-OpenStack">
@@ -41,7 +115,6 @@
     comunidad y un proyecto de Software Libre, como un software para ayudar a
     las organizaciónes a ejecutar sus propios clouds para computación o
     almacenamiento virtual.</para>
-
     <para>Desde el punto de vista de software, OpenStack es una colección de
     proyectos de software libre mantenidos por la comunidad que incluyen varios
     componentes, siendo los más importantes:</para>
