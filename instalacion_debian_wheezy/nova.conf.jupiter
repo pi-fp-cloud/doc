@@ -13,7 +13,7 @@ auth_strategy=keystone
 scheduler_driver=nova.scheduler.simple.SimpleScheduler
 
 # DATABASE
-sql_connection=mysql://"user_bd":"contraseña"@192.168.222.1/nova
+sql_connection=mysql://openstackadmin:password@192.168.222.1/nova
 
 # COMPUTE
 libvirt_type=kvm
@@ -49,20 +49,14 @@ vncserver_listen=127.0.0.1
 root_helper=sudo nova-rootwrap
 
 # QUOTAS
-quota_cores=10
+quota_cores=25
 quota_gigabytes=1000
 quota_injected_file_content_bytes=10240
 quota_injected_file_path_bytes=255
 quota_injected_files=5
-quota_instances=10
+quota_instances=50
 quota_metadata_items=128
 quota_ram=65000
 quota_security_group_rules=10
 quota_security_groups=5
 quota_volumes=5
-
-
-# APIS
-
-# VOLUMEN
-
