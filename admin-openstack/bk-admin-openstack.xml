@@ -8,6 +8,8 @@
       xml:id="AdminOpenStack">
   <?rax pdf.url="../AdminOpenStack.pdf"?>
   <title>Administración de OpenStack</title>
+  <subtitle>Instalación, configuración y explotación de OpenStack Essex en
+  Debian GNU/Linux (Wheezy) y Ubuntu 12.04 LTS</subtitle>
   <info>
     <author>
       <personname>
@@ -72,13 +74,13 @@
 	<orgname>IES Ingeniero de la Cierva</orgname>
       </affiliation>
     </author>
-    <copyright>
-      <year>2012</year>
-      <holder>Proyecto Cloud Computing</holder>
-    </copyright>
+    <!-- <copyright> -->
+    <!--   <year>2012</year> -->
+    <!--   <holder>Proyecto Cloud Computing</holder> -->
+    <!-- </copyright> -->
     <releaseinfo>1.0</releaseinfo>
     <productname>Documentación Proyecto Cloud</productname>
-    <pubdate>25-06-2012</pubdate>
+    <pubdate>10-11-2012</pubdate>
     <legalnotice role="apache2">
       <annotation>
 	<remark>Copyright details are filled in by the template.</remark>
@@ -90,11 +92,26 @@
       </annotation>
     </legalnotice>
     <abstract>
-      <para>Guía de introdución a la instalación, configuración y explotación de OpenStack.</para>
+      <para>Este documento es un manual de introducción a la instalación,
+      configuración y explotación de OpenStack Essex en sistemas
+      GNU/Linux.</para>
+      <para>Se incluyen varios capítulos que van desde una explicación de lo que
+      es OpenStack, sus componentes y cómo funcionan; cómo se instala OpenStack
+      en Debian GNU/Linux y Ubuntu 12.04 LTS y por último se describen los
+      aspectos fundamentales del manejo y administración del cloud.</para>
+      <para>Este documento forma parte del proyecto de innovación
+      <emphasis>Implantación y puesta a punto de la infraestructura de un cloud 
+      computing privado para el despliegue de servicios en la nube</emphasis>,
+      cofinanciado por el Ministerio de Educación, Cultura y Deportes y el Fondo
+      Social Europeo, al amparo de la Resolución de 5 de abril de 2011, de la
+      Secretaría de Estado de Educación y Formación Profesional, por la que se
+      convocan ayudas destinadas a la realización de proyectos de innovación
+      aplicada y transferencia del conocimiento en la formación profesional del
+      sistema educativo (BOE número 100 del 27 de abril de 2011).</para>
     </abstract>
     <revhistory>
       <revision>
-	<date>28-10-2012</date>
+	<date>10-11-2012</date>
 	<revdescription>
 	  <itemizedlist spacing="compact">
 	    <listitem>
