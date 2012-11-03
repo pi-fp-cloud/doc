@@ -9,8 +9,8 @@
   imágenes pueden tener diferentes formatos, pueden ser sistemas operativos
   limpios recién instalados o por contra sistemas con muchas aplicaciones
   completamente configuradas y pueden ser incluso instantáneas
-  (<emphasis>snapshots</emphasis>) de instancias que se están ejecutando en
-  alguno de los nodos de computación.</para>
+  (<emphasis>snapshots</emphasis>) de instancias que se están ejecutando o se
+  han ejecutado en alguno de los nodos de computación.</para>
   <para>El componente de OpenStack encargado de la gestión de instancias es
   Glance que inicialmente almacena las imágenes en el directorio
   <filename>/var/lib/glance/images</filename>, aunque es posible utilizar
@@ -98,9 +98,9 @@
       <title>Formato del contenedor</title>
       <para>El formato del contenedor se refiere a si la imagen de la máquina
       virtual está en un formato de archivo que contiene metadatos.</para> 
-      <para>Nota: El contenido de la imagen no es utilizado por Glance o otros
+      <note><para>El contenido de la imagen no es utilizado por Glance o otros
       componentes de Openstack actualmente, así que si no estamos seguros de que
-      formato poner, utilizaremos <emphasis>bare</emphasis>.</para>
+      formato poner, utilizaremos <emphasis>bare</emphasis>.</para></note>
       <para>Actualmente podemos utilizar uno de los siguientes tipos de formato
       para el formato del contenedor:</para>
       <variablelist>
@@ -161,12 +161,9 @@
     xlink:href="https://launchpad.net/cirros/+download">https://launchpad.net/cirros/+download</link>,
     por ejemplo, podemos descargar una imagen en formato de disco qcow para
     x86_64:</para>
-    <para><code>wget
-    https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img</code></para>
+    <screen><prompt>root@jupiter:~# </prompt><userinput>wget https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-disk.img</userinput></screen>
     <para>y posteriormente agregarla a glance:</para>
-    <para><code>glance add name="CirrOS x86_64 limpia" is_public=true
-    container_format=bare disk_format=qcow2 &lt; cirros-0.3.0-x86_64-disk.img
-    </code></para>
+    <screen><prompt>root@jupiter:~# </prompt><userinput>glance add name="CirrOS x86_64 limpia" is_public=true container_format=bare disk_format=qcow2 &lt; cirros-0.3.0-x86_64-disk.img</userinput></screen>
     <variablelist>
       <varlistentry>
 	<term><filename>add</filename></term>
@@ -216,9 +213,9 @@
   </section>
   <section xml:id="glance_instalacion_maquinas">
     <title>Procedimiento general de provisión de imágenes</title>
-    <para>En secciones posteriores se explicará la forma específica de crear
-    imágenes del cloud para una distribución GNU/Linux o para un sistema
-    Windows, pero vamos a resumir los pasos generales.</para>
+    <para>Vamos a comentar brevemente los pasos generales para crear una imagen
+    de una máquina virtual para el cloud, aunque en los siguientes apartados se
+    particularizará para sistemas GNU/Linux y Windows.</para>
     <para>La instalación debemos hacerla en un equipo con KVM instalado y
     configurado y con un cliente VNC disponible<footnote><para>Podría hacerse
     sin vnc directamente con sdl, pero VNC es más versátil y nos permite por
@@ -230,24 +227,20 @@
 	máquina. Esta imagen se corresponde con el disco duro de la máquina
 	virtual. Por ejemplo para crear una imagen de 1 GiB en formato
 	qcow2:</para>
-	<para><code>kvm-img create -f qcow2 Nombre-imagen.img 1G</code></para>
+	<screen><prompt>usuario@venus:~$ </prompt><userinput>kvm-img create -f qcow2 Nombre-imagen.img 1G</userinput></screen>
       </listitem>
       <listitem>
-	<para>Arrancar la máquina virtual con KVM incluyendo la iso con el
+	<para>Iniciar la máquina virtual con KVM incluyendo la iso con el
 	instalador del SO. Esto levantará una conexión VNC a las que nos
 	tendremos que conectar para hacer la instalación. Por ejemplo:</para>
-	<para><code>kvm -m 512 -cdrom instalador-SO.iso -drive
-	file=Nombre-imagen.img,if=scsi,index=0 -boot d -net nic -net user
-	-nographic  -vnc</code></para>
+	<screen><prompt>usuario@venus:~$ </prompt><userinput>kvm -m 512 -cdrom instalador-SO.iso -drive file=Nombre-imagen.img,if=scsi,index=0 -boot d -net nic -net user -nographic  -vnc</userinput></screen>
       </listitem>
       <listitem><para>Conectamos mediante VNC a la máquina virtual y terminar la
       instalación</para></listitem>
       <listitem><para>Copiar la imagen al nodo de glance y añadirla a la base de
       datos, especificando si la imagen será pública o no y el formato del
       contenedor:</para>
-      <para><code>glance add name="Debian Squeeze 6.0.5" is_public=true
-      container_format=ovf disk_format=qcow2 &lt;
-      Nombre-imagen.img</code></para>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>glance add name="Debian Squeeze 6.0.5" is_public=true container_format=ovf disk_format=qcow2 &lt; Nombre-imagen.img</userinput></screen>
       </listitem>
     </orderedlist>
   </section>
@@ -255,37 +248,41 @@
     <title>Creación de imágenes GNU/Linux</title>
     <para>En primer lugar creamos un fichero para la imagen del sistema (en este
     caso se ha optado por formato raw):</para>
-    <para><code>kvm-img create -f raw Debian6.0.5.img 1G</code></para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>kvm-img create -f raw Debian6.0.5.img 1G</userinput></screen>
     <para>Iniciamos una máquina virtual con KVM con la ISO de instalación
     descargada anteriormente (en este caso la versión netinst de Debian
     stable), para comenzar instalación y conectarnos por VNC:</para>
-    <para><code>kvm -m 512 -cdrom debian-6.0.5-amd64-netinst.iso -drive
-    file=debian6.0.5.img,if=scsi,index=0 -boot d -net nic -net user -nographic
-    -vnc :0</code></para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>kvm -m 512 -cdrom debian-6.0.5-amd64-netinst.iso -drive file=debian6.0.5.img,if=scsi,index=0 -boot d -net nic -net user -nographic -vnc :0</userinput></screen>
     <para>Durante la instalación creamos una sola partición que ocupe todo el
-    disco virtual y la asociamos a /. No creamos partición de swap.</para>
+    disco virtual y la asociamos a /. No creamos partición de swap, en caso de
+    que se necesite en la instancia, deberá ir definida en el sabor
+    asociado.</para>
+    <para>No importa la contraseña que elijamos para el usuario root, ya que la
+    forma estándar de acceder a la instancia que utilice esta imagen, será
+    inyectando la clave pública ssh del usuario que ejecute la instancia, para
+    que sólo él pueda acceder remotamente aunque desconozca la contraseña de
+    root.</para>
     <para>Si fuera necesario volver a iniciar el sistema, pero en este caso,
     desde el fichero con el disco duro virtual, ejecutaríamos la siguiente
     instrucción:</para>
-    <para><code>kvm -m 512 -drive file=debian6.0.5.img,if=scsi,index=0,boot=on
-    -boot c -net nic -net user -nographic -vnc :0</code></para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>kvm -m 512 -drive file=debian6.0.5.img,if=scsi,index=0,boot=on -boot c -net nic -net user -nographic -vnc :0</userinput></screen>
     <para>Durante la instalación del sistema, es imprescindible instalar el
     servidor ssh, ya que será el método utilizado por defecto para acceder a las
     instancias del cloud una vez que estén iniciadas.</para>
     <para>Una vez terminada la instalación del sistema, se copia el fichero con
     la imagen del nuevo sistema al equipo en el que se ejecuta glance y se
     agrega a las imágenes disponibles de la siguiente manera:</para>
-    <para><code>glance add name="Debian Squeeze 6.0.5" is_public=true
-    container_format=ovf disk_format=raw &lt; Debian6.0.5.img</code></para>
+    <screen><prompt>root@jupiter:~$ </prompt><userinput>glance add name="Debian Squeeze 6.0.5" is_public=true container_format=ovf disk_format=raw &lt; Debian6.0.5.img</userinput></screen>
   </section>
   <section>
     <title>Creación de imágenes Windows</title>
     <para>Como en cualquier otro caso, creamos un fichero para la imagen del
     sistema (en este caso se ha optado por formato qcow2):</para>
-    <para><code>kvm-img create -f qcow2 win7.qcow2 10G</code></para>
-    <para>En el caso de instalar un sistema Windows 7 el tamaño mínimo del disco
-    debe ser de 7 GB para poder hacer la instalación, aunque es recomendable al
-    menos 10.</para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>kvm-img create -f qcow2 win7.qcow2 10G</userinput></screen>
+    <para>Obviamente es necesario crear una imagen de disco suficientemente
+    grande para albergar el sistema operativo que se va a instalar, en este
+    ejemplo se ha supuesto que la versión de Windows 7 elegida ocupará menos de
+    10GiB de espacio en disco.</para>
     <para>Las instancias de OpenStack con KVM se inician utilizando dispositivos
     virtuales virtio para los discos duros y las interfaces de red. Los 
     sistemas GNU/Linux los reconocen sin problemas ya que los controladores de
@@ -298,16 +295,16 @@
     de disco duro, los controladores virtio en una
     <emphasis>disquetera</emphasis> y la iso del instalador del sistema
     windows:</para>
-    <para><code>kvm -m 1024 -cdrom Windows7.iso -drive
-    file=win7.img,if=virtio,boot=on -fda virtio-win-1.1.16.vfd -boot d
-    -nographic -vnc :0</code></para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>kvm -m 1024 -cdrom Windows7.iso -drive file=win7.img,if=virtio,boot=on -fda virtio-win-1.1.16.vfd -boot d -nographic -vnc :0</userinput></screen>
     <para>Comenzamos la instalación del sistema Windows a través de la conexión
     VNC y cuando tengamos que seleccionar el disco duro para el sistema nos
     encontraremos con que no existe ninguno, entonces deberemos de hacer click
     en "Cargar controladores" en el botón de la izquierda y cargar los
     controladores de dispositivos virtio desde A:\amd64\win7.</para> 
     <para>Una vez acabada la instalación y reiniciado el sistema windows, es
-    necesario activar RDP:</para>
+    necesario activar RDP ya que será el mecanismo habitual para acceder
+    remotamente a la instancia (será posible en cualquier caso hacerlo también a
+    través de VNC si está apropiadamente configurado en el cloud):</para>
     <itemizedlist>
       <listitem><para>Panel de Control &gt; Sistema &gt; Configuración avanzada
       del sistema &gt; Acceso Remoto</para></listitem>
@@ -320,12 +317,11 @@
     </itemizedlist>
     <para>Si fuera necesario realizar algún cambio después de la instalación,
     arrancaríamos la máquina virtual de la siguiente manera:</para>
-    <para><code>kvm -m 1024 -drive file=win7.img,if=virtio,index=0,boot=on -boot c -net nic -net user -nographic -vnc :0</code></para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>kvm -m 1024 -drive file=win7.img,if=virtio,index=0,boot=on -boot c -net nic -net user -nographic -vnc :0</userinput></screen>
     <para>Por último, transferimos la imagen del disco con el sistema windows al
     equipo en el que se encuentra Glance y la añadimos de la misma forma que las
     otras imágenes:</para>
-    <para><code>glance add name="Windows 7 Profesional 64bits" is_public=true
-    container_format=bare disk_format=raw &lt;  win7.img</code></para>
+    <screen><prompt>root@jupiter:~# </prompt><userinput>glance add name="Windows 7 Profesional 64bits" is_public=true container_format=bare disk_format=raw &lt;  win7.img</userinput></screen>
   </section>
   <section>
     <title>Amazon Machine Images</title>
@@ -342,32 +338,26 @@
     <para>Los pasos que hay que realizar para agregar una Imagen de Amazon a
     OpenStack son los siguientes:</para>
     <itemizedlist>
-      <listitem><para>Descargaremos el archivo que incluye las images ami, ari
-      y aki y procederemos a subirlas a glance.</para>
-      <para><code>wget
-      https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-uec.tar.gz</code></para></listitem>
-      <listitem><para>Descomprimimos el archivo que contiene 3
-      ficheros:</para>
-      <para><code>tar xvzf cirros-0.3.0-x86_64-uec.tar.gz</code></para>
-      <para>cirros-0.3.0-x86_64-blank.img, cirros-0.3.0-x86_64-initrd,
-      cirros-0.3.0-x86_64-vmlinuz</para>
+      <listitem>
+	<para>Descargaremos el archivo que incluye las images ami, ari
+	y aki y procederemos a subirlas a glance.</para>
+	<screen><prompt>usuario@venus:~$ </prompt><userinput>wget https://launchpad.net/cirros/trunk/0.3.0/+download/cirros-0.3.0-x86_64-uec.tar.gz</userinput></screen>
       </listitem>
-      <listitem><para>Subimos las imágenes a glance, teniendo en cuenta que la
-      imagen con el sistema debe ser la última en subirse, ya que requiere que
-      estén previamente disponibles en glance la imagen con el kérnel y la
-      imagen con el initrd.</para>
-      <para><code>glance add disk_format=aki container_format=aki
-      name="cirros-0.3.0-x86_64-vmlinuz" &lt;
-      cirros-0.3.0-x86_64-vmlinuz</code></para>
-      <para><code>glance add disk_format=ari container_format=ari
-      name="cirros-0.3.0-x86_64-initrd" &lt;
-      cirros-0.3.0-x86_64-initrd</code></para>
-      <para><code>glance add disk_format=ami container_format=ami
-      name="cirros-ami-img 64bits - javi"
-      kernel_id=cdbd8865-a088-4bb6-ada2-f3bca6b13820
-      ramdisk_id=48fadc60-97a2-4250-bbd2-69ca298a94b9 &lt;
-      cirros-0.3.0-x86_64-blank.img
-      </code></para>
+      <listitem>
+	<para>Descomprimimos el archivo que contiene 3 ficheros:</para>
+	<screen><prompt>usuario@venus:~$ </prompt><userinput>tar xvzf cirros-0.3.0-x86_64-uec.tar.gz</userinput></screen>
+	<para>que nos dará los ficheros
+	<filename>cirros-0.3.0-x86_64-blank.img</filename>,
+	<filename>cirros-0.3.0-x86_64-initrd</filename> y <filename>cirros-0.3.0-x86_64-vmlinuz</filename>.</para>
+      </listitem>
+      <listitem>
+	<para>Subimos las imágenes a glance, teniendo en cuenta que la imagen
+	con el sistema debe ser la última en subirse, ya que requiere que estén
+	previamente disponibles en glance la imagen con el kérnel y la imagen
+	con el initrd.</para>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>glance add disk_format=aki container_format=aki name="cirros-0.3.0-x86_64-vmlinuz" &lt; cirros-0.3.0-x86_64-vmlinuz</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>glance add disk_format=ari container_format=ari name="cirros-0.3.0-x86_64-initrd" &lt; cirros-0.3.0-x86_64-initrd</userinput></screen>
+	<screen><prompt>root@jupiter:~# </prompt><userinput>glance add disk_format=ami container_format=ami name="cirros-ami-img 64bits" kernel_id=cdbd8865-a088-4bb6-ada2-f3bca6b13820 ramdisk_id=48fadc60-97a2-4250-bbd2-69ca298a94b9 &lt; cirros-0.3.0-x86_64-blank.img</userinput></screen>
       <para>Donde los identificadores del kérnel y el initrd son los que ha
       asociado en los pasos anteriores el propio Glance.</para>
       </listitem>
@@ -376,34 +366,37 @@
     para diferentes imágenes de disco, siempre y cuando sean versiones
     adecuadas para el sistema que se va a utilizar posteriormente.</para>
   </section>
-
-
-      <!-- Imagen de Snapshot -->
-
-<!-- Crear una imagen de una instancia corriendo. -->
-
-<!-- Primero necesitamos el ID de la máquina que vamos a hacer un Snapshot, para esto necesitaremos sacar un listado de las máquinas en funcionamiento. -->
-
-<!-- nova list -->
-
-<!-- Nota: Los snapshots se hacen de máquinas activas. -->
-
-<!-- Nos fijamos en el ID de la maquina de la que queramos crear una imagen y -->
-
-<!-- nova image-create < ID > NombreNuevaMaquina -->
-
-<!-- Ej: nova image-create 9dccd6ba-d19a-494a-a110-fd003d453616  "Snapshot de 3" -->
-
-<!-- Comprobaremos que se ha creado la imagen, con el siguiente comando: -->
-
-<!-- nova image-list -->
-
-<!-- Deberemos esperar que pase de “SAVING” a “ACTIVE”, cuando esto ocurra veremos que el Snapshot se ha creado correctamente. -->
-
-<!-- Al hacer el snapshot, por defecto la imagen se crea como privada, para cambiar este parámetro deberemos de utilizar glance update -->
-
-<!-- glance update < ID > is_public=true -->
-
-<!-- Una vez terminado este proceso ya podremos ponernos a lanzar instancias de la Snapshot como si de una imagen se tratara. -->
-
+  <section>
+    <title>Imagen de uns instantánea de una instancia</title>
+    <para>Una de las opciones más interesantes para crear una imagen es a partir
+    de una instantánea de una instancia que se está ejecutando en alguno de los
+    nodos de computación del cloud.</para>
+    <para>En primer lugar necesitamos obtener el ID de la máquina que vamos a
+    hacer la instantánea (<emphasis>snapshot</emphasis>), para esto
+    necesitaremos sacar un listado de las máquinas en funcionamiento.</para>
+    <note><para>Lógicamente los snapshots sólo se se pueden hacer de instancias
+    activas</para></note>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova list</userinput></screen>
+    <para>Nos fijamos en el ID de la instancia de la que queramos crear una
+    imagen y ejecutamos la instrucción:</para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova image-create &lt; ID &gt; NombreNuevaImagen</userinput></screen>
+    <para>Comprobaremos que se ha creado la imagen, listando las imágenes
+    disponibles:</para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova image-list</userinput></screen>
+    <para>Que aparecerá en estado "SAVING" mientras se está guardando la
+    instantánea y "ACTIVE", cuando termine el proceso y esté disponible para su
+    uso en una nueva instancia.</para>
+    <note><para>Al hacer el snapshot, la imagen por defecto se crea de forma
+    privada y sólo está disponible para el usuario que la creó. Si queremos que
+    esta imagen esté disponible para el resto de usuarios, debemor hacerla
+    pública.</para></note>
+    <para>Si queremos hacer pública una imagen obtenida a partir de una
+    instantánea, debemos ejecutar la siguiente instrucción de glance (con un
+    usuario que tenga privilegios para hacerlo):</para>
+    <screen><prompt>root@jupiter:~# </prompt><userinput>glance update &lt; ID &gt; is_public=true</userinput></screen>
+    <para>Una vez terminado este proceso ya podremos ponernos a lanzar
+    instancias de la Snapshot como si de una imagen se tratara.</para>
+  </section>
 </chapter>
+
+
