@@ -3,69 +3,128 @@
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es" xml:id="salas">
   <title>Salas</title>
-  <para>Para la implantación y localización de los distintos servidores        
-se ha elegido en cada uno de los centros participantes una sala adecuada para su
-    puesta en funcionamiento. La característica principal de estas salas es que
-    están interconectadas con cableado estructurado a cada una de las aulas
-    donde se imparte docencia y donde se explota por parte de profesores y
-    alumnos las distintas funcionalidades ofrecidas por el Cloud Privado. 
-  </para>
-  <para>Salvo diferencias mínimas entre los distintos centros, las salas cuentan
-  principalmente con: 
+  <para>Como es lógico, para la implantación y localización de los distintos
+  servidores se ha elegido en cada uno de los centros participantes una sala
+  adecuada para su puesta en funcionamiento. La característica principal de
+  estas salas es que están interconectadas con cableado estructurado a cada una
+  de las aulas donde se imparte docencia y donde se explota por parte de
+  profesores y alumnos las distintas funcionalidades ofrecidas por el Cloud
+  Privado.</para>
+  <para>Salvo algunas particularidades, las salas cuentan principalmente con:</para>
   <itemizedlist>
-    <listitem><para>Armario Rack para servidores y conmutadores</para></listitem>
+    <listitem><para>Armario Rack para servidores y
+    conmutadores</para></listitem>
     <listitem><para>Cableado estructurado de interconexión con aulas de
-    docencia</para></listitem>
-    <listitem><para>Sistema de refrigeración para temperatura
+    docencia</para></listitem> 
+    <listitem><para>Sistema de refrigeración para mantener temperatura
     constante</para></listitem>
-    <listitem><para>Sistema SAI para normalización de fluido eléctrico</para></listitem>
+    <listitem><para>Sistema SAI para normalización de fluido
+    eléctrico</para></listitem>
   </itemizedlist>
-  </para>
   <section xml:id="armario-rack">
     <title>Armario Rack</title>
-    <para>Armario rack de 46 U para albergar tanto los distintos conmutadores,
-    paneles de parcheo y servidores del proyecto del Cloud Privado</para>
+    <para>Armario rack de 42/46 U para albergar tanto los distintos
+    conmutadores, paneles de parcheo y servidores del proyecto del Cloud
+    Privado. Puesto que este armario alojará servidores en formato rack que
+    suelen tener mucha profundidad, el armario deberá ser de 900 o 1000 cm de
+    profundidad.</para> 
     <para>En este armario se instalan el o los switches necesarios para la
-    conectividad del Cloud con las aulas así como el nodo controlador y los
-    nodos de computación. Además se instala también el nodo de almacenamiento
-    que dependiendo de cada centro puede ser o un servidor dedicado a NAS/SAN o
-    una NAS/SAN propiamente dicha.</para>
-    <para>Debido a las características de los servidores se hace una
-    recomendación por parte del proveedor de que el armario esté localizado en
-    frente del sistema de refrigeración para proporcionar una corriente de aire
-    frío desde la parte delantera del armario hacia la parte trasera del
-    mismo.</para>
+    conectividad del Cloud con las aulas así como los nodos del cloud (equipo
+    controlador, computación y almacenamiento, equipos cuyas características se
+    detallan en el capítulo <link linkend="servidores"
+    >Servidores</link>).</para>
+    <para>En instalaciones tan pequeñas como ésta, todos los elementos (equipos y
+    elementos de red) pueden compartir un mismo armario, mientras que en
+    instalaciones mayores, están normalmente separados.</para>
+    <para>Todos los equipos que se instalan en el armario incluyen ventiladores
+    internos para refrigerar sus componentes. Estos ventiladores normalmente
+    crean una corriente de adelante hacia atrás, salvo algunos elementos de red
+    que la generan de lado a lado (esto es porque es posible poner elementos de
+    red en la parte delantera y trasera del armario). Esto hace que sea
+    recomendable siempre localizar el armario en frente del sistema de
+    refrigeración para proporcionar una corriente de aire frío desde la parte
+    delantera del armario hacia la parte trasera del mismo. En instalaciones
+    mayores, en las que la refrigeración es un problema de primera magnitud es
+    muy recomendable la creación de pasillos aislados entre las partes
+    delanteras y traseras de los armarios, lo que se denomina pasillos fríos y
+    calientes.</para>
+    <para>La ubicación de cada uno de los elementos en el armario se debe
+    planificar previamente teniendo en cuenta los siguientes aspectos:</para>
+    <itemizedlist>
+      <listitem>
+	<para>Los sistemas de alimentación ininterrumpida deben ir en la parte
+	inferior del armario.</para>
+      </listitem>
+      <listitem>
+	<para>Los servidores que son equipos que producen mucho calor y deben
+	estar muy bien refrigerados deben estar lo más abajo posible, ya que la
+	temperatura de la sala será más fría en la parte inferior.</para>
+      </listitem>
+      <listitem>
+	<para>Los elementos de red suelen ir en la parte superior, ya que no es
+	tan importante la refrigeración en ellos.</para>
+      </listitem>
+      <listitem>
+	<para>En el caso de contar con bandejas para fibra óptica, éstas deben
+	ir en la parte más alta del armario.</para>
+      </listitem>
+    </itemizedlist>
+    <para>Teniendo en cuenta estas premisas, se plantea de forma esquemática la
+    disposición de los elementos en el armario, como en el siguiente
+    diagrama:</para>
+    <mediaobject>
+      <imageobject role="fo">
+	<imagedata fileref="figures/armario-iesgn.svg" scalefit="1" format="SVG" 
+		   width="70%" contentdepth="100%"/>
+      </imageobject>
+      <caption>
+	<para>Diagrama del armario de uno de los centros, en la que se disponen
+	todos los elementos de la red y los equipos del cloud.</para>
+      </caption>
+    </mediaobject>
   </section>
   <section xml:id="cableado-estructurado">
     <title>Cableado estructurado</title>
-    <para>Para la conectividad de las aulas con el Cloud Privado se cuenta con
-    cable CAT 6 desde cada una de las aulas a la sala de servidores.</para>
+    <para>Para la conectividad de las aulas con el Cloud Privado se cuenta bien
+    con fibra óptica multimodo, bien con cable de pares UTP de categoría 6 desde
+    cada una de las aulas a la sala de servidores.</para>
     <para>En los centros en los que cada aula contaba con su switch se procede a
     conectar éste con el panel de parcheo de la sala de servidores. En uno de
-    los centros se procede a cablear directamente desde cada punto de red de aula hasta
-    la sala de servidores.</para>    
+    los centros se procede a cablear directamente desde cada punto de red de
+    aula hasta la sala de servidores.</para>
+    <mediaobject>
+      <imageobject role="fo">
+	<imagedata fileref="figures/parcheo.png" scalefit="1" format="PNG" 
+		   width="100%" contentdepth="100%"/>
+      </imageobject>
+      <caption>
+	<para>Fotografía de los paneles de parcheo para la interconexión de las
+	aulas en el armario de uno de los centros participantes. Cada color
+	corresponde a un aula y a una de las VLAN definidas. Los cables UTP que
+	no están conectados todavía corresponden a la red SAN del cloud, que
+	todavía no estaba montada cuando se tomó la fotografía.</para>
+      </caption>
+    </mediaobject>    
   </section>
   <section xml:id="sistema-refrigeracion">
-  <title>Sistema de refrigeración</title>
-  <para>Cada una de las salas de servidores cuenta con un sistema de
-  refrigeración para mantener temperatura constante de los servidores. Debido a
-  las especificaciones técnicas de los servidores esta temperatura se mantiene
-  entre 21 y 23 grados centígrados.</para>
-  <para>Uno de los aspectos a destacar es que el proveedor de los servidores
-  recomienda que además del sistema de refrigeración del tipo aire acondicionado
-  se añada un extractor de aire de forma que no solo se refrigere a través del
-  aire acondicionado sino que además se proceda a extraer el aire caliente de la
-  sala de servidores conllevando así un ahorro energético.</para>
-  <section xml:id="sistema-sai">
-  <title>Sistema SAI</title>
-  <para>Para la normalización y continuidad del fluido eléctrico se decide instalar para cada
-  una de los centros en la sala de servidores un SAI.</para>
-  <para>Las características de cada uno de los SAI adquiridos resultan un tanto
-  diferentes pero como ejemplo para la infraestructura que se está utilizando se
-  ha optado por SAI de entre 3000 VA y 4000 VA para soportar la carga de los
-  distintos servidores y equipos de conectividad dedicados al proyecto.</para>
-</section>
-
-</section>
-
+    <title>Sistema de refrigeración</title>
+    <para>Cada una de las salas de servidores cuenta con un sistema de
+    refrigeración para mantener temperatura constante de los servidores. Debido a
+    las especificaciones técnicas de los servidores esta temperatura se mantiene
+    entre 21 y 23 grados centígrados.</para>
+    <para>Uno de los aspectos a destacar es que el proveedor de los servidores
+    recomienda que además del sistema de refrigeración del tipo aire acondicionado
+    se añada un extractor de aire de forma que no solo se refrigere a través del
+    aire acondicionado sino que además se proceda a extraer el aire caliente de la
+    sala de servidores conllevando así un ahorro energético.</para>
+    <section xml:id="sistema-sai">
+      <title>Sistema de Alimentación Ininterrumpida (SAI)</title>
+      <para>Para la normalización y continuidad del fluido eléctrico se decide
+      instalar para cada uno de los centros en la sala de servidores un SAI.</para>
+      <para>Las características de cada uno de los SAI adquiridos resultan un tanto
+      diferentes pero como ejemplo para la infraestructura que se está utilizando se
+      ha optado por SAI de entre 3000 VA y 4000 VA para soportar la carga de los
+      distintos servidores y equipos de conectividad dedicados al proyecto.</para>
+    </section>
+  </section>
 </chapter>
