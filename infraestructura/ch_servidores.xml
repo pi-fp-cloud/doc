@@ -244,12 +244,13 @@
 	  Gbps y hasta 100 IOPS</para>
 	</listitem>
 	<listitem>
-	  <para>SAS 10000 ó 15000 rpm): Hasta 900 GiB de almacenamiento, bus de
+	  <para>SAS (10000 ó 15000 rpm): Hasta 900 GiB de almacenamiento, bus de
 	  6 Gbps y hasta 150 IOPS</para>
 	</listitem>
 	<listitem>
-	  <para>SSD: Hasta 1 TiB de almacenamiento, bus de 3 ó 6 Gbps y hasta
-	  100.000 IOPS (!).</para>
+	  <para>SSD: Convencionales hasta 256 GiB de almacenamiento, aunque hay
+	  unidades de estado sólido de hasta 4 TiB, bus de 3 ó 6 Gbps y desde
+	  1000 hasta 100.000 IOPS (!).</para>
 	</listitem>
       </itemizedlist>
       <para>El único factor que falta en la relación anterior es el precio, que

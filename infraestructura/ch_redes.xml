@@ -44,7 +44,7 @@
     servidores, ya que esto permite administrar completamente el
     servidor de forma remota (es posible encenderlo, apagarlo,
     comprobar la temperatura y otras acciones que sólo sería posible
-    realizar estando "físicamente" delante del equipo.</para>
+    realizar estando "físicamente" delante del equipo).</para>
     <para>La red de gestión debe ser una red independiente, al menos desde el
     punto de vista lógico, por lo que o bien se configura con un
     switch propio o se configura una VLAN específica para estos
@@ -96,24 +96,24 @@
     <emphasis>bonding</emphasis> de varias de ellas) con una dirección
     dentro del rango anterior.</para>
   </section>
-  <section>
-    <title>Esquema de red</title>
-    <para>Teniendo en cuenta las consideraciones anteriores, podemos
-    representar esquemáticamente la configuración en la siguiente
-    figura, en la que aparece un nodo controlador (jupiter), cuatro
-    nodos de computación (europa, io, calisto y ganimedes) y un nodo
-    de almacenamiento (saturno):</para>
-    <mediaobject>
-      <imageobject>
-	<imagedata fileref="figures/esquema_red_iesgn.png" scalefit="1"
-		   format="PNG"  width="100%" contentdepth="100%"
-		   align="center"/>
-      </imageobject>
-      <caption>
-	<para>Esquema de red para el Cloud que representa los nodos de
-	la red conectados a las redes pública y privada (se ha obviado
-	la red IPMI en esta figura).</para>
-      </caption>
-    </mediaobject>
-  </section>
+  <!-- <section> -->
+  <!--   <title>Esquema de red</title> -->
+  <!--   <para>Teniendo en cuenta las consideraciones anteriores, podemos -->
+  <!--   representar esquemáticamente la configuración en la siguiente -->
+  <!--   figura, en la que aparece un nodo controlador (jupiter), cuatro -->
+  <!--   nodos de computación (europa, io, calisto y ganimedes) y un nodo -->
+  <!--   de almacenamiento (saturno):</para> -->
+  <!--   <mediaobject> -->
+  <!--     <imageobject> -->
+  <!-- 	<imagedata fileref="figures/esquema_red_iesgn.png" scalefit="1" -->
+  <!-- 		   format="PNG"  width="100%" contentdepth="100%" -->
+  <!-- 		   align="center"/> -->
+  <!--     </imageobject> -->
+  <!--     <caption> -->
+  <!-- 	<para>Esquema de red para el Cloud que representa los nodos de -->
+  <!-- 	la red conectados a las redes pública y privada (se ha obviado -->
+  <!-- 	la red IPMI en esta figura).</para> -->
+  <!--     </caption> -->
+  <!--   </mediaobject> -->
+  <!-- </section> -->
 </chapter>
