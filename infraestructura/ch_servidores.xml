@@ -9,15 +9,46 @@
   hay que hacer una inversión importante por lo que es necesario
   conocer de forma precisa las características necesarias para estos
   equipos.</para>
+  <para>La principal referencia que se utilizó fue <link
+  xlink:href="http://www.referencearchitecture.org/hardware-specifications/"
+  >http://www.referencearchitecture.org/hardware-specifications/</link>, que
+  lamentablemente ya no está disponible. En la referencia anterior se detallaba
+  de forma precisa las características mínimas y las recomendables para cada uno
+  de los equipos que forman el cloud.</para>
+  <para>Otras referencias que se han tenido en cuenta han sido:</para>
+  <itemizedlist>
+    <listitem>
+      <para><link
+		xlink:href="http://docs.stackops.org/display/doc03/Global+System+Requirements"
+		>Global System Requirements. StackOps</link></para>
+    </listitem>
+    <listitem>
+      <para><link
+		xlink:href="http://docs.openstack.org/trunk/openstack-compute/admin/content/compute-system-requirements.html"
+		>Compute and Image System Requirements. OpenStack</link></para>
+    </listitem>
+    <listitem>
+      <para><link xlink:href="http://www.dell.com/OpenStack" >Recommended
+      Systems. Dell</link></para>
+    </listitem>
+  </itemizedlist>
+  <para>Además, se solicitó ayuda a la lista de usuarios de OpenStack
+  directamente, que puede verse en el hilo "<link
+  xlink:href="https://lists.launchpad.net/openstack/msg09098.html" >hardware
+  specifications for a little private cloud</link>".</para>
+  <para>Con toda esta información, nos decidimos por un determinado esquema en
+  el que contaríamos con un nodo controlador, cuatro nodos de computación y un
+  nodo de almacenamiento, equipos que se describen a continuación.</para>
   <section xml:id="tipo-servidores">
     <title>Tipos de servidores</title>
     <para>Dependiendo del tamaño de la organización y por tanto del número de
     equipos que se va a utilizar, se podrá asignar una función a cada servidor,
     tal como aparece en <link linkend="esquema-grande">ejemplo de
-    arquitectura</link>.</para>
+    arquitectura</link> de la documentación del proyecto OpenStack.</para>
     <mediaobject>
       <imageobject>
-	<imagedata fileref="figures/NOVA_compute_nodes.png" width="10cm" format="PNG"/>
+	<imagedata fileref="figures/NOVA_compute_nodes.png" scalefit="1" format="PNG" 
+		   width="100%" contentdepth="100%"/>
       </imageobject>
       <caption>
 	<para>Ejemplo de esquema de nodos de una infraestructura con varios
@@ -34,7 +65,7 @@
       <listitem>
 	<para>Nodo controlador: Equipo en el que se instalarán la mayor
 	parte de los servicios de gestión del cloud (autenticación,
-	planificador, gestión de volúmenes, APIs, etc.)</para>
+	planificador, gestión del cloud, APIs, etc.)</para>
 	<para>El nodo controlador no precisa ninguna característica
 	especial y puede utilizarse cualquier equipo de
 	características básicas. Sí sería importante, quizás en una
@@ -63,6 +94,52 @@
 	apropiadamente.</para>
       </listitem>
     </itemizedlist>
+  </section>
+  <section>
+    <title>Configuraciones mínima y recomendada</title>
+    <para>El factor fundamental que condiciona el número de nodos necesarios
+    para implementar un cloud con OpenStack es el número de instancias que
+    simultáneamente se van a ejecutar. En este sentido se podría plantear una
+    configuración mínima como la del siguiente esquema:</para>
+    <mediaobject>
+      <imageobject role="fo">
+	<imagedata fileref="figures/esquema-minimo.png" scalefit="1" format="PNG" 
+		   width="70%" contentdepth="100%"/>
+      </imageobject>
+      <caption>
+	<para>Esquema de cloud formado por un nodo controlador y dos nodos de
+	computación.</para> 
+      </caption>
+    </mediaobject>
+    <para>En este esquema el nodo controlador tendrá que asumir también las
+    funcionalidades del nodo de almacenamiento y los dos nodos de computación
+    serán los equipos que ejecuten las instancias. Dependiendo de las
+    características de los nodos de computación se podrán ejecutar más o menos
+    instancias simultáneamente.</para>
+    <para>Para mejorar la configuración anterior, habría que aumentar el número
+    de nodos de computación y separar el almacenamiento en un equipo aparte del
+    nodo controlador, que permita por ejemplo instalar un sistema operativo
+    específicamente orientado al almacenamiento por ejemplo. Es por esto por lo
+    que planteamos como configuración recomendada para nuestro caso la del
+    siguiente esquema:</para>
+    <mediaobject>
+      <imageobject role="fo">
+	<imagedata fileref="figures/esquema_red_iesgn.png" scalefit="1" format="PNG" 
+		   width="70%" contentdepth="100%"/>
+      </imageobject>
+      <caption>
+	<para>Esquema de cloud formado por un nodo controlador y dos nodos de
+	computación.</para> 
+      </caption>
+    </mediaobject>
+    <para>Además de lo anterior, los nodos de computación se comunican con el
+    nodo de almacenamiento a mediante 3 interfaces de red Gigabit Ethernet que
+    habrá que configurar en modo <emphasis>bonding</emphasis> ya que es posible
+    que haya mucho tráfico de red entre los nodos de computación y el de
+    almacenamiento si se utiliza mucho almacenamiento permanente. Además los
+    nodos de computación están directamente conectados a lo que se denomina red
+    pública, que se explicará posteriormente, lo que permite que se acceda a las
+    instancias directamente sin pasar por el nodo controlador.</para>
   </section>
   <section xml:id="nodo-controlador">
     <title>Nodo controlador</title>
@@ -124,7 +201,8 @@
       </itemizedlist>
             <mediaobject>
 	<imageobject>
-	  <imagedata fileref="figures/supermicro-as-1012c-mrf.jpg" width="10cm" format="JPG"/>
+	  <imagedata fileref="figures/supermicro-as-1012c-mrf.jpg" scalefit="1"
+		     format="PNG" width="70%" contentdepth="100%"/>
 	</imageobject>
 	<caption>
 	  <para>Imagen del equipo Supermicro 1012C-MRF.</para>
@@ -204,19 +282,26 @@
     </section>
     <section xml:id="serv-doble-twin">
       <title>Supermicro-2022TG-H6RF</title>
-      <para>Este equipo realmente son 4 equipos en 1, que comparten un mismo chasis y 2 fuentes de 
-      alimentación. Los 4 nodos de este equipo son totalmente independientes y cualquier fallo en 
-      uno de ellos no afecta al funcionamiento de los demás.</para>
-      <para>Estos 4 nodos son los equipos que realmente van a soportar la mayor parte del trabajo del 
-      cloud, ya que en ellos se ejecutan todas las instancias del cloud (máquinas virtuales), por lo
-      que es necesario que sean equipos de altas prestaciones, con procesadores muy potentes y gran
-      cantidad de memoria RAM, además se ha optado por un modelo con bus SAS y discos SAS de 15.000
-      rpm para conseguir altas velocidades de E/S a disco local. Para la comunicación con la red de
-      almacenamiento y el <link linkend="nodo-controlador">servidor de
-      gestión</link> se han incluido varias interfaces de red Gigabit
-      configuradas en modo <emphasis>bonding</emphasis> IEEE 802.3ad
-      (<emphasis>link aggregation</emphasis>) para aumentar el ancho de banda
-      total y redundancia del canal.</para>
+      <para>Se tomó inicialmente como referencia el equipo <link
+      xlink:href="http://www.dell.com/us/enterprise/p/poweredge-c6105/pd?refid=poweredge-c6105"
+      >Dell PowerEdge C6105</link> recomendado por OpenStack, pero se encontró
+      un equipo de prestaciones muy superiores y mejor de precio.</para>
+      <para>Este equipo realmente son 4 equipos en 1, que comparten un mismo
+      chasis y 2 fuentes de alimentación. Los 4 nodos de este equipo son
+      totalmente independientes y cualquier fallo en uno de ellos no afecta al
+      funcionamiento de los demás.</para>
+      <para>Estos 4 nodos son los equipos que realmente van a soportar la mayor
+      parte del trabajo del cloud, ya que en ellos se ejecutan todas las
+      instancias del cloud (máquinas virtuales), por lo que es necesario que
+      sean equipos de altas prestaciones, con procesadores muy potentes y gran
+      cantidad de memoria RAM, además se ha optado por un modelo con bus SAS y
+      discos SAS de 15.000 rpm para conseguir altas velocidades de E/S a disco
+      local. Para la comunicación con la red de almacenamiento y el <link
+      linkend="nodo-controlador">servidor de gestión</link> se han incluido
+      varias interfaces de red Gigabit configuradas en modo
+      <emphasis>bonding</emphasis> IEEE 802.3ad (<emphasis>link
+      aggregation</emphasis>) para aumentar el ancho de banda total y
+      redundancia del canal.</para>
       <para>Especificaciones técnicas del equipo:</para>
       <itemizedlist>
 	<listitem><para>Chasis 
