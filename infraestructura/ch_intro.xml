@@ -3,10 +3,26 @@
 	 xmlns:xlink="http://www.w3.org/1999/xlink"
 	 version="5.0" xml:lang="es">
   <title>Introducción</title>
-  <para>Hay varios aspectos de infraestructura a considerar, algunos
-  de ellos serán demasiado obvios para la mayoría de los lectores,
-  pero los incluímos pensando en la implantación partiendo de cero,
-  los aspectos que veremos a continuación son:</para>
+  <para>La elección adecuada del hardware para la implantación de un cloud de
+  infraestructura es un paso muy importante, bien se trate de adquirir hardware
+  nuevo o reutilizar el hardware del que se dispone.</para>
+  <para>Una de las ventajas que tiene planificar las características de hardware
+  para un cloud de infraestructura es que es un sistema fácilmente escalable,
+  por lo que puede dimensionarse para las necesidades actuales o
+  sobre-dimensionar ligeramente para las inmediatamente futuras. Si
+  posteriormente es necesario aumentar las prestaciones del hardware, se pueden
+  adquirir nuevos elementos e integrarlos fácilmente con los actuales, sin
+  necesidad de hacer modificaciones en los primeros.</para>
+  <para>Este documento describe un caso particular de cloud utilizado con fines
+  educativos, el objetivo final es que cada uno de los centros participantes
+  cuente con un cloud privado en el que sus alumnos puedan ejecutar varias
+  instancias de forma simultánea, pero no es un sistema en producción
+  propiamente, por lo que no es una prioridad el respaldo o la configuración en
+  alta disponibilidad de los servicios.</para>
+  <para>Hay varios aspectos de infraestructura a considerar, algunos de ellos
+  serán obvios para algunos de los lectores, pero los incluimos pensando en la
+  implantación partiendo de cero, los aspectos que veremos a continuación
+  son:</para>
   <itemizedlist>
     <listitem>
       <para><link linkend="salas">Adecuación de las salas de los servidores</link></para>
