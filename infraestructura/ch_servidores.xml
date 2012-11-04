@@ -48,7 +48,7 @@
     <mediaobject>
       <imageobject>
 	<imagedata fileref="figures/NOVA_compute_nodes.png" scalefit="1" format="PNG" 
-		   width="100%" contentdepth="100%"/>
+		   width="100%" contentdepth="100%" align="center"/>
       </imageobject>
       <caption>
 	<para>Ejemplo de esquema de nodos de una infraestructura con varios
@@ -104,7 +104,7 @@
     <mediaobject>
       <imageobject role="fo">
 	<imagedata fileref="figures/esquema-minimo.png" scalefit="1" format="PNG" 
-		   width="70%" contentdepth="100%"/>
+		   width="70%" contentdepth="100%" align="center"/>
       </imageobject>
       <caption>
 	<para>Esquema de cloud formado por un nodo controlador y dos nodos de
@@ -125,7 +125,7 @@
     <mediaobject>
       <imageobject role="fo">
 	<imagedata fileref="figures/esquema_red_iesgn.png" scalefit="1" format="PNG" 
-		   width="70%" contentdepth="100%"/>
+		   width="70%" contentdepth="100%" align="center"/>
       </imageobject>
       <caption>
 	<para>Esquema de cloud formado por un nodo controlador y dos nodos de
@@ -202,7 +202,7 @@
             <mediaobject>
 	<imageobject>
 	  <imagedata fileref="figures/supermicro-as-1012c-mrf.jpg" scalefit="1"
-		     format="PNG" width="70%" contentdepth="100%"/>
+		     format="PNG" width="70%" contentdepth="100%" align="center"/>
 	</imageobject>
 	<caption>
 	  <para>Imagen del equipo Supermicro 1012C-MRF.</para>
@@ -328,7 +328,8 @@
       </itemizedlist>
       <mediaobject>
 	<imageobject>
-	  <imagedata fileref="figures/AS-2022TG-HLIBQRF.jpg" width="10cm" format="JPG"/>
+	  <imagedata fileref="figures/AS-2022TG-HLIBQRF.jpg"  scalefit="1" format="JPG" 
+		   width="100%" contentdepth="100%" align="center"/>
 	</imageobject>
 	<caption>
 	  <para>Imagen posterior del equipo Supermicro 2022TG-H6RF en la que se observa los 4 nodos que lo componen 
@@ -368,7 +369,8 @@
       </itemizedlist>
       <mediaobject>
 	<imageobject>
-	  <imagedata fileref="figures/intel-sr2612.png" width="10cm" format="JPG"/>
+	  <imagedata fileref="figures/intel-sr2612.png"  scalefit="1" format="JPG" 
+		   width="100%" contentdepth="100%" align="center"/>
 	</imageobject>
 	<caption>
 	  <para>Imagen equipo Intel SR2612UR.</para>
