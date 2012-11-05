@@ -1,16 +1,70 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-	 xmlns:xlink="http://www.w3.org/1999/xlink"
-	 version="5.0" xml:lang="es">
-  <title>Conclusiones</title>
-  <para> Si queremos una Europa competitiva en los próximos años, es primordial
-  promover una formación innovadora. En el caso de las TIC esto pasa por
-  fomentar estrategias formativas que no se limiten a usar y consumir
-  tecnologías desarrolladas por otros países, sino a conocer, adaptar y
-  crear tecnología propia. Esto supone en el caso concreto de los clouds
-  IaaS, que no podemos conformarnos con formar a nuestro alumnado en la
-  utilización de clouds IaaS de determinadas empresas, sino que debemos
-  formarlos para que puedan crear y manejar sus propios clouds, adquieriendo las destrezas necesarias
-  para su administración, gestión y utilización a todos los niveles. </para>
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+       xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:lang="es">
+       <title>Conclusiones</title>
+       <para>Analizando el actual panorama informático y teniendo en cuenta las expectativas de
+              expansión de las soluciones de Cloud Computing, es evidente que es necesario e
+              imprescindible que estas tecnologías se incluyan en los currículos de las enseñanzas
+              TIC. En este sentido, muchas instituciones educativas han comenzado a estudiar estas
+              tecnologías desde un punto de vista teórico, analizando sus componentes y utilizando
+              ciertas soluciones disponibles en la web, centrándose fundamentalmente en entornos
+              PaaS. Sin embargo, desde nuestro punto de vista, consideramos esencial que el alumnado
+              no sólo conozca estas soluciones, sino que las utilice de forma habitual en las clases
+              para adquirir unas destrezas significativas en su manejo. En este sentido, sin ninguna duda, las
+              infraestructuras IaaS son las que ofrecen mejores opciones y mayores posibilidades de estudio, análisis, configuración y uso. </para>
+       <para>Las ventajas de la utilización de estas soluciones no se limitan a los nuevos contenidos que
+              pueden integrarse en los programas de las asignaturas de sistemas y redes, ya que
+              estas infraestructuras pueden utilizarse para implementar escenarios prácticos mucho
+              más complejos, inviables en el esquema tradicional de uso de máquinas virtuales por la
+              complejidad de configurar el escenario inicial y por los problemas que acarrea un
+              error de un estudiante durante el desarrollo de la práctica. Además, las prácticas no
+              interfieren con otras asignaturas, ya que pueden suspenderse las instancias al
+              finalizar la clase y reanudarla cuando se precise. De hecho, si los centros educativos
+              cuentan con conexiones a Internet con el suficiente ancho de banda de subida de datos,
+              el alumnado podría utilizar estas mismas instancias desde su hogar, siendo posible
+              continuar con el trabajo comenzado en clase sin necesidad de contar con un gran
+              equipamiento y sin tener que volver a realizar configuraciones o restauraciones de
+              copias.</para>
+       <para>De esta forma, el hecho de utilizar las soluciones IaaS no como un fin en sí mismo,
+              sino como una herramienta para aprender otros temas, provoca que el estudiante se
+              familiarice de forma natural y sencilla con la tecnología, al usarla en su día a día
+              para resolver prácticas, configurar escenarios, probar nuevos sistemas o realizar
+              nuevas configuraciones. Este aprendizaje, adquirido de forma continua, es mucho más
+              significativo que si estos contenidos se impartieran como un tema de una única
+              asignatura de Cloud Computing.</para>
+       <para>Uno de los argumentos esgrimidos en muchas ocasiones para no implantar estas soluciones
+              es el de la inversión inicial necesaria para su puesta en marcha. Sin embargo, si se
+              opta por una de las soluciones libres disponibles en el mercado como OpenStack o
+              OpenNebula, que están como mínimo al mismo nivel de rendimiento y fiabilidad que las
+              soluciones propietarias, el coste se limita prácticamente a los propios servidores que
+              forman la infraestructura del Cloud. La configuración recomendada incluye 2 servidores
+              para la gestión, configurados en Alta Disponibilidad, que no requieren ninguna
+              caracterísitca especial, 1 servidor para el almacenamiento cuya capacidad de disco
+              depende del número imágenes, instantáneas y volúmenes que se quiera almacenar, y 4 o
+              más servidores para la ejecución de instacias, por lo que se requieren procesadores
+              potentes y gran cantidad de memoria RAM (entre 0,5 y 2 GiB por instancia). Sin
+              embargo, al ser estas solciones tan escalables, un centro educativo podría plantearse
+              comenzar con una instalación mínima, que constaría de 3 servidores (1 para la gestión
+              del Cloud y 2 para la ejecución de instancias), e ir añadiendo componentes año a año,
+              cuando las circunstacias económicas del centro lo permitiesen.</para>
+       <para>Es este sentido hay que tener en cuenta que, una vez puesta en marcha la
+              infraestructura, muchos gastos habituales del departamento se reducen o desaparecen, por lo que
+              la inversión inicial iría amortizándose con el paso de los cursos. Por plantear un par
+              de ejemplos, una vez instalado un Cloud privado en un centro, ya no es necesario que
+              los equipos de aula de los estudiantes tengan demasiada memoria RAM para ejecutar
+              máquinas virtuales, ya que con este esquema de funcionamiento las instancias se
+              ejecutan en el propio Cloud y los alumnos se conectan a ellas utilizando clientes de
+              administración remota. Y, de igual forma, los carísimos dispositivos de interconexión
+              (especialmente routers y switches) pueden también simularse en el Cloud, con la
+              ventaja añadida de que pueden instanciarse tantos como se deseen, construyendo los
+              escenarios tan complejos y completos como sea necesario, por lo que se podría limiar
+              la adquisición de este tipo de equipamientos.</para>
+       <para> Si queremos una Europa competitiva en los próximos años, es primordial promover una
+              formación innovadora. En el caso de las TIC esto pasa por fomentar estrategias
+              formativas que no se limiten a usar y consumir tecnologías desarrolladas por otros
+              países, sino a conocer, adaptar y crear tecnología propia. Y esto implica, en el caso
+              concreto de los clouds IaaS, que no podemos conformarnos con formar a nuestro alumnado
+              en la utilización de clouds IaaS de determinadas empresas, sino que debemos formarlos
+              para que puedan crear y manejar sus propios clouds, adquieriendo las destrezas
+              necesarias para su administración, gestión y utilización a todos los niveles. </para>
 </chapter>
