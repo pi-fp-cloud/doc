@@ -294,7 +294,7 @@ m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 
 
   <itemizedlist>
   <listitem>
-    <para>Listar los usuarios existentes</para>
+    <para> <emphasis role="bold">Listar los usuarios existentes</emphasis></para>
     <screen><prompt>$</prompt><userinput>keystone user-list</userinput></screen>
     <screen>
 +----------------------------------+---------+--------------------+--------+
@@ -308,7 +308,7 @@ m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 
     </screen>
   </listitem>
   <listitem>
-  <para>Crear un usuario nuevo asociado a un proyecto (sabiendo el id de proyecto-tenant)</para>
+  <para><emphasis role="bold">Crear un usuario nuevo asociado a un proyecto (sabiendo el id de proyecto-tenant)</emphasis></para>
 <screen><prompt>$</prompt><userinput> keystone user-create --name alumno
 --tenant_id e7b1868b24a742318f1d73f612ecfe1d --pass curso12-13 --email correo@gmail.com 
 </userinput></screen>
@@ -345,7 +345,7 @@ $6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiOwVSHtLU5HvkZBXrqXEmU
 </screen>     
 </listitem>
 <listitem>
-<para>Borrar un usuario sabiendo su id (ejemplo borrar usuario alumno)</para>
+<para><emphasis role="bold">Borrar un usuario sabiendo su id (ejemplo borrar usuario alumno)</emphasis></para>
 <screen><prompt>$</prompt><userinput> keystone user-delete d0bfed18cce3460892ae99ee812d8aa3 </userinput>
 <prompt>$</prompt><userinput> keystone user-list</userinput></screen>
 <screen>
@@ -391,7 +391,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 </para>
 <itemizedlist>
 <listitem>
-  <para>Listar proyectos (tenant)</para>
+  <para><emphasis role="bold">Listar proyectos (tenant)</emphasis></para>
   <screen><prompt>$</prompt><userinput> keystone tenant-list</userinput>
 +----------------------------------+---------+---------+
 |                id                |   name  | enabled |
@@ -402,7 +402,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
   </screen>
 </listitem>
 <listitem>
-  <para>Crear un proyecto</para>
+  <para><emphasis role="bold">Crear un proyecto</emphasis></para>
 <screen><prompt>$</prompt><userinput>keystone tenant-create --name asir1 --description "1 curso asir" </userinput>
 +-------------+----------------------------------+
 |   Property  |              Value               |
@@ -415,7 +415,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 </screen>
 </listitem>
 <listitem>
-<para>Listar información detallada de un proyecto</para>
+<para><emphasis role="bold">Listar información detallada de un proyecto</emphasis></para>
 <screen><prompt>$</prompt><userinput>keystone tenant-get 8c6d42b3e339448fb3068ec512df7802 </userinput></screen>
 
 <screen>
@@ -430,7 +430,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 </screen>
 </listitem>
 <listitem>
-<para>Borrar un proyecto</para>
+<para><emphasis role="bold">Borrar un proyecto</emphasis></para>
 <screen><prompt>$</prompt><userinput>keystone tenant-delete 8c6d42b3e339448fb3068ec512df7802</userinput>
 </screen>           
 </listitem>
@@ -636,7 +636,7 @@ bcc6c02ce3eeaf89b869048bdf5039817b7c989be5e6ef7498dd09f9 |
  </screen>
 </listitem>
 <listitem>
-<para>Mostrar estado de los servicios de nova</para>
+<para><emphasis role="bold">Mostrar estado de los servicios de nova</emphasis></para>
 <screen><prompt>$</prompt><userinput>nova-manage service list</userinput></screen>
 
 <screen>
@@ -653,7 +653,7 @@ nova-compute     dozer                                nova             enabled X
 </screen>
 </listitem>
 <listitem>
-<para>Mostrar estado de recursos en un determinado nodo</para>
+<para><emphasis role="bold">Mostrar estado de recursos en un determinado nodo</emphasis></para>
 <screen><prompt>$</prompt><userinput>nova-manage service describe_resource trinity</userinput></screen>
 <screen>
 HOST                              PROJECT     cpu mem(mb)     hdd

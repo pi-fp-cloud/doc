@@ -1086,7 +1086,7 @@ root@jupiter:~#
 	elementos es Keystone.</para>
 	<para>Con Keystone recién instalado no tenemos ningún usuario
 	con privilegios de administración en la base de datos de
-	Keystone, por lo no podríamos hacer ninguna modificación. El
+	Keystone, por lo que no podríamos hacer ninguna modificación. El
 	mecanismo que proporciona keystone para solventar esta situación
 	es definir en el fichero de configuración un token con
 	privilegios de administración, que recibe el nombre de
