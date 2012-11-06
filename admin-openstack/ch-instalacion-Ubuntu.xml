@@ -194,10 +194,11 @@
 
       <para>Para la configuración de la red se ha optado por la siguiente
       configuración, tal como se muestra en la figura:</para>
-
 	<mediaobject>
 	  <imageobject role="fo">
-	    <imagedata fileref="figures/infra_red_iescierva.svg" format="SVG" scale="60"/>
+	    <imagedata fileref="figures/infra_red_iescierva.svg" scalefit="1"
+		     width="60%" contentdepth="100%" format="SVG"
+		     align="center"/>
 	  </imageobject>
 	  <imageobject role="html">
 	    <imagedata fileref="figures/infra_red_iescierva.png" format="PNG" scale="50"/>
@@ -314,18 +315,19 @@
 
       <para>A continuación se muestra la figura anterior con los nombres de las
       interfaces y las direcciones IP:</para>
-
-      <figure xml:id="infra_red2">
+      <figure>
 	<title>Infraestructura de nuestro Cloud Computing (IES Cierva/IES Los Albares)</title>
-	<mediaobject>
-	  <imageobject role="fo">
-	    <imagedata fileref="figures/infra_red_iescierva2.svg" format="SVG" scale="60"/>
-	  </imageobject>
-	  <imageobject role="html">
-	    <imagedata fileref="figures/infra_red_iescierva2.png" format="PNG" scale="50"/>
-	  </imageobject>
-	</mediaobject>
-      </figure>
+      <mediaobject>
+	<imageobject role="fo">
+	  <imagedata fileref="figures/infra_red_iescierva2.svg" format="SVG" 
+		     scalefit="1" width="60%" contentdepth="100%"
+		     align="center"/>
+	</imageobject>
+	<imageobject role="html">
+	  <imagedata fileref="figures/infra_red_iescierva2.png" format="PNG" scale="50"/>
+	</imageobject>
+      </mediaobject>
+    </figure>
     </section>
     <section xml:id="id_bonding">
       <title>Configuración del bonding y de las VLAN</title>
@@ -1461,13 +1463,13 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  siguiente:</para>
 	  <programlisting>
 root@jupiter:~# nova-manage service list
-Binary           Host       Zone    Status     State Updated_At
-nova-consoleauth jupiter    nova    enabled    :-)   2012-07-28 10:02:04
-nova-cert        jupiter    nova    enabled    :-)   2012-07-28 10:02:05
-nova-scheduler   jupiter    nova    enabled    :-)   2012-07-28 10:02:03
-nova-compute     jupiter    nova    enabled    :-)   2012-07-28 10:01:57
-nova-volume      jupiter    nova    enabled    :-)   2012-07-28 10:02:04
-nova-network     jupiter    nova    enabled    :-)   2012-07-28 10:02:03
+Binary           Host       Zone    Status     State    Updated_At
+nova-consoleauth jupiter    nova    enabled    :-)      2012-07-28 10:02:04
+nova-cert        jupiter    nova    enabled    :-)      2012-07-28 10:02:05
+nova-scheduler   jupiter    nova    enabled    :-)      2012-07-28 10:02:03
+nova-compute     jupiter    nova    enabled    :-)      2012-07-28 10:01:57
+nova-volume      jupiter    nova    enabled    :-)      2012-07-28 10:02:04
+nova-network     jupiter    nova    enabled    :-)      2012-07-28 10:02:03
 	  </programlisting>
 	  <para>Es posible que algún servicio no arranque de inmediato, y
 	  muestre en el anterior listado la cadena "XXX" en el campo
@@ -1677,14 +1679,14 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 
 	    <screen>
 <prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
-Binary           Host      Zone             Status     State Updated_At
-nova-consoleauth jupiter   nova             enabled    :-)   2012-07-31 15:47:23
-nova-cert        jupiter   nova             enabled    :-)   2012-07-31 15:47:25
-nova-scheduler   jupiter   nova             enabled    :-)   2012-07-31 15:47:24
-nova-compute     jupiter   nova             enabled    :-)   2012-07-31 15:47:21
-nova-volume      jupiter   nova             enabled    :-)   2012-07-31 15:47:25
-nova-network     jupiter   nova             enabled    :-)   2012-07-31 15:47:27
-nova-compute     io        nova             enabled    :-)   2012-07-31 15:47:29
+Binary           Host      Zone        Status     State Updated_At
+nova-consoleauth jupiter   nova        enabled    :-)   2012-07-31 15:47:23
+nova-cert        jupiter   nova        enabled    :-)   2012-07-31 15:47:25
+nova-scheduler   jupiter   nova        enabled    :-)   2012-07-31 15:47:24
+nova-compute     jupiter   nova        enabled    :-)   2012-07-31 15:47:21
+nova-volume      jupiter   nova        enabled    :-)   2012-07-31 15:47:25
+nova-network     jupiter   nova        enabled    :-)   2012-07-31 15:47:27
+nova-compute     io        nova        enabled    :-)   2012-07-31 15:47:29
 	    </screen>
 	    <para>...en la que se puede ver el nuevo nodo de computación,
 	    <literal>io</literal>.</para>
