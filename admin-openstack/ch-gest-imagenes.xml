@@ -60,7 +60,7 @@
 	<varlistentry>
 	  <term><filename>iso</filename></term>
 	  <listitem>
-	    <para>Formato de ficheros o contenido de un dispostivos óptico como
+	    <para>Formato de ficheros o contenido de un dispositivo óptico como
 	    un CDROM o DVD.</para>
 	  </listitem>
 	</varlistentry>
@@ -309,9 +309,9 @@
       <listitem><para>Panel de Control &gt; Sistema &gt; Configuración avanzada
       del sistema &gt; Acceso Remoto</para></listitem>
       <listitem><para>Seleccionar "Permitir que las conexiones desde equipos que
-      se ejecuten en cualquier version de escritorio remoto"</para></listitem>
+      se ejecuten en cualquier versión de escritorio remoto"</para></listitem>
       <listitem><para>Por defecto sólo el administrador tiene acceso así que
-      después haremos click en en "Seleccionar usuarios remotos" y agregaremos
+      después haremos click en "Seleccionar usuarios remotos" y agregaremos
       el nombre de los usuarios con el que se van a querer conectar desde las
       otras máquinas.</para></listitem>
     </itemizedlist>
@@ -367,19 +367,19 @@
     adecuadas para el sistema que se va a utilizar posteriormente.</para>
   </section>
   <section>
-    <title>Imagen de uns instantánea de una instancia</title>
+    <title>Instantánea de una instancia</title>
     <para>Una de las opciones más interesantes para crear una imagen es a partir
     de una instantánea de una instancia que se está ejecutando en alguno de los
     nodos de computación del cloud.</para>
     <para>En primer lugar necesitamos obtener el ID de la máquina que vamos a
     hacer la instantánea (<emphasis>snapshot</emphasis>), para esto
-    necesitaremos sacar un listado de las máquinas en funcionamiento.</para>
-    <note><para>Lógicamente los snapshots sólo se se pueden hacer de instancias
-    activas</para></note>
+    necesitaremos sacar un listado de las máquinas en funcionamiento
+    (lógicamente los snapshots sólo se se pueden hacer de instancias
+    activas).</para>
     <screen><prompt>usuario@venus:~$ </prompt><userinput>nova list</userinput></screen>
     <para>Nos fijamos en el ID de la instancia de la que queramos crear una
     imagen y ejecutamos la instrucción:</para>
-    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova image-create &lt; ID &gt; NombreNuevaImagen</userinput></screen>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova image-create &lt;ID&gt; NombreNuevaImagen</userinput></screen>
     <para>Comprobaremos que se ha creado la imagen, listando las imágenes
     disponibles:</para>
     <screen><prompt>usuario@venus:~$ </prompt><userinput>nova image-list</userinput></screen>
@@ -388,14 +388,14 @@
     uso en una nueva instancia.</para>
     <note><para>Al hacer el snapshot, la imagen por defecto se crea de forma
     privada y sólo está disponible para el usuario que la creó. Si queremos que
-    esta imagen esté disponible para el resto de usuarios, debemor hacerla
+    esta imagen esté disponible para el resto de usuarios, debemos hacerla
     pública.</para></note>
     <para>Si queremos hacer pública una imagen obtenida a partir de una
     instantánea, debemos ejecutar la siguiente instrucción de glance (con un
     usuario que tenga privilegios para hacerlo):</para>
     <screen><prompt>root@jupiter:~# </prompt><userinput>glance update &lt; ID &gt; is_public=true</userinput></screen>
     <para>Una vez terminado este proceso ya podremos ponernos a lanzar
-    instancias de la Snapshot como si de una imagen se tratara.</para>
+    instancias de la instantánea como si de una imagen se tratara.</para>
   </section>
 </chapter>
 

@@ -197,11 +197,11 @@
 	<mediaobject>
 	  <imageobject role="fo">
 	    <imagedata fileref="figures/infra_red_iescierva.svg" scalefit="1"
-		     width="60%" contentdepth="100%" format="SVG"
+		     width="100%" contentdepth="100%" format="SVG"
 		     align="center"/>
 	  </imageobject>
 	  <imageobject role="html">
-	    <imagedata fileref="figures/infra_red_iescierva.png" format="PNG" scale="50"/>
+	    <imagedata fileref="figures/infra_red_iescierva.png" format="PNG" scale="100"/>
 	  </imageobject>
 	  <caption>
 	    <para>Infraestructura Cloud Computing (IES Cierva/IES Los
@@ -320,7 +320,7 @@
       <mediaobject>
 	<imageobject role="fo">
 	  <imagedata fileref="figures/infra_red_iescierva2.svg" format="SVG" 
-		     scalefit="1" width="60%" contentdepth="100%"
+		     scalefit="1" width="100%" contentdepth="100%"
 		     align="center"/>
 	</imageobject>
 	<imageobject role="html">
