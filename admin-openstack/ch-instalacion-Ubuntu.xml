@@ -132,8 +132,8 @@
       <listitem>
 	<para>El sistema deberá estar actualizado antes de empezar con el
 	proceso de instalación/configuración:</para>
-	<screen><prompt>$ </prompt><userinput>sudo apt-get update</userinput></screen>
-	<screen><prompt>$ </prompt><userinput>sudo apt-get upgrade</userinput></screen>
+	<screen><prompt>usuario@jupiter:~$ </prompt><userinput>sudo apt-get update</userinput></screen> 
+	<screen><prompt>usuario@jupiter:~$ </prompt><userinput>sudo apt-get upgrade</userinput></screen>
       </listitem>
       
     </itemizedlist>
@@ -195,8 +195,6 @@
       <para>Para la configuración de la red se ha optado por la siguiente
       configuración, tal como se muestra en la figura:</para>
 
-      <figure xml:id="infra_red">
-	<title>Infraestructura Cloud Computing (IES Cierva/IES Los Albares)</title>
 	<mediaobject>
 	  <imageobject role="fo">
 	    <imagedata fileref="figures/infra_red_iescierva.svg" format="SVG" scale="60"/>
@@ -204,8 +202,11 @@
 	  <imageobject role="html">
 	    <imagedata fileref="figures/infra_red_iescierva.png" format="PNG" scale="50"/>
 	  </imageobject>
+	  <caption>
+	    <para>Infraestructura Cloud Computing (IES Cierva/IES Los
+	    Albares)</para>
+	  </caption>
 	</mediaobject>
-      </figure>
 
       <para>En nuestra infraestructura el controlador del Cloud
       (<literal>jupiter</literal>) cuenta con dos tarjetas de red Ethernet,
@@ -360,8 +361,7 @@
 	<orderedlist>
 	  <listitem>
 	    <para>Instalar el paquete vlan:</para>
-	    <screen><prompt>$ </prompt><userinput>apt-get install vlan</userinput></screen>
-
+	    <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install vlan</userinput></screen>
 	  </listitem>
 
 	  <listitem>
@@ -390,15 +390,15 @@ rtc
 	  <listitem>
 	    <para>Instalamos los siguientes paquetes:</para>
 	    <screen>
-<prompt>$ </prompt><userinput>apt-get install ifenslave ethtool</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>apt-get install ifenslave ethtool</userinput>
 	    </screen>
 	  </listitem>
 
 	  <listitem>
 	    <para>Bajamos las interfaces de red:</para>
 	    <screen>
-<prompt>$ </prompt><userinput>ifdown eth0</userinput>
-<prompt>$ </prompt><userinput>ifdown eth1</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>ifdown eth0</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>ifdown eth1</userinput>
 	    </screen>
 	  </listitem>
 
@@ -462,7 +462,7 @@ auto bond0
 	    <para>Probamos que tenemos conectividad y que el bonding está
 	    configurado:</para>
 	    <screen>
-	      <prompt>$ </prompt><userinput>cat /proc/net/bonding/bond0</userinput>
+	      <prompt>root@jupiter:~# </prompt><userinput>cat /proc/net/bonding/bond0</userinput>
 Ethernet Channel Bonding Driver: v3.7.1 (April 27, 2011)
 
 Bonding Mode: IEEE 802.3ad Dynamic link aggregation
@@ -506,7 +506,7 @@ Slave queue ID: 0
 	  <listitem>
 	  <para>Podemos comprobar las VLAN activas a través del siguiente
 	  comando:</para>
-	  <screen><prompt>$ </prompt><userinput>cat /proc/net/vlan/config</userinput>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>cat /proc/net/vlan/config</userinput>
 VLAN Dev name	 | VLAN ID
 Name-Type: VLAN_NAME_TYPE_RAW_PLUS_VID_NO_PAD
 bond0.60       | 60  | bond0
@@ -615,16 +615,13 @@ bond0.63       | 63  | bond0
       módulo <literal>3w-9xxx</literal> que se carga automáticamente y nos
       envía estos mensajes al log del sistema:</para>
       <programlisting>
-	[    2.799824] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
-	[    2.799867] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
-	[    2.799880] 3w-9xxx 0000:01:00.0: setting latency timer to 64
-	[    3.080257] 3w-9xxx: scsi6: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
-	[    3.416117] 3w-9xxx: scsi6: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
-	[   12.307881] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
-	[   12.308300] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
-	[   12.308695] 3w-9xxx: scsi6: ERROR: (0x03:0x0101): Invalid command opcode:opcode=0x85.
-	[127301.671991] 3w-9xxx: scsi6: AEN: INFO (0x04:0x0029): Verify started:unit=0.
-	[131817.864145] 3w-9xxx: scsi6: AEN: INFO (0x04:0x002B): Verify completed:unit=0.
+	3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
+	3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
+	3w-9xxx 0000:01:00.0: setting latency timer to 64
+	3w-9xxx: scsi6: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
+	3w-9xxx: scsi6: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
+	3w-9xxx: scsi6: AEN: INFO (0x04:0x0029): Verify started:unit=0.
+	3w-9xxx: scsi6: AEN: INFO (0x04:0x002B): Verify completed:unit=0.
       </programlisting>           
       <para>Para Debian existe un repositorio bajo <link
       xlink:href="http://jonas.genannt.name/">http://jonas.genannt.name</link>
@@ -635,8 +632,8 @@ bond0.63       | 63  | bond0
       <itemizedlist>
 	<listitem>
 	  <para>Nos descargamos el software desde el link "SUPPORT" de la página
-	  http://www.3ware.com (ahora LSI). Se trata de la controladora RAID
-	  3ware 9650SE-2LP.</para>
+	  <link xlink:href="http://www.3ware.com">www.3ware.com</link> (ahora
+	  LSI). Se trata de la controladora RAID 3ware 9650SE-2LP.</para>
 	</listitem>
 
 	<listitem>
@@ -667,14 +664,14 @@ bond0.63       | 63  | bond0
       <para>Como software a instalar solo instalaremos el servidor SSH, a través
       del comando:</para>
 
-      <screen><prompt>$ </prompt><userinput>apt-get install openssh-server</userinput></screen>
+      <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install openssh-server</userinput></screen>
 
       <para>Tras finalizar la instalación actualizaremos la máquina a través de
       los comandos:</para>
       <screen>
-<prompt>$ </prompt><userinput>apt-get update</userinput>
-<prompt>$ </prompt><userinput>apt-get upgrade</userinput>
-<prompt>$ </prompt><userinput>apt-get dist-upgrade</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>apt-get update</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>apt-get upgrade</userinput>
+<prompt>root@jupiter:~# </prompt><userinput>apt-get dist-upgrade</userinput>
       </screen>
 
       <para>Tras la instalación, lo más probable es que tengamos que reiniciar.</para>
@@ -716,17 +713,14 @@ bond0.63       | 63  | bond0
 	  <literal>hora.rediris.es</literal>.</para>
 
 	  <para>Podemos comprobar que la configuración es correcta a través del
-	  comando <command>crontab -l</command></para>
+	  comando <command>crontab -l</command>:</para>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>crontab -l</userinput></screen>
 	  <programlisting>
-	    root@jupiter:~# crontab -l
 	    # m h  dom mon dow   command
 	    0 4 * * * ntpdate ntp.iescierva.net ; hwclock -w
-	    root@jupiter:~#
 	  </programlisting>
 	</listitem>
-
       </orderedlist>
-      
     </section>
 
     <section>
@@ -741,8 +735,7 @@ bond0.63       | 63  | bond0
 	<listitem>
 	  <para>Instalamos los paquetes necesarios, básicamente el servidor
 	  MySQL, y la interfaz (DB-API) de Python para MySQL:</para>
-	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install mysql-server python-mysqldb</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install mysql-server python-mysqldb</userinput></screen>
 	</listitem>
 
 	<listitem>
@@ -820,8 +813,7 @@ mysql>
 	<listitem>
 	  <para>Creamos la base de datos que el servicio necesita en
 	  MySQL. Para ello iniciamos el cliente MySQL:</para>
-	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput></screen>
 	  <para>Desde el prompt de MySQL ejecutamos las siguientes
 	  sentencias:</para>
 	  <screen>
@@ -833,18 +825,14 @@ mysql>
 
 	<listitem>
 	  <para>Instalamos todo el software necesario:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>apt-get install keystone python-keystone python-keystoneclient</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install keystone python-keystone python-keystoneclient</userinput></screen>
 	</listitem>
 
 	<listitem>
 	  <para>Keystone utiliza por defecto una base de datos <literal>SQLite</literal>,
 	  por lo que tendremos que borrar la base de datos que se configura en
 	  la instalación por defecto:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>rm /var/lib/keystone/keystone.db</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>rm /var/lib/keystone/keystone.db</userinput></screen>
 	</listitem>
 
 	<listitem>
@@ -873,9 +861,7 @@ connection = mysql://keystone:calex2010!!@172.20.254.190/keystone
 
 	<listitem>
 	  <para>Reiniciamos el servicio:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>service keystone restart</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>service keystone restart</userinput></screen>
 	</listitem>
 
 	<listitem>
@@ -1074,33 +1060,33 @@ root@jupiter:~#
 	  </programlisting>
 	</listitem>
       </orderedlist>
-
-      <section xml:id="id_expl_resumida_admin_token">
-	<title>¿Qué es el ADMIN_TOKEN?</title>
-	<para>Keystone introduce en OpenStack un sistema de
-	autenticación basado en tokens, de manera que todos los
-	elementos del cloud (usuarios y servicios principalmente), no se
-	autentican directamente unos a otros, sino que lo hace con un
-	actor intermedio mediante tokens, este actor intermedio
-	encargado de verificar la autenticidad de cada uno de los
-	elementos es Keystone.</para>
-	<para>Con Keystone recién instalado no tenemos ningún usuario
-	con privilegios de administración en la base de datos de
-	Keystone, por lo que no podríamos hacer ninguna modificación. El
-	mecanismo que proporciona keystone para solventar esta situación
-	es definir en el fichero de configuración un token con
-	privilegios de administración, que recibe el nombre de
-	ADMIN_TOKEN, que puede definirse directamente en la instalación
-	o cuando queramos en el fichero
-	<filename>/etc/keystone/keystone.conf</filename>, el ADMIN_TOKEN
-	puede tener cualquier valor, pero hay que custodiarlo
-	adecuadamente mientras esté activo, ya que otorga privilegios de
-	administración sobre Keystone a quien lo
-	conozca. Posteriormente, una vez definidos los usuarios en  
-	keystone y los demás elementos, podemos borrar este campo del
-	fichero de configuración de keystone y no volver a
-	utilizarlo.</para>
-      </section>
+      <!-- Esto está ahora en el tema de intro -->
+      <!-- <section xml:id="id_expl_resumida_admin_token"> -->
+      <!-- 	<title>¿Qué es el ADMIN_TOKEN?</title> -->
+      <!-- 	<para>Keystone introduce en OpenStack un sistema de -->
+      <!-- 	autenticación basado en tokens, de manera que todos los -->
+      <!-- 	elementos del cloud (usuarios y servicios principalmente), no se -->
+      <!-- 	autentican directamente unos a otros, sino que lo hace con un -->
+      <!-- 	actor intermedio mediante tokens, este actor intermedio -->
+      <!-- 	encargado de verificar la autenticidad de cada uno de los -->
+      <!-- 	elementos es Keystone.</para> -->
+      <!-- 	<para>Con Keystone recién instalado no tenemos ningún usuario -->
+      <!-- 	con privilegios de administración en la base de datos de -->
+      <!-- 	Keystone, por lo que no podríamos hacer ninguna modificación. El -->
+      <!-- 	mecanismo que proporciona keystone para solventar esta situación -->
+      <!-- 	es definir en el fichero de configuración un token con -->
+      <!-- 	privilegios de administración, que recibe el nombre de -->
+      <!-- 	ADMIN_TOKEN, que puede definirse directamente en la instalación -->
+      <!-- 	o cuando queramos en el fichero -->
+      <!-- 	<filename>/etc/keystone/keystone.conf</filename>, el ADMIN_TOKEN -->
+      <!-- 	puede tener cualquier valor, pero hay que custodiarlo -->
+      <!-- 	adecuadamente mientras esté activo, ya que otorga privilegios de -->
+      <!-- 	administración sobre Keystone a quien lo -->
+      <!-- 	conozca. Posteriormente, una vez definidos los usuarios en   -->
+      <!-- 	keystone y los demás elementos, podemos borrar este campo del -->
+      <!-- 	fichero de configuración de keystone y no volver a -->
+      <!-- 	utilizarlo.</para> -->
+      <!-- </section> -->
     </section>
   </section>
 
@@ -1125,22 +1111,19 @@ root@jupiter:~#
 	<listitem>
 	  <para>Creamos la base de datos que el servicio necesita en MySQL. Para
 	  ello iniciamos el cliente MySQL:</para>
-	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>mysql -u root -p</userinput></screen>
 	  <para>Desde el prompt de MySQL ejecutamos las siguientes
 	  sentencias:</para>
 	  <screen>
-	    <prompt>mysql> </prompt><userinput>CREATE DATABASE glance;</userinput>
-	    <prompt>mysql> </prompt><userinput>GRANT ALL ON glance.* to 'glance'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
-	    <prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
+<prompt>mysql> </prompt><userinput>CREATE DATABASE glance;</userinput>
+<prompt>mysql> </prompt><userinput>GRANT ALL ON glance.* to 'glance'@'%' IDENTIFIED BY 'calex2010!!';</userinput>
+<prompt>mysql> </prompt><userinput>FLUSH PRIVILEGES;</userinput>
 	  </screen>
 	</listitem>
 
 	<listitem>
 	  <para>Instalamos todo el software necesario:</para>
-	  <screen>
-	    <prompt>root@jupiter:~# </prompt><userinput>apt-get install glance glance-api glance-client glance-common glance-registry python-glance</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>apt-get install glance glance-api glance-client glance-common glance-registry python-glance</userinput></screen>
 	</listitem>
 
 	<listitem>
@@ -1235,9 +1218,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  <para>Nada más instalar, no hay ninguna imagen dada de alta, pero el
 	  siguiente comando, que muestra la lista de imágenes disponible, nos
 	  debería dar una lista vacía:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>glance index</userinput></screen>
 	  <para>Podemos asegurarnos que todo ha ido bien (incluyendo la
 	  autenticación con Keystone) si tras ejecutar el comando anterior, la
 	  salida del comando <command>echo $?</command> nos devuelve como código
@@ -1285,10 +1266,9 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  en la lista de imágenes que proporciona el servicio Glance:</para>
 	  <programlisting>
 root@jupiter:~# glance index
-ID                                   Name                           Disk Format          Container Format     Size          
------------------------------------- ------------------------------ -------------------- -------------------- --------------
-fe22ea9c-ebb2-4bb8-be34-ea7732a8a3d2 Cirros (test) 0.3.0 64 bits    qcow2                bare                        9761280
-root@jupiter:~# 
+ID       Name                        Disk Format Container Format Size          
+-------- --------------------------- ----------- ---------------- -------
+fe22-... Cirros (test) 0.3.0 64 bits qcow2       bare             9761280
 	  </programlisting>
 	</listitem>	
       </orderedlist>
@@ -1305,13 +1285,13 @@ root@jupiter:~#
     <section>
       <title>Instalación y configuración</title>
       <para>Una infraestructura OpenStack puede ejecutar tantos nodos
-      <literal>nova</literal> como desee. Como mínimo uno, esto hace que sea posible tener una
-      infraestructura de OpenStack en un solo nodo, pero podemos desplegar
-      tantos nodos de computación como servidores tengamos. El máximo depende de
-      diversos factores como la carga a soportar, la disponibilidad de
-      servidores, factores económicos, ancho de banda de nuestra red, uso del
-      Cloud, y un largo etcétera. En nuestra instalación el servicio
-      <literal>nova-compute</literal> se ejecutará en cuatro nodos,
+      <literal>nova</literal> como desee. Como mínimo uno, esto hace que sea
+      posible tener una infraestructura de OpenStack en un solo nodo, pero
+      podemos desplegar tantos nodos de computación como servidores tengamos. El
+      máximo depende de diversos factores como la carga a soportar, la
+      disponibilidad de servidores, factores económicos, ancho de banda de
+      nuestra red, uso del Cloud, y un largo etcétera. En nuestra instalación el
+      servicio <literal>nova-compute</literal> se ejecutará en cuatro nodos, 
       concretamente en las máquinas <literal>io</literal>,
       <literal>europa</literal>, <literal>ganimedes</literal> y
       <literal>calisto</literal>. Inicialmente configuraremos al controlador
@@ -1477,31 +1457,27 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  <screen>
 <prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
 	  </screen>
-	  <para>...que nos debería proporcionar una salida similar a la
+	  <para>que nos debería proporcionar una salida similar a la
 	  siguiente:</para>
 	  <programlisting>
 root@jupiter:~# nova-manage service list
-Binary           Host                                 Zone             Status     State Updated_At
-nova-consoleauth jupiter                              nova             enabled    :-)   2012-07-28 10:02:04
-nova-cert        jupiter                              nova             enabled    :-)   2012-07-28 10:02:05
-nova-scheduler   jupiter                              nova             enabled    :-)   2012-07-28 10:02:03
-nova-compute     jupiter                              nova             enabled    :-)   2012-07-28 10:01:57
-nova-volume      jupiter                              nova             enabled    :-)   2012-07-28 10:02:04
-nova-network     jupiter                              nova             enabled    :-)   2012-07-28 10:02:03
+Binary           Host       Zone    Status     State Updated_At
+nova-consoleauth jupiter    nova    enabled    :-)   2012-07-28 10:02:04
+nova-cert        jupiter    nova    enabled    :-)   2012-07-28 10:02:05
+nova-scheduler   jupiter    nova    enabled    :-)   2012-07-28 10:02:03
+nova-compute     jupiter    nova    enabled    :-)   2012-07-28 10:01:57
+nova-volume      jupiter    nova    enabled    :-)   2012-07-28 10:02:04
+nova-network     jupiter    nova    enabled    :-)   2012-07-28 10:02:03
 	  </programlisting>
 	  <para>Es posible que algún servicio no arranque de inmediato, y
 	  muestre en el anterior listado la cadena "XXX" en el campo
 	  <literal>State</literal>, en ese caso esperamos pero comprobamos
 	  mientras que el servicio está realmente en ejecución con el comando
 	  (en el caso de <literal>nova-compute</literal>):</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>ps ax | grep nova-compute</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>ps ax | grep nova-compute</userinput></screen>
 	  <para>Si el servicio no está en ejecución, algo ha ido mal (o bastante
 	  mal), por lo que tendremos que revisar los logs:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>less /var/log/nova/nova-compute.log</userinput>
-	  </screen>
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>less /var/log/nova/nova-compute.log</userinput></screen>
 
 	  <note>
 	    <para>El servicio <literal>nova-compute</literal> suele mostrar los
@@ -1517,39 +1493,26 @@ nova-network     jupiter                              nova             enabled  
 	  servicio Glance con cualquiera de los siguientes comandos:</para>
 	  <screen>
 <prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
-	  </screen>
-
-	  <screen>
 <prompt>root@jupiter:~# </prompt><userinput>nova image-list</userinput>
 	  </screen>
-
 	  <para>Generamos las claves SSH necesarias para conectarnos a través
 	  del protocolo SSH a las máquinas virtuales una vez iniciadas:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>nova keypair-add test > /root/test.pem</userinput>
-	  </screen>
-
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>nova keypair-add test > /root/test.pem</userinput></screen>
 	  <para>Para iniciar una instancia necesitamos el nombre de la imagen,
 	  el flavor (podemos crear más) y las claves SSH anteriormente
 	  generadas, ejecutamos el siguiente comando:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>nova boot --image "Cirros (test) 0.3.0 64 bits" --flavor m1.small --key_name test my-first-server</userinput>
-	  </screen>
-
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>nova boot --image "Cirros (test) 0.3.0 64 bits" --flavor m1.small --key_name test my-first-server</userinput></screen>
 	  <para>Podemos comprobar el estado de la instancia a través del
 	  comando:</para>
-	  <screen>
-<prompt>root@jupiter:~# </prompt><userinput>nova list</userinput>
-	  </screen>
-
+	  <screen><prompt>root@jupiter:~# </prompt><userinput>nova list</userinput></screen>
 	  <para>... que debería mostrar una salida como ésta:</para>
 	  <programlisting>
 root@jupiter:~# nova list
-+--------------------------------------+-----------------+--------+------------------+
-|                  ID                  |       Name      | Status |     Networks     |
-+--------------------------------------+-----------------+--------+------------------+
-| 95db6cb7-6d29-4728-8a57-00f0a16fdf0f | my-first-server | ACTIVE | private=10.0.0.2 |
-+--------------------------------------+-----------------+--------+------------------+
++-----------+-----------------+--------+------------------+
+|   ID      |       Name      | Status |     Networks     |
++-----------+-----------------+--------+------------------+
+| 95db6-... | my-first-server | ACTIVE | private=10.0.0.2 |
++-----------+-----------------+--------+------------------+
 root@jupiter:~#
 	  </programlisting>
 
@@ -1562,41 +1525,38 @@ root@jupiter:~#
 	  <para>... de esta forma:</para>
 	  <programlisting>
 root@jupiter:~# nova show 95db6cb7-6d29-4728-8a57-00f0a16fdf0f
-+-------------------------------------+----------------------------------------------------------+
-|               Property              |                          Value                           |
-+-------------------------------------+----------------------------------------------------------+
-| OS-DCF:diskConfig                   | MANUAL                                                   |
-| OS-EXT-SRV-ATTR:host                | jupiter                                                  |
-| OS-EXT-SRV-ATTR:hypervisor_hostname | None                                                     |
-| OS-EXT-SRV-ATTR:instance_name       | instance-00000001                                        |
-| OS-EXT-STS:power_state              | 1                                                        |
-| OS-EXT-STS:task_state               | None                                                     |
-| OS-EXT-STS:vm_state                 | active                                                   |
-| accessIPv4                          |                                                          |
-| accessIPv6                          |                                                          |
-| config_drive                        |                                                          |
-| created                             | 2012-07-25T09:02:58Z                                     |
-| flavor                              | m1.small                                                 |
-| hostId                              | 3321967f22b94709966c1525bfb8fe73e88019b1a03228af56e8b847 |
-| id                                  | 95db6cb7-6d29-4728-8a57-00f0a16fdf0f                     |
-| image                               | Cirros (test) 0.3.0 64 bits                              |
-| key_name                            | test                                                     |
-| metadata                            | {}                                                       |
-| name                                | my-first-server                                          |
-| private network                     | 10.0.0.2                                                 |
-| progress                            | 0                                                        |
-| status                              | ACTIVE                                                   |
-| tenant_id                           | e7b1868b24a742318f1d73f612ecfe1d                         |
-| updated                             | 2012-07-26T06:49:51Z                                     |
-| user_id                             | 05743001bbf14700bcdf2ecc43edbf9b                         |
-+-------------------------------------+----------------------------------------------------------+
-root@jupiter:~#	    
++-------------------------------------+---------------------------------+
+|               Property              |               Value             |
++-------------------------------------+---------------------------------+
+| OS-DCF:diskConfig                   | MANUAL                          |
+| OS-EXT-SRV-ATTR:host                | jupiter                         |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | None                            |
+| OS-EXT-SRV-ATTR:instance_name       | instance-00000001               |
+| OS-EXT-STS:power_state              | 1                               |
+| OS-EXT-STS:task_state               | None                            |
+| OS-EXT-STS:vm_state                 | active                          |
+| accessIPv4                          |                                 |
+| accessIPv6                          |                                 |
+| config_drive                        |                                 |
+| created                             | 2012-07-25T09:02:58Z            |
+| flavor                              | m1.small                        |
+| hostId                              | 3321967f22b94709966c1525bfb8f...|
+| id                                  | 95db6cb7-6d29-4728-8a57-00f0a...|
+| image                               | Cirros (test) 0.3.0 64 bits     |
+| key_name                            | test                            |
+| metadata                            | {}                              |
+| name                                | my-first-server                 |
+| private network                     | 10.0.0.2                        |
+| progress                            | 0                               |
+| status                              | ACTIVE                          |
+| tenant_id                           | e7b1868b24a742318f1d73f612ecf...|
+| updated                             | 2012-07-26T06:49:51Z            |
+| user_id                             | 05743001bbf14700bcdf2ecc43edb...|
++-------------------------------------+---------------------------------+
 	  </programlisting>
 
 	  <para>Nos podemos conectar a través de SSH a la instancia con el comando:</para>
-	  <screen>
-<prompt>$ </prompt><userinput>ssh -i test.pem cirros@10.0.0.2</userinput>
-	  </screen>
+	  <screen><prompt>usuario@ayla:~$ </prompt><userinput>ssh -i test.pem cirros@10.0.0.2</userinput></screen>
 	</listitem>
 
       </orderedlist>
@@ -1651,9 +1611,7 @@ root@jupiter:~#
 	  <listitem>
 	    <para>No instalamos todo el software de Nova, solo un paquete,
 	    además de las herramientas para la configuración de bridges:</para>
-	  <screen>
-<prompt>root@io:~# </prompt><userinput>apt-get install nova-compute bridge-utils</userinput>
-	  </screen>
+	  <screen><prompt>root@io:~# </prompt><userinput>apt-get install nova-compute bridge-utils</userinput></screen>
 	  </listitem>
 
 	  <listitem>
@@ -1710,9 +1668,7 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 	  <listitem>
 	    <para>Reiniciamos el servicio
 	    <literal>nova-compute</literal>:</para>
-	    <screen>
-<prompt>root@io:~# </prompt><userinput>service nova-compute restart</userinput>
-	    </screen>
+	    <screen><prompt>root@io:~# </prompt><userinput>service nova-compute restart</userinput></screen>
 	  </listitem>
 
 	  <listitem>
@@ -1721,16 +1677,16 @@ export SERVICE_ENDPOINT=http://172.20.254.190:35357/v2.0
 
 	    <screen>
 <prompt>root@jupiter:~# </prompt><userinput>nova-manage service list</userinput>
-Binary           Host                                 Zone             Status     State Updated_At
-nova-consoleauth jupiter                              nova             enabled    :-)   2012-07-31 15:47:23
-nova-cert        jupiter                              nova             enabled    :-)   2012-07-31 15:47:25
-nova-scheduler   jupiter                              nova             enabled    :-)   2012-07-31 15:47:24
-nova-compute     jupiter                              nova             enabled    :-)   2012-07-31 15:47:21
-nova-volume      jupiter                              nova             enabled    :-)   2012-07-31 15:47:25
-nova-network     jupiter                              nova             enabled    :-)   2012-07-31 15:47:27
-nova-compute     io                                   nova             enabled    :-)   2012-07-31 15:47:29
+Binary           Host      Zone             Status     State Updated_At
+nova-consoleauth jupiter   nova             enabled    :-)   2012-07-31 15:47:23
+nova-cert        jupiter   nova             enabled    :-)   2012-07-31 15:47:25
+nova-scheduler   jupiter   nova             enabled    :-)   2012-07-31 15:47:24
+nova-compute     jupiter   nova             enabled    :-)   2012-07-31 15:47:21
+nova-volume      jupiter   nova             enabled    :-)   2012-07-31 15:47:25
+nova-network     jupiter   nova             enabled    :-)   2012-07-31 15:47:27
+nova-compute     io        nova             enabled    :-)   2012-07-31 15:47:29
 	    </screen>
-	    <para>... en la que se puede ver el nuevo nodo de computación,
+	    <para>...en la que se puede ver el nuevo nodo de computación,
 	    <literal>io</literal>.</para>
 	  </listitem>
 
@@ -1813,9 +1769,7 @@ iface bond0.60 inet manual
 	  <literal>libvirtd</literal>: "Cannot find 'pm-is-supported' in path:
 	  No such file or directory". Este log se elimina instalando el
 	  siguiente paquete en todos los nodos de comutación:</para>
-	  <screen>
-	    <prompt>root@io:~# </prompt><userinput>apt-get install pm-utils</userinput>
-	  </screen>
+	  <screen><prompt>root@io:~# </prompt><userinput>apt-get install pm-utils</userinput></screen>
 	</listitem>
 
 	<listitem>
@@ -1832,9 +1786,7 @@ iface bond0.60 inet manual
 	    <listitem>
 	      <para>Nos hacemos con su identificador a través de la siguiente
 	      consulta en la base de datos <literal>nova</literal>:</para>
-	      <screen>
-		<prompt>mysql> </prompt><userinput>select id, uuid from instances;</userinput>
-	      </screen>
+	      <screen><prompt>mysql> </prompt><userinput>select id, uuid from instances;</userinput></screen>
 	      <para>Tomando el id de la instancia que queremos borrar,
 	      supongamos que queremos eliminar la máquina virtual con
 	      <literal>id=99</literal>.</para>
@@ -1867,23 +1819,17 @@ iface bond0.60 inet manual
 	    <listitem>
 	      <para>Detenemos todas las máquinas virtuales que estuvieran en
 	      ejecución:</para>
-	      <screen>
-		<prompt>root@io:~# </prompt><userinput>for i in `virsh list | tail -n +2 | awk ' { print $2 }'`; do virsh destroy $i; done</userinput>
-	      </screen>		
+	      <screen><prompt>root@io:~# </prompt><userinput>for i in `virsh list | tail -n +2 | awk ' { print $2 }'`; do virsh destroy $i; done</userinput></screen>
 	    </listitem>
 
 	    <listitem>
 	      <para>Paramos todos los servicios:</para>
-	      <screen>
-		<prompt>root@io:~# </prompt><userinput>/root/bin/nova.sh stop</userinput>
-	      </screen>		
+	      <screen><prompt>root@io:~# </prompt><userinput>/root/bin/nova.sh stop</userinput></screen>
 	    </listitem>
 
 	    <listitem>
 	      <para>Matamos todos los procesos <literal>dnsmasq</literal>:</para>
-	      <screen>
-		<prompt>root@io:~# </prompt><userinput>for i in `pgrep dnsmasq` ; do kill $i ; done</userinput>
-	      </screen>
+	      <screen><prompt>root@io:~# </prompt><userinput>for i in `pgrep dnsmasq` ; do kill $i ; done</userinput></screen>
 	    </listitem>
 
 	    <listitem>
@@ -2015,7 +1961,7 @@ iface bond0.60 inet manual
 	    (como root) el comando <command>crontab -e</command> y editamos el
 	    fichero que nos sugiere con el siguiente contenido:</para>
 	    <programlisting>
-	      0 4 * * * ntpdate ntp.iescierva.net ; hwclock --systohc
+0 4 * * * ntpdate ntp.iescierva.net ; hwclock --systohc
 	    </programlisting>
 	    <para>Podemos sustituir el servidor <literal>ntp.iescierva.net</literal> por uno en
 	    Internet como <literal>ntp.ubuntu.com</literal> o como
@@ -2024,10 +1970,9 @@ iface bond0.60 inet manual
 	    <para>Podemos comprobar que la configuración es correcta a través del
 	    comando <command>crontab -l</command></para>
 	    <programlisting>
-	      root@venus:~# crontab -l
-	      # m h  dom mon dow   command
-	      0 4 * * * ntpdate ntp.iescierva.net ; hwclock -w
-	      root@venus:~#
+root@venus:~# crontab -l
+# m h  dom mon dow   command
+0 4 * * * ntpdate ntp.iescierva.net ; hwclock -w
 	    </programlisting>
 	  </listitem>
 
