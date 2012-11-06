@@ -653,6 +653,16 @@ public_interface=eth0
     
   </section>
 
+  <section>
+    <title>Configurando direcciones IP públicas (floating IP)</title>
+    <para></para>
+    
+  </section>
 
+  <section>
+    <title>Alta disponibilidad con Nova-Network</title>
+    <para></para>
+    
+  </section>
 
 </chapter>
