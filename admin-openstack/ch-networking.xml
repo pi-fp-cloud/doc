@@ -4,7 +4,655 @@
          xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
          xml:id="ch-networking">
   <title>Networking</title>
+  <para>Es importante conocer todas las opciones de configuración a nivel de red
+  que proporciona OpenStack para diseñar una infraestructura de red acorde a
+  nuestras necesidades.</para>
 
-  <para>Para seguir esta guía se necesita:</para>
+  <section>
+    <title>Opciones de red</title>
+    <para>En esta sección se ofrece un breve resumen de los conceptos
+    importantes sobre red para Nova Compute. Desde la release
+    <literal>Folsom</literal> se puede configurar la red eligiendo entre dos
+    alternativas:</para>
+    <itemizedlist>
+      <listitem>
+	<para>Instalar y configurar <literal>nova-network</literal> como
+	servicio de interconexión de red para las máquinas virtuales (VMs); o</para>
+      </listitem>
+
+      <listitem>
+	<para>Instalar y configurar el nuevo servicio de red
+	<literal>Quantum</literal>.</para>
+      </listitem>      
+    </itemizedlist>
+
+    <para>En la versión estable actual, Essex, el servicio de red
+    <literal>quantum</literal> no está disponible.</para>
+
+    <para>A cada máquina virtual (VM), Compute le asigna una dirección IP
+    privada. Actualmente, Compute configurado con el servicio
+    <literal>nova-network</literal> solo soporta interconexión a través de los
+    bridges del kernel de Linux, lo que permite a las intefaces virtuales
+    conectarse a las redes externas a través de las interfaces físicas.</para>
+
+    <para>El controlador de red de <literal>nova-network</literal>, proporciona
+    redes virtuales que habilitan a los nodos de computación interactuar entre
+    ellos y con la red pública.</para>
+
+    <para>Actualmente, la configuración de Nova Compute con nova-network soporta
+    tres clases de redes, implementadas a través de tres gestores de redes
+    ("Network Manager"):</para>
+    <itemizedlist>
+      <listitem>
+	<para>Flat Network Manager.</para>
+      </listitem>
+
+      <listitem>
+	<para>Flat DHCP Network Manager</para>
+      </listitem>
+
+      <listitem>
+	<para>VLAN Network Manager</para>
+      </listitem>
+      
+    </itemizedlist>
+    
+    <para>En principio, las tres clases de redes pueden coexistir en un único
+    sistema cloud. Sin embargo no cabe la posibilidad de elegir dentro de un
+    proyecto entre los tres tipos de redes, por lo que hasta ahora no se puede
+    elegir más de un tipo de red para una única instalación de Nova
+    Compute.</para>
+
+    <note>
+      <para>Todas las opciones de red requieren que la configuración entre todos
+      los nodos físicos de OpenStack ya esté configurada. OpenStack ni crea ni
+      configura ninguna interfaz de red en los nodos, salvo los bridges y las
+      interfaces de red de las VMs.</para>
+
+      <para>Todos los nodos deben tener dos interfaces de red, una interfaz para
+      la red pública y otra para la red privada. Esto viene configurado a través de la
+      opción <literal>public_interface</literal> en el caso de la red pública y
+      <literal>flat_interface</literal>/<literal>vlan_interface</literal> en el caso
+      de la red privada (según el gestor utilizado flat/VLAN).</para>
+
+      <para>La interfaz de la red interna se utiliza en la comunicación entre
+      las VMs y NO DEBERÍA tener ninguna dirección IP configurada antes de la
+      instalación de OpenStack. Esta interfaz actúa únicamente como enlace entre
+      los puntos finales reales, máquinas virtuales y dnsmasq. Además, esta
+      interfaz debe estar configura en modo promiscuo ya que es la encargada de
+      recibir paquetes cuyas direcciones MAC destino coinciden con las de la
+      máquinas virtuales y no con la del anfitrión.</para>
+    </note>
+
+    <para>Todos los gestores configuran la red a través de los <emphasis
+    role="italic">controladores de red</emphasis>, como por ejemplo el controlador
+    L3 (<literal>l3.py</literal> y <literal>linux_net.py</literal>). Este
+    controlador utiliza tanto comandos de red como <literal>iptables</literal> o
+    <literal>route</literal>, así como la propia librería base
+    <literal>libvirt</literal>. El controlador de red no está vinculado a ningún
+    gestor de red en concreto, sino que todos los gestores utilizan el mismo
+    controlador. El driver normalmente se inicializa (crea bridges, etc.)
+    solo cuando se despliega la primera máquina virtual en el nodo.</para>
+
+    <para>Todos los gestores de red puede operar en dos modos:
+    <literal>single-host</literal> o <literal>multi-host</literal>, esta
+    decisión influye en gran medida sobre la configuración de red. En el modo
+    single existe únicamente una instancia de <literal>nova-network</literal> la
+    cual se utiliza como gateway por defecto para las máquinas virtuales y
+    ejecuta un único servidor DHCP (dnsmasq). Mientras que el modo multi-host
+    todos los nodos de computación ejecutan su propio instancia de
+    <literal>nova-network</literal>. En cualquier caso, todo el tráfico entre
+    las VMs y la red externa fluye a través del servicio
+    <literal>nova-network</literal>.</para>
+
+    <para>Compute realiza un distinción entre las direcciones que se asignan a
+    las máquinas virtuales, estas direcciones pueden ser: IPs fijas e IPs flotantes
+    (<emphasis role="italic">fixed/floating IPs</emphasis>). Las direcciones IP fijas son
+    direcciones que se asignan a una instancia durante su creación y permanecen
+    invariables hasta que la VM termine. Por el contrario, las direcciones IP
+    flotantes son direcciones que se pueden asociar de forma dinámica con
+    cualquier instancia y desasociarse en cualquier momento. Un usuario puede
+    reservar direcciones flotante para su proyecto.</para>
+
+    <para>En modo <literal>Flat</literal>, el administrador de la red especifica
+    una subred. Las direcciones IP para las máquinas virtuales se toman de esta
+    subred y se inyectan en la imagen durante la creación de la VM. Cada
+    instancia recibe una única dirección IP del pool de direcciones
+    disponibles. El administrador de la red debe configurar el bridge de Linux
+    (normalmente denominando <literal>br100</literal>, aunque esto es
+    configurable) tanto en el nodo que hospeda al controlador de la red, como en
+    nodos que ejecutan las instancias. Todas las instancias del sistema se unen
+    al mismo bridge, configurado manualmente por el administrador de la
+    red.</para>
+
+    <note>
+      <para>La inyección de la dirección IP en la imagen de la máquina virtual
+      solo funciona para aquellos sistemas que mantienen la configuración de red
+      a través del fichero <filename>/etc/network/interfaces</filename>.</para>
+    </note>
+
+    <para>En el modo <literal>Flat DHCP</literal>, OpenStack inicia un servidor
+    DHCP (a través del proceso dnsmasq) para la asignación de direcciones IP a
+    las instancias desde la subred especificada además de configurar el bridge
+    de red.</para>
+
+    <para>De la misma forma que en el modo Flat, todas las instancias se
+    conectan a un único bridge en el nodo de computación, en este modo, además,
+    se ejecuta un servidor DHCP encargado de configurar las instancias
+    (dependiendo del modo single/multi-host junto a cada uno de los procesos
+    nova-network). En este modo, Compute hace un poco más de trabajo aparte de
+    unir al bridge una interfaz de red (la indicada a través de
+    <literal>flat_interface</literal>, <literal>eth0</literal> por defecto),
+    configura y ejecuta un proceso dnsmasq, que actúa como servidor DHCP sobre
+    el bridge configurado, normalmente en la dirección 10.0.0.1. Para cada
+    máquina virtual, Nova reserva una dirección IP fija y configura a dnsmasq
+    con el par MAC/IP para la VM; dnsmasq no participa en el proceso de reserva
+    de las direcciones, solo gestiona las IPs según el mapeo realizado por Nova.
+    Las instancias reciben una dirección IP fija a través de un dhcpdiscover,
+    estas IPs no se asignan a ninguna de las interfaces del anfitrión, solo a
+    las interfaces de las máquinas virtuales.</para>
+
+    <para>En cualquier configuración de red <literal>Flat</literal>, los hosts
+    que ejecutan el servicio nova-network son los responsables de reenviar el
+    tráfico desde la red privada, configurada en el fichero
+    <filename>nova-conf</filename> a través del parámetro
+    <literal>fixed_range</literal>. Estos hosts necesitan tener configurado un
+    bridge, br100, y conectado físicamente a cualquier otro nodo que hospede
+    máquinas virtuales. Es necesario configurar la opción
+    <literal>flat_network_bridge</literal> o crear redes con el parámetro bridge
+    para evitar posibles errores.</para>
+
+    <note>
+      <para>En el modo Flat DHCP con una configuración single-host es posible
+      hacer pings a las máquinas virtuales a través de sus dirección IP fijas
+      desde el nodo que ejecuta el servicio nova-network, sin embargo no es
+      posible hacerlo desde el resto de nodos. Este es el comportamiento que se
+      debe esperar.</para>
+    </note>
+
+    <para>El modo de red VLAN es el modo por defecto para una instalación de
+    OpenStack. En este modo, Compute crea una VLAN y un bridge para cada
+    proyecto. Para una instalación de múltiples máquinas, el modo de red VLAN
+    necesita de un switch que soporte etiquetado VLAN (802.1q). Cada proyecto
+    consigue un rango de direcciones privadas que son accesibles únicamente
+    desde dentro de la VLAN. Para que un usuario pueda acceder a las instancias
+    de su proyecto, se tiene que crear una instancia especial VPN (con nombre en
+    clave cloudpipe). Compute genera un certificado y una clave para que el
+    usuario pueda acceder a la VPN y la inicia de forma automática. Esto
+    proporciona un segmento de red privado para las instancias de cada
+    proyecto y permite que puedan ser accedidas desde Internet a través de una
+    conexión VPN. En este modo, cada proyecto obtiene su propia VLAN, su propio
+    bridge Linux y su subred.</para>
+
+    <para>Las subredes son especificadas por el administrador de la red, y se
+    asignan de forma dinámica a un proyecto cuando se requiere. Dentro de cada
+    una de las VLANs se inicia un servidor DHCP para configurar las direcciones
+    IP a las máquinas virtuales desde la subred asignada al proyecto. Todas las
+    instancias que pertenecen a un proyecto se unen a un mismo bridge dentro de
+    la misma VLAN del proyecto. OpenStack Compute crea todos los bridges de
+    Linux necesarios así como las VLANs cuando se requiera.</para>
+
+    <note>
+      <para>Con la configuración por defecto de Compute, una vez que una máquina
+      virtual se destruye, puede tomar cierto tiempo que la dirección IP
+      asociada a la máquina vuelva a estar disponible para otra VM.</para>
+
+      <para>La opción de configuración
+      <literal>force_dhcp_release=True</literal> obliga al servicio Compute
+      enviar un paquete dhcprelease cuando se destruye una máquina virtual. Esto
+      consigue que la dirección IP esté automáticamente disponible.</para>
+
+      <para>Esta opción de configuración se aplica a ambos modos, tanto a Flat
+      DHCP como a VLAN Manager.</para>
+
+      <para>El uso de esta opción necesita del programa
+      <literal>dhcp_release</literal>. Hay que asegurarse de que esté disponible
+      en todos los nodos que ejecuten el servicio
+      <literal>nova-compute</literal> antes de habilitar esta opción. Basta
+      comprobarlo a través del comando <literal>which</literal> o
+      <literal>whereis</literal>:</para>
+      <screen>
+<prompt>root@jupiter:~# </prompt><userinput>which dhcp_release</userinput>
+/usr/bin/dhcp_release
+      </screen>
+    </note>
+  </section>
+
+  <section>
+    <title>Servidor DHCP: dnsmasq</title>
+    <para>El servicio Compute utiliza <literal>dnsmasq</literal> como servidor
+    DHCP, tanto en modo Flat DHCP como en el modo VLAN. El servicio
+    <literal>nova-network</literal> es el encargado de iniciar los procesos
+    dnsmasq necesarios.</para>
+
+    <para>El comportamiento del proceso dnsmasq es configurable a través de la
+    creación de su fichero de configuración. Basta especificar el fichero a
+    utilizar a través de la opción <literal>dnsmasq_config_file</literal>. Por
+    ejemplo:</para>
+    <programlisting>
+dnsmasq_config_file=/etc/dnsmasq-nova.conf
+    </programlisting>
+
+    <para>Para la correcta configuración del servicio a través de este fichero
+    se recomienda leer la documentación oficial de dnsmasq.</para>
+
+    <para>dnsmasq también es capaz de actuar de caché DNS para las máquinas
+    virtuales, se puede configurar directamente en el fichero de configuración
+    de Nova, <filename>nova.conf</filename>, a través de la opción
+    <literal>dns_server</literal> qué servidor DNS se utilizará, por
+    ejemplo, si queremos utilizar el servidor DNS público de Google, basta con
+    especificar:</para>
+    <programlisting>
+dns_server=8.8.8.8
+    </programlisting>
+
+   <para>El servicio dnsmasq utiliza syslog como salida de los mensajes de log
+   (<filename>/var/log/syslog</filename>), esta salida es muy útil para depurar
+   errores y problemas en el caso de que las máquinas virtuales arranquen
+   correctamente pero no sean accesible a través de la red.</para>
+
+   <para>El administrador de la red puede ejecutar el comando
+   <command>nova-manage fixed reserve --address=x.x.x.x </command> para especificar
+   la dirección IP de inicio a reservar para el servidor DHCP. Este comando
+   sustituye a la opción <literal>flat_network_dhcp_start</literal> disponible
+   desde la versión Diablo. Esta reserva solo afecta a la dirección que se utiliza
+   como inicio para la asignación de IPs a las máquinas virtuales, no a la
+   dirección IP fija que el servicio nova-network configura en los bridges.</para>
+
+  </section>
+
+  <section>
+    <title>Servicio Metadata</title>
+    <para>Compute utiliza un servicio especial de metadatos ("metadata service")
+    que permite a las máquinas virtuales recuperar datos específicos
+    propios. Las instancias pueden acceder a este servicio a través de la URL
+    <literal>http://169.254.169.254</literal>. Por ejemplo, una instancia puede
+    recuperar su clave SSH pública a través de una petición GET en la
+    dirección:</para>
+    <programlisting>
+http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key
+    </programlisting>
+
+    <para>Las instancias también pueden recuperar información sobre el usuario
+    (pasados a través del parámetro user_data en la llamada a la API o a través del
+    parámetro <literal>--user_data</literal> del comando <command>nova
+    boot</command>) a través del servicio de metadatos, realizando la siguiente
+    solicitud GET:</para>
+    <programlisting>
+http://169.254.169.254/latest/user-data
+    </programlisting>
+
+    <para>Este servicio es compatible con el servicio de metainformación de
+    Amazon EC2; las imágenes de máquinas virtuales diseñadas para EC2
+    funcionarán adecuadamente sobre OpenStack.</para>
+
+    <para>Este servicio de metadatos está implementado a través del servicio
+    <literal>nova-api</literal> o a través de
+    <literal>nova-api-metadata</literal> (este último solo se ejecuta en el modo
+    multi-host). Si se ejecuta el servicio <literal>nova-api</literal>,
+    <literal>metadata</literal> debe ser uno de los elementos de la lista del
+    parámetro <literal>enabled_apis</literal> en el fichero de configuración
+    <filename>nova.conf</filename>. La opción por defecto para
+    <literal>enabled_apis</literal> incluye al servicio metadata.</para>
+
+    <para>Para permitir que las instancias puedan alcanzar a este servicio, el
+    servicio <literal>nova-network</literal> configura iptables para realizar
+    NAT de la dirección 169.254.169.254 en el puerto 80 hacia la máquina
+    configurada en el parámetro <literal>metadata_host</literal> (por defecto
+    valor $my_ip, la cual es la IP del servicio nova-network) y puerto
+    especificado en el parámetro <literal>metadata_port</literal> (por defecto
+    puerto 8775) en el fichero de configuración
+    <filename>nova.conf</filename>. </para>
+
+    <warning>
+      <para>La opción de configuración <literal>metadata_host</literal> debe ser
+      una dirección IP, nunca un nombre de host.</para>
+    </warning>
+
+    <note>
+      <para>La configuración de servicios por defecto de Compute asumen que los
+      servicios <literal>nova-network</literal> y <literal>nova-api</literal> se
+      ejecutan sobre el mismo host. Si este no es el caso, se debe realizar el
+      siguiente cambio en fichero <filename>/etc/nova/nova.conf</filename> del
+      host que ejecute el servicio <literal>nova-network</literal>:</para>
+
+      <para>Fijar la opción <literal>metadata_host</literal> a la dirección IP
+      del nodo que esté ejecutando el servicio <literal>nova-api</literal>.</para>
+    </note>
+
+  </section>
+
+  <section>
+    <title>Configuración de red en los nodos de computación</title>
+    <para>Para configurar la red en los nodos de computación que ejecutan las
+    máquinas virtuales hay que seguir los siguientes pasos:</para>
+
+    <orderedlist>
+      <listitem>
+	<para>Fijar la opción <literal>network_manager</literal> en nova.conf.</para>
+      </listitem>
+
+      <listitem>
+	<para>Usar el comando <command>nova-manage network create label CIDR n
+	n</command> para crear la subred en la que residan las VMs.</para>
+      </listitem>
+
+      <listitem>
+	<para>Integrar el bridge en la red.</para>
+      </listitem>    
+    </orderedlist>
+
+    <para>Por defecto Compute usa el modo VLAN. Se puede elegir el modo de red
+    para las máquinas virtuales a través del fichero de configuración
+    <filename>nova.conf</filename> de cualquiera de estas tres formas:</para> 
+
+    <itemizedlist>
+      <listitem>
+	<para>Red simple, sin VLAN:</para>
+	<programlisting>
+--network_manager=nova.network.manager.FlatManager
+	</programlisting>
+      </listitem>
+
+      <listitem>
+	<para>Flat DCHP, se debe indicar un bridge a través de la opción
+	<literal>flat_network_bridge</literal>:</para>
+	<programlisting>
+--network_manager=nova.network.manager.FlatDHCPManager
+	</programlisting>
+      </listitem>
+
+      <listitem>
+	<para>Red VLAN con DHCP, configuración por defecto. Se puede indicar con:</para>
+	<programlisting>
+--network_manager=nova.network.manager.VlanManager
+	</programlisting>
+      </listitem>
+    </itemizedlist>
+    
+    <para>Al ejecutar el comando <command>nova-manage network create</command>,
+    se usa la configuración del fichero <filename>nova-conf</filename>. Se puede
+    crear la red donde se ejecutarán las VMS a través del siguiente comando:</para>
+
+    <programlisting>
+nova-manage network create private 192.168.0.0/24 1 256
+    </programlisting>
+
+    <section>
+      <title>Configurando una red Flat</title>
+      <para>FlatNetworking utiliza adaptadores ethernet configurados como
+      bridges para permitir tráfico de red entre varios nodos. Esta
+      configuración se puede realizar con un solo adaptador físico o
+      varios. Esta opción no requiere que de un switch que realice etiquetado
+      VLAN y es una configuración muy común en instalaciones de desarrollo o
+      configuraciones para prueba de conceptos. Cuando se opta por este tipo de
+      red, Nova no realiza ninguna gestión de la red. En vez de eso, las
+      direcciones IP se inyectan en la instancia a través de modificaciones en
+      el sistema de ficheros de las VMs (o a través de agentes). El reenvío de
+      metainformación de sebe configurar manualmente en el gateway en el caso de
+      que se necesite.</para>
+
+      <para>Para configurar este tipo de red, hay que asegurarse de que en el
+      fichero nova.conf aparezca una línea con el siguiente contenido:</para>
+
+      <programlisting>
+network_manager=nova.network.manager.FlatManager
+      </programlisting>
+
+      <note>
+	<para>Al configurar este tipo de red, no habilitar el parámetro
+	<literal>flat_injected</literal> puede ocasionar que las VMs no reciban
+	la información IP durante el inicio.</para>
+      </note>
+
+      <section>
+	<title>Flat Networking con libvirt</title>
+	<para>Compute utiliza como bridge por defecto el denominado 'br100', el
+	cual se almacena en la base de datos de Nova, para cambiar el nombre del
+	bridge es necesario realizar los cambios en la base de datos. Para más
+	información sobre el resto de parámetros de configuración consultar las
+	figuras de este capítulo.</para>
+
+	<para>En cualquier configuración FlatNetworking (con o sin DHCP), el host
+	que ejecuta el servicio nova-network es el responsable de reenviar el
+	tráfico desde y hacia la red privada. Esta configuración recae sobre los
+	parámetros de configuración <literal>--fixed_range=</literal> y
+	<literal>--flat_network_bridge</literal> del fichero de configuración
+	<literal>nova.conf</literal>. El host necesita tener configurado el
+	bridge <literal>br100</literal> y poder hablar con cualquier otro nodo
+	que ejecute máquinas virtuales. Con cualquier de las opciones Flat de
+	red, el gateway por defecto para la máquina virtual es el host que
+	ejecuta el servicio nova-network. </para>
+
+	<para>La configuración consiste en fijar la dirección IP externa del
+	nodo en el bridge, y asociarle la interfaz eth0. Para hacer esto, basta
+	con editar el fichero <filename>/etc/network/interfaces</filename> con
+	este contenido:</para>
+
+	<programlisting>
+# The loopback network interface
+auto lo
+iface lo inet loopback
+
+# The primary network interface
+# auto eth0
+# iface eth0 inet dhcp
+
+auto br100
+iface br100 inet dhcp
+    bridge_ports    eth0
+    bridge_stp      off
+    bridge_maxwait  0
+    bridge_fd       0
+	</programlisting>
+
+	<para>Y reiniciamos el servicio a través del siguiente comando:</para>
+	<screen><prompt># </prompt><userinput>root@ayla:~# /etc/init.d/networking restart</userinput></screen>
+
+	<para>Para esta configuración todo en uno, perfecta para entornos de
+	desarrollo y pruebas, la configuración resultante es la mostrada en la
+	figura:</para>
+
+	<figure>
+	  <title>Flat network: instalación del servidor all-in-one</title>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata scale="80"
+			 fileref="figures/FlatNetworkSingleInterfaceAllInOne.png" />
+	    </imageobject>
+	  </mediaobject>
+	</figure>
+
+	<para>Para una instalación con varios nodos de computación con una sola
+	interfaz de red por nodo, la configuración de red sería la descrita en
+	la siguiente figura. Esta configuración es útil en entornos de
+	desarrollo y pruebas de concepto, pero no para entornos reales en
+	producción:</para>
+
+	<figure>
+	  <title>Flat network: varios servidores, una sola interfaz</title>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata scale="80"
+			 fileref="figures/FlatNetworkSingleInterface.png" />
+	    </imageobject>
+	  </mediaobject>
+	</figure>
+
+	<para>Para una instalación con varios nodos y varias interfaces de red,
+	la configuración de red sería la mostrada en la siguiente figura. Esta
+	configuración es apta para entornos de producción y separa el tráfico de
+	administración del tráfico generado por las máquinas virtuales:</para>
+
+	<figure>
+	  <title>Flat network: varios servidores, una sola interfaz</title>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata scale="80"
+			 fileref="figures/FlatNetworkMultInterface.png" />
+	    </imageobject>
+	  </mediaobject>
+	</figure>	
+      </section>
+
+
+    </section>
+
+    <section>
+      <title>Configurando una red Flat DHCP</title>
+      <para>Con Flat DHCP, el host o los hosts que ejecutan nova-network actúan
+      como gateways para las máquinas virtuales. Si se está utilizando la
+      configuración single-host (un solo nodo ejecutando nova-network) se puede
+      utiliza el parámetro optativo <literal>network_host</literal> del fichero
+      <filename>nova.conf</filename> del nodo para indicar qué nodo está
+      ejecutando nova-network, de esta forma se consigue una comunicación más
+      eficiente con nova-network.</para>
+
+      <para>En cualquier configuración FlatNetworking (con o sin DHCP), el host
+      que ejecuta el servicio nova-network es el responsable de reenviar el
+      tráfico desde y hacia la red privada. Esta configuración recae sobre los
+      parámetros de configuración <literal>--fixed_range=</literal> y
+      <literal>--flat_network_bridge</literal> del fichero de configuración
+      <literal>nova.conf</literal>. El host necesita tener configurado el
+      nombre del bridge, ya que no hay ninguno por defecto, lo normal es
+      llamarlo <literal>br100</literal>. El servicio nova-network llevará la
+      cuenta de todas las IPs asignadas y liberadas a través de DHCP, utilizando
+      la característica <emphasis role="italic">dhcp-script</emphasis> de
+      dnsmasq (nova-network proporciona el script
+      <command>bin/nova-dhcpbridge</command>). De esta forma nova-network es
+      capaz de liberar la dirección IP de una máquina virtual cuando ésta se
+      detiene. El servicio también es capaz de de configurar las reglas de
+      iptables necesarias para que la máquina virtual sea capaz de comunicarse
+      con el exterior e incluso contactar con el servicio de metadatos para
+      recuperar información sobre el cloud.</para>
+
+      <para>En este modo de red, los nodos de computación son los encargados de
+      iniciar el bridge y enlazar a él las interfaces de las VMs. Los nodos de
+      computación no deberían tener asociada una dirección IP en la interfaz que se
+      utilice para la red que une a las VMs, ya que esto pondría a las VMs y al
+      host en la misma red lógica. Cuando una VM arranca, envía una petición
+      DHCP solicitando una dirección, y el servidor DHCP responde con la
+      dirección IP asignada a la máquina. Esta dirección IP se asigna realmente
+      por Nova, Nova la añade en el fichero de configuración del servidor DHCP,
+      que se limita a darle a la VM la dirección.</para>
+
+      <para>Hay más información detallada sobre la configuración FlatDHCP con un
+      solo nodo de ejecución de nova-network en <link
+      xlink:href="http://www.mirantis.com/blog/openstack-networking-single-host-flatdhcpmanager/">este
+      blog</link>. Ciertas partes del documento también son relevantes en el
+      resto de nodos. </para>
+
+      <para>FlatDCHP no crea ninguna VLAN, tan solo crea un bridge. Este bridge
+      funciona correctamente en instalaciones de un solo nodo, cuando entran en
+      juego varios nodos, el tráfico necesita una forma de salir del bridge
+      hacia una interfaz física.</para>
+
+      <section>
+	<title>FlatDHCP Networking con libvirt</title>
+	<para>Cuando se utiliza libvirt como sistema de virtualización, la
+	configuración utilizada es la que se muestra en la figura:</para>
+
+	<figure>
+	  <title>Flat DHCP network con libvirt, múltiples interfaces y múltiples
+	  servidores</title>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata scale="50"
+			 fileref="figures/flatdhcp-net.jpg" />
+	    </imageobject>
+	  </mediaobject>
+	</figure>	
+
+	<para>Hay que prestar especial atención al configurar la opción
+	<literal>--flat_interface</literal>. Si se especifica una interfaz con
+	una dirección IP ya configurada y es la interfaz que se utiliza para,
+	por ejemplo, conectarse al nodo a través de SSH, se perderá la
+	posibilidad de poder acceder al nodo, ya que esta interfaz es la que se
+	usa para el bridge y se desconfigura a nivel IP. En el modo FlatDHCP, el
+	parámetro <literal>--network_size</literal> debería ser el número de IPs
+	completo del rango. Si se está creando una red /12 (en notación CIDR),
+	entonces este número debería ser 2^20=1.048.576 direcciones IP. Una red
+	de este tamaño tardaría mucho en crearse, ya que para cada una de las
+	direcciones IP hay que crear una entrada en la base de datos.</para>
+
+	<para>Si se tiene una interfaz sin utilizar en el host, por ejemplo
+	<literal>eth2</literal>, con conectividad pero sin dirección IP, se
+	puede indicar a FlatDHCP que la utilice como bridge indicándolo a través
+	del fichero de configuración <filename>nova.conf</filename> con el
+	parámetro <literal>flat_interface=eth2</literal>. El host que ejecuta
+	nova-network configurará la IP del gateway a este bridge. Para esta
+	configuración basta añadir las siguientes directivas al fichero de
+	configuración <filename>nova.conf</filename>:</para>
+
+	<programlisting>
+dhcpbridge_flagfile=/etc/nova/nova.conf
+dhcpbridge=/usr/bin/nova-dhcpbridge
+network_manager=nova.network.manager.FlatDHCPManager
+fixed_range=10.0.0.0/8
+flat_network_bridge=br100
+flat_interface=eth2
+flat_injected=False
+public_interface=eth0
+	</programlisting>
+
+	<para>También se puede añadir la interfaz no utilizada al bridge br100
+	de forma manual y no configurar el parámetro
+	<literal>flat_interface</literal>. </para>
+
+      </section>
+     </section>
+
+     <section>
+       <title>Flujo del tráfico saliente con configuraciones de red Flat</title>
+       <para>En cualquier configuración FlatNetworking (con o sin DHCP), el host
+       que ejecuta el servicio nova-network es el responsable del reenvío de
+       tráfico hacia y desde la red fija. La red fija se configura a través del
+       parámetro <literal>fixed_range</literal> y es la utilizada por las
+       máquinas virtuales. El host necesita tener una interfaz bridge
+       (normalmente <literal>br100</literal>) configurada y conectada a
+       cualquier otro nodo que ejecute máquinas virtuales. Para cualquier de los
+       modos Flat, el gateway por defecto de las máquinas virtuales es el host
+       que ejecuta nova-network.</para>
+
+       <para>Cuando una máquina virtual envía tráfico hacia la redes externas,
+       lo envía primero a su gateway por defecto, que es la máquina donde el
+       servicio nova-network está configurado.</para>
+
+       <figure>
+	 <title>Hosts con una sola interfaz, primera ruta</title>
+	 <mediaobject>
+	   <imageobject>
+	     <imagedata scale="80"
+			 fileref="figures/SingleInterfaceOutbound_1.png" />
+	   </imageobject>
+	 </mediaobject>
+       </figure>	
+
+       <para>Acto seguido, el host configurado con nova-network actúa como
+       router reenviando el tráfico hacia Internet.</para>
+
+       <warning>
+	 <para>Si se está utilizando una única interfaz , entonces la interfaz
+	 (a menudo eth0) debe estar configurada en modo promiscuo para que el
+	 reenvío de tráfico funcione correctamente. Esto no es necesario en un
+	 despliegue en que los nodos tengan dos interfaces de red.</para>
+       </warning>       
+     </section>
+
+     <section>
+       <title>Configurando VLAN Networking</title>
+       <para></para>
+       
+     </section>
+   
+  </section>
+
+  <section>
+    <title>Habilitar ping y SSH en las VMs</title>
+    <para></para>
+    
+  </section>
+
+
 
 </chapter>
