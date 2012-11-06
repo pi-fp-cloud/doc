@@ -921,7 +921,7 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 	  diferente.</para></note>
 	  <para>Nosotros vamos a crear inicialmente un segmento /24 de
 	  direcciones IP de la red pública para utilizar como direcciones IP
-	  flotantes:
+	  flotantes:</para>
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>nova-manage floating create --ip_range=172.22.221.0/24</userinput></screen>
 	</section>
       </section>
