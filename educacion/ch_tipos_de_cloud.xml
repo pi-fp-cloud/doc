@@ -1,65 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<chapter xmlns="http://docbook.org/ns/docbook"
-         xmlns:xi="http://www.w3.org/2001/XInclude"
-	 xmlns:xlink="http://www.w3.org/1999/xlink"
-	 version="5.0" xml:lang="es">
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xi="http://www.w3.org/2001/XInclude"
+  xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0" xml:lang="es">
   <title>Tipos de cloud computing</title>
-  <para>El cloud computing abarca muchos aspectos diferentes, por lo
-  que pueden realizarse distintas clasificaciones dependiendo de la
-  característica que se considere. Inicialmente se pueden señalar los
-  tipos de clouds descritos a continuación, que pueden encontrarse resumidos en la siguiente figura:</para>
+  <para>El cloud computing abarca muchos aspectos diferentes, por lo que pueden realizarse distintas
+    clasificaciones dependiendo de la característica que se considere. Inicialmente se pueden
+    señalar los tipos de clouds descritos a continuación, que pueden encontrarse resumidos en la
+    siguiente figura:</para>
   <mediaobject>
     <imageobject>
       <imagedata fileref="figures/tipos_de_cloud.png" width="20cm" format="PNG"/>
     </imageobject>
     <caption>
-      <para>Diagrama esquemático con los diferentes tipos de cloud, lo
-      que ofrece cada uno y a quién va dirigido.</para>
+      <para>Diagrama esquemático con los diferentes tipos de cloud, lo que ofrece cada uno y a quién
+        va dirigido.</para>
     </caption>
   </mediaobject>
   <itemizedlist>
-    <listitem><para>Software as a Service (SaaS). La forma más conocida de cloud en
-    la que todas las aplicaciones de software se encuentran en la nube y
-    el usuario suele acceder a ellas mediante un simple navegador
-    web. Hay un enorme número de aplicaciones en la nube, muchas de
-    ellas utilizadas por gran cantidad de personas a diario; son muy
-    conocidas y utilizadas aplicaciones web generales como redes
-    sociales, correo web, aplicaciones ofimáticas online;
-    específicamente de uso empresarial como ERP o CRM, o incluso
-    instalando y configurando aplicaciones propias como joomla,
-    wordpress, drupal, moodle,etcétera.</para></listitem>      
-    <listitem><para>Platform as a Service (PaaS). Un nuevo enfoque para el
-    desarrollo de software, esta tecnología ofrece la posibilidad de
-    acceder a todas las herramientas de desarrollo de aplicaciones sin
-    instalar nada en el equipo propio. Las principales compañías de
-    software han desarrollado sus propios PaaS, entre las que cabe
-    mencionar Google App Engine, Microsoft Windows Azure y Oracle
-    Cloud.</para></listitem>
-    <listitem><para>Infraestructure as a Service (IaaS). La evolución de la
-    infraestructura clásica de servidores físicos en las empresas,
-    sustituyéndolos por servidores virtuales con ubicación en la propia
-    empresa o Internet. Destaca en este ámbito la implementación
-    comercial Amazon EC2 (Elastic Compute Cloud) y las implementaciones
-    de software libre Opennebula y Eucalyptus, que son compatibles con
-    el API de Amazon EC2, pero que permiten un control total sobre la
-    tecnología.</para></listitem>
+    <listitem>
+      <para>Software as a Service (SaaS). La forma más conocida de cloud en la que todas las
+        aplicaciones de software se encuentran en la nube y el usuario suele acceder a ellas
+        mediante un simple navegador web. Hay un enorme número de aplicaciones en la nube, muchas de
+        ellas utilizadas por gran cantidad de personas a diario; son muy conocidas y utilizadas
+        aplicaciones web generales como redes sociales, correo web, aplicaciones ofimáticas online;
+        específicamente de uso empresarial como ERP o CRM, o incluso instalando y configurando
+        aplicaciones propias como joomla, wordpress, drupal, moodle,etcétera.</para>
+    </listitem>
+    <listitem>
+      <para>Platform as a Service (PaaS). Un nuevo enfoque para el desarrollo de software, esta
+        tecnología ofrece la posibilidad de acceder a todas las herramientas de desarrollo de
+        aplicaciones sin instalar nada en el equipo propio. Las principales compañías de software
+        han desarrollado sus propios PaaS, entre las que cabe mencionar Google App Engine, Microsoft
+        Windows Azure y Oracle Cloud.</para>
+    </listitem>
+    <listitem>
+      <para>Infraestructure as a Service (IaaS). La evolución de la infraestructura clásica de
+        servidores físicos en las empresas, sustituyéndolos por servidores virtuales con ubicación
+        en la propia empresa o Internet. Destaca en este ámbito la implementación comercial Amazon
+        EC2 (Elastic Compute Cloud) y las implementaciones de software libre Opennebula y
+        Eucalyptus, que son compatibles con el API de Amazon EC2, pero que permiten un control total
+        sobre la tecnología.</para>
+    </listitem>
   </itemizedlist>
-  <para>Si por otro lado, atendemos a los modos de funcionamiento de los
-  clouds, podemos clasificarlos en:</para>
+  <para>Si por otro lado, atendemos a los modos de funcionamiento de los clouds, podemos
+    clasificarlos en:</para>
   <itemizedlist>
-    <listitem><para>Públicos. Cuando los servicios ofrecidos por la nube son
-    servidos por empresas externas.</para></listitem>      
-      <listitem><para>Privados. Cuando los servicios ofrecidos se manejan por un sólo
-      cliente que controla las aplicaciones que se ejecutan.</para></listitem>
-      <listitem><para>Híbridos. Que es un solución que combina las dos anteriores.</para></listitem>      
+    <listitem>
+      <para>Públicos. Cuando los servicios ofrecidos por la nube son servidos por empresas
+        externas.</para>
+    </listitem>
+    <listitem>
+      <para>Privados. Cuando los servicios ofrecidos se manejan por un sólo cliente que controla las
+        aplicaciones que se ejecutan.</para>
+    </listitem>
+    <listitem>
+      <para>Híbridos. Que es una solución que combina las dos anteriores.</para>
+    </listitem>
   </itemizedlist>
-  <para>Desde el punto de vista del uso educativo del cloud, SaaS es adecuado
-    en planes formativos muy diversos y está ampliamente extendido y
-    utilizado en todos los niveles educativos, es  la base de lo que se
-    conoce hoy en día como Educación 2.0. Por su parte, el interés sobre
-    los clouds PaaS proviene fundamentalmente de los estudios relacionados
-    con el desarrollo de software. Por último, los estudios relacionados
-    con los sistemas y redes tienen un nuevo campo de acción con los clouds
-    IaaS, principalmente privados ya que permiten manejar y conocer todos
-  los niveles de esta tecnología.</para>
+  <para>Desde el punto de vista del uso educativo del cloud, SaaS es adecuado en planes formativos
+    muy diversos y está ampliamente extendido y utilizado en todos los niveles educativos, es la
+    base de lo que se conoce hoy en día como Educación 2.0. Por su parte, el interés sobre los
+    clouds PaaS proviene fundamentalmente de los estudios relacionados con el desarrollo de
+    software. Por último, los estudios relacionados con los sistemas y redes tienen un nuevo campo
+    de acción con los clouds IaaS, principalmente privados ya que permiten manejar y conocer todos
+    los niveles de esta tecnología.</para>
+  <para>En un centro educativo, especialmente si imparte enseñanzas TIC, la mejor opción sería por
+    tanto utilizar un Cloud de infraestructura privado basado en software libre, ya que los clouds privados
+    permiten un control total del mismo, de manera que puede ser utilizado sin ningún límite y, por
+    consiguiente, conocerlo de forma detallada, y las soluciones libres, por su parte, permiten un
+    control abosoluto sobre el software, garantizan la independencia tecnológica, se basan en el uso
+    de estándares, permiten una mayor interoperabilidad y, entre muchas más razones, suponen un
+    importante ahorro de costes, al no ser necesario adquirir una licencia de uso.</para>
 </chapter>

@@ -18,6 +18,16 @@
                 <orgname>IES Gonzalo Nazareno</orgname>
             </affiliation>
         </author>
+	<author>
+	  <!-- Vamos añadiendo autores a medida que vayan contribuyendo -->
+            <personname>
+                <firstname>Alberto</firstname>
+                <surname>Molina Coballes</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
         <!-- <copyright> -->
         <!--     <year>2012</year> -->
         <!-- </copyright> -->
