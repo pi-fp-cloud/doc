@@ -212,100 +212,6 @@
 	</tgroup>
       </table>
     </section>
-    <!-- <section> -->
-    <!--   <title>Instalación de jupiter</title> -->
-    <!--   <section> -->
-    <!-- 	<title>Configuración previa de RAID</title> -->
-    <!-- 	<para>jupiter incluye dos discos duros SATAII de 500 GiB y una -->
-    <!-- 	controladora de disco 3ware 9650SE. Se ha optado por configurar esta -->
-    <!-- 	controladora de disco en modo RAID 1, para incluir un nivel elemental de -->
-    <!-- 	seguridad y consistencia de datos, aunque obviamente esto no descarta la -->
-    <!-- 	utilización adicional de otros mecanismos de copias de seguridad que se -->
-    <!-- 	configurarán posteriormente. Al tratarse de una controladora RAID -->
-    <!-- 	hardware y estar configurado previamente, el sistema operativo que -->
-    <!-- 	arranque en el equipo sólo verá un disco duro en <code>/dev/sda</code> -->
-    <!-- 	de 500GB aproximadamente.</para> -->
-    <!--   </section> -->
-    <!--   <section> -->
-    <!-- 	<title>Instalación de Debian Wheezy</title> -->
-    <!-- 	<para>El sistema operativo elegido para los equipos del cloud -->
-    <!-- 	es la versión de pruebas <emphasis>(testing)</emphasis> de Debian -->
-    <!-- 	GNU/Linux (amd64), que actualmente se conoce con el nombre de código -->
-    <!-- 	<emphasis>wheezy</emphasis> y que cuando finalmente se estabilice se -->
-    <!-- 	conocerá como Debian 7. Pensamos que es la mejor opción en el caso de -->
-    <!-- 	Debian, ya que <emphasis>squeeze</emphasis>, la versión estable -->
-    <!-- 	actualmente, no incluye paquetes de OpenStack y la opción de instalar -->
-    <!-- 	directamente desde los ficheros fuente o bien utilizar repositorios no -->
-    <!-- 	oficiales, no nos parece tan acertada. La -->
-    <!-- 	<emphasis>inestabilidad</emphasis> que comporta utilizar una versión no -->
-    <!-- 	estabilizada de Debian, nos parece en este momento asumible, más teniendo -->
-    <!-- 	en cuenta que vamos a implementar un cloud privado y no -->
-    <!-- 	crítico, que se utilizará a partir del curso próximo con fines -->
-    <!-- 	formativos.</para> -->
-    <!-- 	<para>Durante la instalación realizamos el siguiente esquema de -->
-    <!-- 	particionado:</para> -->
-    <!-- 	<programlisting> -->
-    <!-- 	  Disposit. Inicio    Comienzo      Fin      Bloques  Id Sistema -->
-    <!-- 	  /dev/sda1   *        2048     1953791      975872   83 Linux -->
-    <!-- 	  /dev/sda2         1953792   976539647   487292928   8e Linux LVM -->
-    <!-- 	</programlisting> -->
-    <!-- 	<para>Es decir, reservamos una pequeña partición de 1G en la -->
-    <!-- 	que ubicaremos el directorio /boot y el resto lo gestionamos -->
-    <!-- 	con LVM. Inicialmente creamos sólo dos volúmenes -->
-    <!-- 	lógicos (uno para el sistema raíz y otro para el área de -->
-    <!-- 	intercambio):</para> -->
-    <!-- 	<programlisting> -->
-    <!-- 	  LV           VG   Attr   LSize -->
-    <!-- 	  jupiter-root vg   -wi-ao 18,62g -->
-    <!-- 	  jupiter-swap vg   -wi-ao  1,86g -->
-    <!-- 	</programlisting> -->
-    <!-- 	<section> -->
-    <!-- 	  <title>Gestión del RAID desde el sistema operativo</title> -->
-    <!-- 	  <para>Aunque la controladora RAID es hardware y el sistema -->
-    <!-- 	  operativo no la gestiona, es importante que se pueda controlar -->
-    <!-- 	  su estado a través de algún módulo del kernel. En este caso el -->
-    <!-- 	  módulo 3w-9xxx que se carga automáticamente y nos envía estos -->
-    <!-- 	  mensajes al log del sistema:</para> -->
-    <!-- 	  <programlisting> -->
-    <!-- 	    [    2.381798] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014. -->
-    <!-- 	    [    2.381841] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19 -->
-    <!-- 	    [    2.381849] 3w-9xxx 0000:01:00.0: setting latency timer to 64 -->
-    <!-- 	    [    2.612067] scsi0 : 3ware 9000 Storage Controller -->
-    <!-- 	    [    2.612128] 3w-9xxx: scsi0: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19. -->
-    <!-- 	    [    2.952039] 3w-9xxx: scsi0: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2. -->
-    <!-- 	  </programlisting>	     -->
-    <!-- 	  <para>Pendiente de hacer:</para> -->
-    <!-- 	  <para>http;//jonas.genannt.name/  Hay repositorio, con -->
-    <!-- 	  aplicaciones para manejar el RAID 3ware 9650SE</para> -->
-    <!-- 	</section> -->
-    <!--   </section> -->
-    <!--   <section> -->
-    <!-- 	<title>Configuración de red jupiter</title> -->
-    <!-- 	<para>La configuración de red de jupiter es muy sencilla, ya que es un -->
-    <!-- 	equipo con dos interfaces de red (eth0 y eth1), conectadas a la red -->
-    <!-- 	pública y a la red privada respectivamente, el contenido del fichero -->
-    <!-- 	<filename>/etc/network/interfaces</filename> incluye la configuración  -->
-    <!-- 	estática de las dos interfaces de red:</para> -->
-    <!-- 	<programlisting> -->
-    <!-- 	  auto lo -->
-    <!-- 	  iface lo inet loopback -->
-
-    <!-- 	  auto eth0 -->
-    <!-- 	  iface eth0 inet static -->
-    <!-- 	  address 172.22.222.1 -->
-    <!-- 	  netmask 255.255.0.0 -->
-    <!-- 	  network 172.22.0.0 -->
-    <!-- 	  broadcast 172.22.255.255 -->
-    <!-- 	  gateway 172.22.0.1 -->
-
-    <!-- 	  auto eth1 -->
-    <!-- 	  iface eth1 inet static -->
-    <!-- 	  address 192.168.222.1 -->
-    <!-- 	  netmask 255.255.255.0 -->
-    <!-- 	  network 192.168.222 -->
-    <!-- 	  broadcast 255.255.255.0 -->
-    <!-- 	</programlisting> -->
-    <!--   </section> -->
       <section>
 	<title>Instalación y configuración inicial de MySQL</title>
 	<para>Todos los componentes de OpenStack (incluso glance y
@@ -914,7 +820,7 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 	<para>Como hemos vistos en puntos anteriores, los usuarios organizan sus
 	recursos en el cloud en proyectos. Un proyecto contiene un conjunto de
 	instancias o máquinas virtuales a las que se les asigna de forma
-	automática una dirección IP privada de las definidas en la
+	automática una dirección IP fija de las definidas en la
 	configuración. Se pueden establecer diferentes formas de configuración
 	de la red de los proyectos, actualmente podemos configurar la red de
 	nuestra nube de tres formas distintas:</para>
@@ -923,14 +829,14 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 	  <listitem><para>Flat DHCP Network Manager</para></listitem>
 	  <listitem><para>VLAN Network Mananger</para></listitem>
 	</itemizedlist>
-	<para>Tenemos que señalar la diferencia entre IP privada, que es
+	<para>Tenemos que señalar la diferencia entre IP fija, que es
 	la dirección que se le asigna a la instancia desde su creación hasta su
 	destrucción, y las IP flotantes, que son direcciones que dinámicamente
 	se pueden asignar a una instancia y que nos va a permitir acceder a
 	ellas desde una red pública.</para>
 	<para>En los dos primeros modos de red (Flat Mode) el administrador debe
 	indicar un conjunto de direcciones que serán asignadas como direcciones
-	IP privadas cuando se creen las instancias. La diferencia entre los dos
+	IP fijas cuando se creen las instancias. La diferencia entre los dos
 	modos es, que mientras en el primero la dirección IP se inyecta en la
 	configuración de la máquina (es decir se escribe en el fichero
 	<filename>/etc/network/interfaces</filename>), en la segunda opción
@@ -947,19 +853,20 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 	FlatDHCP.</para>
 	<section>
 	  <title>Configuración del tipo de red VLAN</title>
-	  <para>En el modo vlan, por defecto sólo se permite la conexión entre
+	  <note><para>En el modo vlan, por defecto sólo se permite la conexión entre
 	  instancias de un mismo proyecto, aunque éstas se ejecuten en
-	  diferentes nodos de computación.</para>
+	  diferentes nodos de computación.</para></note>
 	  <para>Los requisitos para utilizar el modo VLAN como configuración de
 	  red son los siguientes:</para>
 	  <itemizedlist>
 	    <listitem>
-	      <para>El ip forwading debe estar habilitado.</para>
+	      <para>El ip forwading debe estar habilitado en cada nodo donde se
+	      ejecute <literal>nova-compute</literal>.</para>
 	    </listitem>
 	    <listitem>
 	      <para>Los nodos de computación (que tienen instalado nova-network
 	      y nova-compute) tienen que tener cargado el módulo del kernel
-	      8021q.</para>
+	      80211q.</para>
 	    </listitem>
 	    <listitem>
 	      <para>Los switches de la red deben soportar la configuración de
@@ -977,11 +884,12 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 	  <para>En la primera línea se especifica que vamos a usar el modo de
 	  red VLAN. Con la directiva <command>vlan_interface</command> indicamos
 	  la interfaz de red con la que se va asociar el bridge que se ha
-	  creado. La directiva <command>fixed_range</command> indica el rango
-	  completo de IP que se va a dividir en subredes para cada vlan
+	  creado, en nuestro caso la interfaz de red conectada a la red
+	  privada. La directiva <command>fixed_range</command> indica el rango
+	  completo de IP que se va a dividir en subredes para cada vlan 
 	  creada. Por último, la directiva <command>network_size</command>
-	  indica el tmaña de cada subred asociada a cada vlan. Es decir, que con
-	  esta configuración, cada vlan será un segmento de red del tipo
+	  indica el tamaño de cada subred asociada a cada vlan. Es decir, que
+	  con esta configuración, cada vlan será un segmento de red del tipo
 	  10.0.X.0/24.</para>
 	</section>
 	<section>
@@ -1004,12 +912,16 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 	<section>
 	  <title>Creación de un rango de IP flotantes</title>
 	  <para>Como indicábamos anteriormente a las instancias se le puede
-	  asignar dinámicamente una ip pública o flotante que nos permite el
-	  acceso a ella desde la red pública. En esta sección vamos a indicar
-	  como se crea el rango de ip flotantes.</para>
-	  <para>Nosotros vamos a crear un rango de ip flotante con el
-	  siguiente <command> nova-manage floating create</command> de
-	  la siguiente manera:</para>
+	  asignar dinámicamente una ip flotante que nos permite el acceso a ella
+	  desde la red pública. En esta sección vamos a indicar como se crea el
+	  rango de ip flotantes.</para>
+	  <note><para>Estas IP reciben el nombre de flotantes porque
+	  pueden asociarse a una instancia en un determinado momento, para
+	  posteriormente desasociarla y asociarla a una instancia
+	  diferente.</para></note>
+	  <para>Nosotros vamos a crear inicialmente un segmento /24 de
+	  direcciones IP de la red pública para utilizar como direcciones IP
+	  flotantes:
 	  <screen><prompt>root@jupiter:~# </prompt><userinput>nova-manage floating create --ip_range=172.22.221.0/24</userinput></screen>
 	</section>
       </section>
@@ -1084,31 +996,28 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
     (ejecución de instancias, creación de pares de clave ssh, asociación de
     direcciones IP flotantes) y algunas tareas de administración (gestión de
     cuotas de los proyectos, gestión de instancias, etc.)</para>
-    <section>
-      <title>Instalación</title>
-      <para>El dashboard Horizon lo vamos a instalar en el nodo controlador
-      jupiter, para ello instalamos desde el repositorio de Debian:</para>
-      <screen><prompt>root@jupiter:~# </prompt><userinput>aptitude install apache2 openstack-dashboard openstack-dashboard-apache</userinput></screen>
-      <para>Como podemos observar utilizamos el servidor web Apache2, en el cual
-      se configura un virtual host que podemos configurar en el fichero
-      <filename>/etc/apache2/sites-availables/openstack-dashboard</filename>. Para
-      acceder a la aplicación web podemos acceder desde una navegador a la URL:
-      <uri>http://direccion_ip_jupiter:8080/</uri>.</para>
-      <para>Como observamos por defecto utiliza el puerto 8080 para el acceso,
-      si queremos utilizar el puerto 80, simplemente debemos modificar el
-      fichero
-      <filename>/etc/apache2/sites-availables/openstack-dashboard</filename> y
-      realizar las siguientes modificaciones en las dos primeras líneas:</para>
-      <programlisting>
-	Listen 80
-	&lt;VirtualHost *:80&gt;
-      </programlisting>
-      <para>Y a continuación desactivamos el virtual host por defecto y
-      reiniciamos el servidor web.</para>
-      <screen>
-	<prompt>root@jupiter:~# </prompt><userinput>a2dissite default</userinput>
-	<prompt>root@jupiter:~# </prompt><userinput>service apache2 restart</userinput>
-      </screen>
-    </section>
+    <para>El dashboard Horizon lo vamos a instalar en el nodo controlador
+    jupiter, para ello instalamos desde el repositorio de Debian:</para>
+    <screen><prompt>root@jupiter:~# </prompt><userinput>aptitude install apache2 openstack-dashboard openstack-dashboard-apache</userinput></screen>
+    <para>Como podemos observar utilizamos el servidor web Apache2, en el cual
+    se configura un virtual host que podemos configurar en el fichero
+    <filename>/etc/apache2/sites-availables/openstack-dashboard</filename>. Para
+    acceder a la aplicación web podemos acceder desde una navegador a la URL:
+    <uri>http://direccion_ip_jupiter:8080/</uri>.</para>
+    <para>Como observamos por defecto utiliza el puerto 8080 para el acceso,
+    si queremos utilizar el puerto 80, simplemente debemos modificar el
+    fichero
+    <filename>/etc/apache2/sites-availables/openstack-dashboard</filename> y
+    realizar las siguientes modificaciones en las dos primeras líneas:</para>
+    <programlisting>
+      Listen 80
+      &lt;VirtualHost *:80&gt;
+    </programlisting>
+    <para>Y a continuación desactivamos el virtual host por defecto y
+    reiniciamos el servidor web.</para>
+    <screen>
+      <prompt>root@jupiter:~# </prompt><userinput>a2dissite default</userinput>
+      <prompt>root@jupiter:~# </prompt><userinput>service apache2 restart</userinput>
+    </screen>
   </section>
 </chapter>

@@ -5,11 +5,13 @@
       xmlns:svg="http://www.w3.org/2000/svg"
       xmlns:html="http://www.w3.org/1999/xhtml"
       version="5.0"
+      xml:lang="es"
       xml:id="AdminOpenStack">
   <?rax pdf.url="../AdminOpenStack.pdf"?>
-  <title>Administración de OpenStack</title>
-  <subtitle>Instalación, configuración y explotación de OpenStack Essex en
-  Debian GNU/Linux (Wheezy) y Ubuntu 12.04 LTS</subtitle>
+  <title>Administración de OpenStack Essex</title>
+  <subtitle>
+    Instalación, configuración y explotación
+  </subtitle>
   <info>
     <author>
       <personname>
@@ -58,6 +60,15 @@
     </author>
     <author>
       <personname>
+	<firstname>Javier</firstname>
+	<surname>Pedrajas Capilla</surname>
+      </personname>
+      <affiliation>
+	<orgname>IES Los Albares</orgname>
+      </affiliation>
+    </author>
+    <author>
+      <personname>
 	<firstname>Cayetano</firstname>
 	<surname>Reinaldos Duarte</surname>
       </personname>
@@ -78,7 +89,6 @@
     <!--   <year>2012</year> -->
     <!--   <holder>Proyecto Cloud Computing</holder> -->
     <!-- </copyright> -->
-    <releaseinfo>1.0</releaseinfo>
     <productname>Documentación Proyecto Cloud</productname>
     <pubdate>10-11-2012</pubdate>
     <legalnotice role="apache2">
@@ -108,6 +118,11 @@
       convocan ayudas destinadas a la realización de proyectos de innovación
       aplicada y transferencia del conocimiento en la formación profesional del
       sistema educativo (BOE número 100 del 27 de abril de 2011).</para>
+      <para>El capítulo de introducción y el capítulo dedicado a redes incluyen
+      algunos fragmentos traducidos de <link
+      xlink:href="http://docs.openstack.org/essex/openstack-compute/admin/content/"
+      >OpenStack Compute Administration Manual</link> de la documentación
+      oficial del proyecto OpenStack.</para>
     </abstract>
     <revhistory>
       <revision>
