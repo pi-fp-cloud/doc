@@ -96,8 +96,7 @@
         diversas prácticas.</para>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="figures/epoca1.png" scalefit="1"
-width="100%" contentdepth="100%" format="PNG"
+          <imagedata fileref="figures/epoca1.png" scalefit="1" width="80%" contentdepth="100%" format="PNG"
 		     align="center"/>
         </imageobject>
         <caption>
@@ -165,7 +164,7 @@ width="100%" contentdepth="100%" format="PNG"
       <mediaobject>
         <imageobject>
           <imagedata fileref="figures/epoca2.png" scalefit="1"
-		     width="100%" contentdepth="100%" format="PNG"
+		     width="80%" contentdepth="100%" format="PNG"
 		     align="center"/>
         </imageobject>
         <caption>
@@ -238,7 +237,7 @@ width="100%" contentdepth="100%" format="PNG"
       <mediaobject>
         <imageobject>
           <imagedata fileref="figures/epoca3.png" scalefit="1"
-		     width="100%" contentdepth="100%" format="PNG"
+		     width="80%" contentdepth="100%" format="PNG"
 		     align="center"/>
         </imageobject>
         <caption>
