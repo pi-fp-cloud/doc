@@ -39,6 +39,16 @@
 	  institución educativa donde se impartan enseñanzas relacionadas con
 	  las Tecnologías de la Información y la Comunicación (TIC).</para>
         </abstract>
+	<legalnotice role="apache2">
+      <annotation>
+	<remark>Copyright details are filled in by the template.</remark>
+      </annotation>
+    </legalnotice>
+    <legalnotice role="cc-by-sa">
+      <annotation>
+	<remark>Remaining licensing details are filled in by the template.</remark>
+      </annotation>
+    </legalnotice>
     </info>
     <xi:include href="ch_introduccion.xml"/>    
     <xi:include href="ch_tipos_de_cloud.xml"/>    
