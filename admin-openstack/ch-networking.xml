@@ -865,47 +865,292 @@ Options:
        desasociarla de su proyecto, esto se puede hacer a través del comando
        <command>nova-manage network modify</command>.</para>
 
-       <para>Crear una red de forma automática puede hacer que AQUI</para>
+       <para>Crear una red hace que de forma automática se vayan creando
+       registros en la base de datos de Nova Compute con direcciones IP fijas. Se puede
+       ver la lista de todas las direcciones IP junto a la máquina virtual asociada a
+       través del comando:</para>
 
+       <screen><prompt>root@jupiter:~# </prompt><userinput>nova-manage fix list</userinput></screen>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-       
-
-
-
-       
+       <para>Si los usuarios necesitan acceder a sus instancias a través de una
+       VPN, es necesario crear una instancia VPN especial a través de <emphasis
+       role="italic">cloudpipe</emphasis>. </para>       
      </section>
+
+     <section>
+       <title>VLAN Networking con libvirt</title>
+       <para>Para que los nodos del cloud soporten el etiquetado VLAN es
+       necesario instalar, en cada uno de los nodos, el paquete
+       <literal>vlan</literal>, además es necesario cargar el módulo del kernel
+       <literal>8021q</literal>. Como root ejecutamos los siguientes
+       comandos:</para>
+
+       <screen>
+<prompt># </prompt><userinput>apt-get install vlan</userinput>
+<prompt># </prompt><userinput>modprobe 8021q</userinput>
+       </screen>
    
+       <para>Para que el módulo <literal>80021q</literal> vuelva a cargarse
+       durante el inicio de la máquina añadimos la siguiente línea al fichero
+       <filename>/etc/modules</filename>:</para>
+       <programlisting>
+8021q
+       </programlisting>
+
+       <para>En algunos casos, nova-network no es capaz de detener correctamente
+       los bridges y las VLAN cuando se para el servicio. Al intentar reiniciar
+       el servicio es posible que no se inicie porque el bridge sigue
+       activo, en este caso hay que leer los logs detenidamente y parar las
+       interfaces relacionadas manualmente, también se recomienda matar todos
+       los procesos dnsmasq. Todas estas acciones se resumen a ejecutar, como
+       root, los siguientes comandos: </para>
+
+       <screen>
+         <prompt># </prompt><userinput>stop nova-network</userinput>
+         <prompt># </prompt><userinput>vconfig rem vlan169</userinput>
+         <prompt># </prompt><userinput>ip link set br169 down</userinput>
+         <prompt># </prompt><userinput>brctl delbr br169</userinput>
+         <prompt># </prompt><userinput>killall dnsmasq</userinput>
+         <prompt># </prompt><userinput>start nova-network</userinput>
+       </screen>
+     </section>
   </section>
 
   <section>
     <title>Habilitar ping y SSH en las VMs</title>
-    <para></para>
-    
+    <para>Es importante asegurarse de que se puede acceder a las máquinas
+    virtuales a través de SSH y de que las VMs responden a los mensajes ICMP de
+    solicitud de eco (pings). Esto se puede conseguir a través de los comandos
+    <command>euca-authorize</command> y <command>nova
+    secgroup-add-rule</command>.</para>
+
+    <note>
+      <para>Estos comandos solo se tienen que ejecutar como root si las
+      credenciales de acceso figuran en el fichero
+      <filename>/root/.bashrc</filename>. Cualquier usuario puede ejecutar estos
+      comandos si sus credenciales están configuradas en su propio fichero
+      <filename>.bashrc</filename>.</para>
+    </note>
+
+    <para>Para activar el acceso ICMP y SSH ejecutamos:</para>
+
+    <itemizedlist>
+      <listitem>
+	<para>Con el comando nova:</para>
+	<screen>
+	  <prompt># </prompt><userinput>nova secgroup-add-rule default icmp -1 -1 -s 0.0.0.0/0</userinput>
+	  <prompt># </prompt><userinput>nova secgroup-add-rule default tcp 22 22 -s 0.0.0.0/0</userinput> 
+	</screen>
+
+      </listitem>
+
+      <listitem>
+	<para>Con euca2tools:</para>
+	<screen>
+	  <prompt># </prompt><userinput>euca-authorize -P icmp -t -1:-1 -s 0.0.0.0/0 default</userinput>
+	  <prompt># </prompt><userinput>euca-authorize -P tcp -p 22 -s 0.0.0.0/0 default</userinput>
+	</screen>
+      </listitem>
+    </itemizedlist>
+
+    <para>Si tras la ejecución de estos comandos no se puede acceder a la VM, se
+    recomienda comprobar si hay exactamente dos procesos dnsmasq en ejecución,
+    si no, ejecutamos los siguientes comandos:</para>
+    <screen>
+      <prompt># </prompt><userinput>killall dnsmasq</userinput>
+      <prompt># </prompt><userinput>service nova-network restart</userinput>
+    </screen> 
   </section>
 
   <section>
-    <title>Configurando direcciones IP públicas (floating IP)</title>
-    <para></para>
-    
+    <title>Configurando direcciones IP públicas (floating)</title>
+
+    <section>
+      <title>Direcciones IP públicas y privadas</title>
+      <para>A cada máquina virtual se le asigna de forma automática una
+      dirección IP privada. Opcionalmente se puede asignar a una VM una
+      dirección pública, accesible desde la red externa. Para esta dirección IP
+      pública, OpenStack utiliza la denominación "flotante" por tratarse de una
+      dirección IP (en el rango de nuestra red externa) que puede asignarse de
+      forma dinámica a cualquier máquina virtual. OpenStack hace NAT (Network
+      Address Translation) sobre estas direcciones para que puedan ser
+      utilizadas por las VMs.</para>
+
+      <para>Si se planea utilizar esta característica, se debe añadir la
+      siguiente línea en el fichero <filename>nova.conf</filename> para
+      especificar sobre qué interfaz tiene que enlazar la IP pública el
+      servicio nova-network.</para>
+
+      <programlisting>
+public_interface=vlan100
+      </programlisting>
+
+      <para>Si se modifica el fichero <filename>nova.conf</filename>, basta con
+      volver a reiniciar el servicio nova-network.</para>
+
+      <note>
+	<title>Tráfico entre las VMs que usen direcciones IP flotantes</title>
+	<para>Debido a la forma en la que se implementan las direcciones
+	flotantes, Source NAT (reglas SNAT con iptables), se pueden producir
+	resultados inesperados sobre los grupos de seguridad, sobretodo en el
+	caso de que las VMs utilicen sus direcciones flotantes para comunicarse
+	con otras máquinas virtuales, y peor aún, que lo hagan dentro del mismo
+	nodo. El tráfico entre VMs a través de la red fija, no tiene este
+	problema y es la forma recomendada para que las máquinas se
+	interconecten. Para asegurar que el tráfico interno no pase por NAT, hay
+	que fijar el parámetro <literal>dmz_cidr=x.x.x.x/y</literal>. Siendo
+	x.x.x.x/y el rango de las direcciones flotantes que se hayan
+	definido.</para>
+      </note>      
+    </section>
+
+    <section>
+      <title>Habilitando el reenvío IP</title>
+      <para>Por defecto, en una máquina Ubuntu, el reenvío IP (forwarding IP ó
+      enrutamiento) está desactivado por defecto.</para>
+
+      <note>
+	<para>El reenvío IP solo se tiene que habilitar en los nodos que ejecuten
+	el servicio nova-network. Si se implementa un despliegue multi-nodo
+	habrá que activar el enrutamiento en todos los nodos que ejecuten el
+	servicio nova-network.</para>
+      </note>
+
+      <para>Para activarlo basta con seguir los siguientes pasos:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para>Comprobamos que está inactivo si el siguiente comando devuelve
+	  el valor cero:</para>
+	  <screen>
+	    <prompt># </prompt><userinput>cat /proc/sys/net/ipv4/ip_forward</userinput>
+	  </screen>
+	  <para>También nos podemos asegurar a través del comando:</para>
+	  <screen>
+	    <prompt># </prompt><userinput>sysctl net.ipv4.ip_forward</userinput>
+	  </screen>
+	</listitem>
+
+	<listitem>
+	  <para>Habilitamos el reenvío, para ello ejecutamos cualquiera de los
+	  siguientes comandos:</para>
+	  <screen>
+	    <prompt># </prompt><userinput>echo 1 > /proc/sys/net/ipv4/ip_forward</userinput>
+	  </screen>
+	  <screen>
+	    <prompt># </prompt><userinput>sysctl -w net.ipv4.ip_forward=1</userinput>
+	  </screen>
+
+	  <para>Para hacer los cambios permanentes tras un reinicio, modificamos
+	  el fichero <filename>/etc/sysctl.conf</filename> actualizando la configuración
+	  en la línea:</para>
+	  <programlisting>
+net.ipv4.ip_forward=1
+	  </programlisting>
+	</listitem>
+      </orderedlist>
+    </section>
+
+    <section>
+      <title>Creando una lista de direcciones IP flotantes</title>
+      <para>Nova mantiene una lista de direcciones IP flotantes que están
+      disponibles para asignar a las instancias, para añadir entradas a esta
+      línea está disponible el comando <command>nova-manage floating
+      create</command>.</para>
+
+      <para>Por ejemplo:</para>
+      <screen>
+	<prompt># </prompt><userinput>nova-manage floating create --ip_range=68.99.26.170/31</userinput>
+      </screen>
+
+      <para>Los comando nova-manage disponibles para la gestión de direcciones ip
+      flotantes son:</para>
+
+      <itemizedlist>
+	<listitem>
+	  <para><command>nova-manage floating list</command>: muestra las
+	  direcciones IP flotantes del pool.</para>
+	</listitem>
+
+	<listitem>
+	  <para><command>nova-manage floating create [cidr]</command>: crea las
+	  direcciones IP flotantes que se especifiquen, ya sea una sola
+	  dirección o una subred completa.</para>
+	</listitem>
+
+	<listitem>
+	  <para><command>nova-manage floating delete [cidr]</command>: elimina
+	  direcciones flotantes, necesita el mismo parámetro que se indicó
+	  durante la creación.</para>
+	</listitem>
+
+      </itemizedlist>      
+    </section>
+
+    <section>
+      <title>Añadiendo una dirección IP flotante a una instancia</title>
+      <para>Añadir una dirección IP flotante a una instancia es un proceso de
+      dos pasos:</para>
+
+      <orderedlist>
+	<listitem>
+	  <para><command>nova floating-ip-create</command>: reserva una
+	  dirección IP flotante de la lista de direcciones disponibles.</para>
+	</listitem>
+
+	<listitem>
+	  <para><command>nova add-floating-ip</command>: añade una dirección IP
+	  flotante a una máquina virtual en ejecución.</para>
+	</listitem>
+      </orderedlist>
+
+      <para>El siguiente ejemplo muestra cómo asignar una dirección IP flotante
+      a la instancia con el ID 12:</para>
+
+      <screen>
+<prompt>$</prompt> <userinput>nova floating-ip-create</userinput>
+<computeroutput>
++-----------------+-------------+----------+------+
+|        Ip       | Instance Id | Fixed Ip | Pool |
++-----------------+-------------+----------+------+
+|    68.99.26.170 | None        | None     |      |
++-----------------+-------------+----------+------+
+</computeroutput>
+<prompt>$</prompt> <userinput>nova add-floating-ip 12 68.99.26.170</userinput>
+      </screen>
+
+      <para>Para desasociar la IP de la instancia y eliminar la dirección,
+      ejecutamos los siguientes comandos:</para>
+
+      <screen>
+<prompt>$</prompt> <userinput>nova remove-floating-ip 12 68.99.26.170</userinput>
+<prompt>$</prompt> <userinput>nova floating-ip-delete 68.99.26.170</userinput>
+      </screen>
+
+    </section>
+   
+    <section>
+      <title>Asignación automática de direcciones IP flotantes</title>
+      <para>El servicio nova-network puede configurarse para que realice una
+      asignación automática de direcciones IP flotantes a las instancias
+      conforme éstas se van lanzando. Basta con añadir el siguiente parámetro al
+      fichero de configuración <filename>nova.conf</filename> y reiniciar el
+      servicio:</para>
+      
+      <programlisting>
+auto_assign_floating_ip=True
+      </programlisting>
+
+      <para>Si se habilita esta opción y todas las direcciones IP ya han sido
+      reservadas, el comando <command>nova boot</command> mostrará un error.</para>      
+    </section>
   </section>
 
+<!--
   <section>
     <title>Alta disponibilidad con Nova-Network</title>
     <para></para>
     
   </section>
-
+-->
 </chapter>
