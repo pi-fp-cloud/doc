@@ -274,7 +274,7 @@ http://169.254.169.254/latest/meta-data/public-keys/0/openssh-key
     </programlisting>
 
     <para>Las instancias también pueden recuperar información sobre el usuario
-    (pasados a través del parámetro user_data en la llamada a la API o a través del
+    (a través del parámetro user_data en la llamada a la API o a través del
     parámetro <literal>--user_data</literal> del comando <command>nova
     boot</command>) a través del servicio de metadatos, realizando la siguiente
     solicitud GET:</para>
@@ -289,7 +289,7 @@ http://169.254.169.254/latest/user-data
     <para>Este servicio de metadatos está implementado a través del servicio
     <literal>nova-api</literal> o a través de
     <literal>nova-api-metadata</literal> (este último solo se ejecuta en el modo
-    multi-host). Si se ejecuta el servicio <literal>nova-api</literal>,
+    multi-host). Si se ejecuta el servicio <literal>nova-api</literal>, 
     <literal>metadata</literal> debe ser uno de los elementos de la lista del
     parámetro <literal>enabled_apis</literal> en el fichero de configuración
     <filename>nova.conf</filename>. La opción por defecto para
@@ -299,7 +299,7 @@ http://169.254.169.254/latest/user-data
     servicio <literal>nova-network</literal> configura iptables para realizar
     NAT de la dirección 169.254.169.254 en el puerto 80 hacia la máquina
     configurada en el parámetro <literal>metadata_host</literal> (por defecto
-    valor $my_ip, la cual es la IP del servicio nova-network) y puerto
+    valor $my_ip, la cual es la IP del servicio nova-network) con el puerto
     especificado en el parámetro <literal>metadata_port</literal> (por defecto
     puerto 8775) en el fichero de configuración
     <filename>nova.conf</filename>. </para>
@@ -315,9 +315,12 @@ http://169.254.169.254/latest/user-data
       ejecutan sobre el mismo host. Si este no es el caso, se debe realizar el
       siguiente cambio en fichero <filename>/etc/nova/nova.conf</filename> del
       host que ejecute el servicio <literal>nova-network</literal>:</para>
-
-      <para>Fijar la opción <literal>metadata_host</literal> a la dirección IP
+      <itemizedlist>
+	<listitem>
+	  <para>Fijar la opción <literal>metadata_host</literal> a la dirección IP
       del nodo que esté ejecutando el servicio <literal>nova-api</literal>.</para>
+	</listitem>	
+      </itemizedlist>
     </note>
 
   </section>
@@ -342,28 +345,30 @@ http://169.254.169.254/latest/user-data
       </listitem>    
     </orderedlist>
 
-    <para>Por defecto Compute usa el modo VLAN. Se puede elegir el modo de red
-    para las máquinas virtuales a través del fichero de configuración
-    <filename>nova.conf</filename> de cualquiera de estas tres formas:</para> 
+    <para>Por defecto, Nova Compute usa el modo <literal>VLAN</literal>. Se
+    puede elegir el modo de red para las máquinas virtuales a través del fichero de
+    configuración <filename>nova.conf</filename> de cualquiera de estas tres
+    formas:</para>
 
     <itemizedlist>
       <listitem>
-	<para>Red simple, sin VLAN:</para>
+	<para><literal>Flat</literal>, red simple sin VLAN:</para>
 	<programlisting>
 --network_manager=nova.network.manager.FlatManager
 	</programlisting>
       </listitem>
 
       <listitem>
-	<para>Flat DCHP, se debe indicar un bridge a través de la opción
-	<literal>flat_network_bridge</literal>:</para>
+	<para><literal>FlatDCHP</literal>, se debe indicar un bridge a través
+	de la opción <literal>flat_network_bridge</literal>:</para>
 	<programlisting>
 --network_manager=nova.network.manager.FlatDHCPManager
 	</programlisting>
       </listitem>
 
       <listitem>
-	<para>Red VLAN con DHCP, configuración por defecto. Se puede indicar con:</para>
+	<para><literal>VLAN</literal>, red VLAN con DHCP, configuración por
+	defecto. Se puede indicar con:</para>
 	<programlisting>
 --network_manager=nova.network.manager.VlanManager
 	</programlisting>
@@ -380,17 +385,16 @@ nova-manage network create private 192.168.0.0/24 1 256
 
     <section>
       <title>Configurando una red Flat</title>
-      <para>FlatNetworking utiliza adaptadores ethernet configurados como
-      bridges para permitir tráfico de red entre varios nodos. Esta
-      configuración se puede realizar con un solo adaptador físico o
-      varios. Esta opción no requiere que de un switch que realice etiquetado
-      VLAN y es una configuración muy común en instalaciones de desarrollo o
-      configuraciones para prueba de conceptos. Cuando se opta por este tipo de
-      red, Nova no realiza ninguna gestión de la red. En vez de eso, las
-      direcciones IP se inyectan en la instancia a través de modificaciones en
-      el sistema de ficheros de las VMs (o a través de agentes). El reenvío de
-      metainformación de sebe configurar manualmente en el gateway en el caso de
-      que se necesite.</para>
+      <para><literal>Flat</literal> utiliza adaptadores ethernet configurados
+      como bridges para permitir tráfico de red entre varios nodos. Esta configuración
+      se puede realizar con un solo adaptador físico o varios. Esta opción no requiere
+      de un switch que realice etiquetado VLAN y es una configuración muy común en
+      instalaciones de desarrollo o configuraciones para pruebas de concepto. Cuando
+      se opta por este tipo de red, Nova no realiza ninguna gestión de la red. En vez
+      de eso, las direcciones IP se inyectan en la instancia a través de
+      modificaciones en el sistema de ficheros de las VMs (o a través de agentes). El
+      reenvío de metainformación de sebe configurar manualmente en el gateway en el
+      caso de que se necesite.</para>
 
       <para>Para configurar este tipo de red, hay que asegurarse de que en el
       fichero nova.conf aparezca una línea con el siguiente contenido:</para>
@@ -446,7 +450,7 @@ iface br100 inet dhcp
     bridge_fd       0
 	</programlisting>
 
-	<para>Y reiniciamos el servicio a través del siguiente comando:</para>
+	<para>Y reiniciar el servicio a través del siguiente comando:</para>
 	<screen><prompt># </prompt><userinput>root@ayla:~# /etc/init.d/networking restart</userinput></screen>
 
 	<para>Para esta configuración todo en uno, perfecta para entornos de
@@ -499,14 +503,14 @@ iface br100 inet dhcp
     </section>
 
     <section>
-      <title>Configurando una red Flat DHCP</title>
-      <para>Con Flat DHCP, el host o los hosts que ejecutan nova-network actúan
-      como gateways para las máquinas virtuales. Si se está utilizando la
-      configuración single-host (un solo nodo ejecutando nova-network) se puede
-      utiliza el parámetro optativo <literal>network_host</literal> del fichero
-      <filename>nova.conf</filename> del nodo para indicar qué nodo está
+      <title>Configurando una red FlatDHCP</title>
+      <para>Con <literal>FlatDHCP</literal>, el host o los hosts que ejecutan
+      nova-network actúan como gateways para las máquinas virtuales. Si se está
+      utilizando la configuración single-host (un solo nodo ejecutando nova-network)
+      se puede utiliza el parámetro optativo <literal>network_host</literal> del
+      fichero <filename>nova.conf</filename> del nodo para indicar qué nodo está
       ejecutando nova-network, de esta forma se consigue una comunicación más
-      eficiente con nova-network.</para>
+      eficiente con el gestor de red.</para>
 
       <para>En cualquier configuración FlatNetworking (con o sin DHCP), el host
       que ejecuta el servicio nova-network es el responsable de reenviar el
@@ -532,7 +536,7 @@ iface br100 inet dhcp
       utilice para la red que une a las VMs, ya que esto pondría a las VMs y al
       host en la misma red lógica. Cuando una VM arranca, envía una petición
       DHCP solicitando una dirección, y el servidor DHCP responde con la
-      dirección IP asignada a la máquina. Esta dirección IP se asigna realmente
+      dirección IP asignada a la máquina. Esta dirección IP es asignada realmente
       por Nova, Nova la añade en el fichero de configuración del servidor DHCP,
       que se limita a darle a la VM la dirección.</para>
 
@@ -540,10 +544,10 @@ iface br100 inet dhcp
       solo nodo de ejecución de nova-network en <link
       xlink:href="http://www.mirantis.com/blog/openstack-networking-single-host-flatdhcpmanager/">este
       blog</link>. Ciertas partes del documento también son relevantes en el
-      resto de nodos. </para>
+      resto de modos. </para>
 
       <para>FlatDCHP no crea ninguna VLAN, tan solo crea un bridge. Este bridge
-      funciona correctamente en instalaciones de un solo nodo, cuando entran en
+      funciona correctamente en instalaciones de un solo nodo; cuando entran en
       juego varios nodos, el tráfico necesita una forma de salir del bridge
       hacia una interfaz física.</para>
 
@@ -668,7 +672,7 @@ public_interface=eth0
 	 habla de redes VLAN. En cualquier caso, estamos haciendo referencia a
 	 un rango de direcciones IP especificadas por una subred (como en
 	 <literal>172.16.20.0/24</literal>) que se encuentran en la misma VLAN
-	 (red nivel 2).</para>
+	 (nivel 2).</para>
        </note>
 
        <para>Implementar el modo de red VLAN es más complicado que el resto de
@@ -691,13 +695,13 @@ public_interface=eth0
 
 	 <listitem>
 	   <para>Se necesita obtener información del administrador de la red
-	   para configurar nova Compute de forma adecuada (máscaras derd,
+	   para configurar nova Compute de forma adecuada (máscaras de red,
 	   direcciones broadcast, gateways, identificadores VLAN, etc).</para>
 	 </listitem>	 
        </itemizedlist>
 
-       <para>VLAN es el modo de red por defecto en OpenStack, se puede
-       configurar a través del parámetro:</para>
+       <para>Aunque <literal>VLAN</literal> sea el modo de red por defecto en
+       OpenStack, se puede forzar la configuración a través del parámetro:</para>
 
        <programlisting>
 network_manager=nova.network.manager.VlanManager
@@ -722,18 +726,17 @@ network_manager=nova.network.manager.VlanManager
        network create</command>. Ejemplo: podemos crear una red, como root,
        a través del siguiente comando:</para>
 
-       <screen>
-         <prompt>#</prompt> <userinput>nova-manage network create --label=example-net --fixed_range_v4=172.16.169.0/24 --vlan=169 --bridge=br169 --project_id=a421ae28356b4cc3a25e1429a0b02e98 --num_networks=1</userinput>
+       <screen><prompt>#</prompt>
+nova-manage network create --label=example-net --fixed_range_v4=172.16.169.0/24 --vlan=169 --bridge=br169 --project_id=a421ae28356b4cc3a25e1429a0b02e98 --num_networks=1
        </screen>
 
        <para>Este ejemplo crea una red denominada <literal>example-net</literal>
-       asociada al proyecto (tenant) <literal>a421ae...0b02e9</literal>. La
-       subred es la <literal>172.16.169.0/24</literal> con una etiqueta VLAN
-       (tag) de <literal>169</literal>, no es necesario que la etiqueta coincida
-       con el tercer byte de la dirección, pero es una asociación muy útil como
-       nemotécnico. Este comando crea además un bridge denominado
-       <literal>br169</literal> en el host que ejecuta el servicio nova-network.
-       Este bridge aparecerá al ejecutar el comando
+       asociada al proyecto (tenant) <literal>a421ae...0b02e9</literal>. La subred es
+       la <literal>172.16.169.0/24</literal> con una etiqueta VLAN (tag) de
+       <literal>169</literal>, no es necesario que la etiqueta coincida con el tercer
+       byte de la dirección, pero es una asociación nemotécnica muy útil. Este
+       comando crea además un bridge denominado <literal>br169</literal> en el host que
+       ejecuta el servicio nova-network.  Este bridge aparecerá al ejecutar el comando
        <command>ifconfig</command>.</para>
 
        <para>Cada red se asocia con un proyecto o tenant, esta asociación se
@@ -751,12 +754,12 @@ network_manager=nova.network.manager.VlanManager
 
        <para>Por ejemplo, el siguiente comando crearía 100 redes, desde la
        <literal>172.16.100.0/24</literal> hasta la
-       <literal>172.16.199.0/24</literal>. Asumiendo que se ha fijado en el
-       fichero de configuración <filename>nova.conf</filename> el parámetro
-       <literal>network_size=256</literal> (este valor siempre se puede pasar
-       también en el comando <command>nova-manage</command>:</para>
-       <screen>
-         <prompt>#</prompt> nova-manage network create --num_networks=100 --fixed_range_v4=172.16.100.0/24
+       <literal>172.16.199.0/24</literal>. Asumiendo que se ha fijado en el fichero de
+       configuración <filename>nova.conf</filename> el parámetro
+       <literal>network_size=256</literal> (este valor siempre se puede indicar
+       en el comando <command>nova-manage</command>:</para>
+       <screen><prompt>#</prompt>
+nova-manage network create --num_networks=100 --fixed_range_v4=172.16.100.0/24
        </screen>
 
        <para>El comando <command>nova-manage network create</command> soporta
@@ -844,8 +847,8 @@ Options:
   --disassociate-host   Disassociate Host from Project
        </programlisting>
 
-       <para>Para eliminar una red podemos utilizar el comando
-       <command>nova-manage network delete</command>, como root:</para>
+       <para>Para eliminar una red podemos utilizar, como root, el comando
+       <command>nova-manage network delete</command>:</para>
 
        <programlisting>
 root@jupiter:~# nova-manage network delete --help
@@ -859,7 +862,7 @@ Options:
        </programlisting>
 
        <para>Hay que destacar que no se puede borrar una red sin antes
-       desasociarla de su proyecto, podemos hacerlo a través del comando
+       desasociarla de su proyecto, esto se puede hacer a través del comando
        <command>nova-manage network modify</command>.</para>
 
        <para>Crear una red de forma automática puede hacer que AQUI</para>
