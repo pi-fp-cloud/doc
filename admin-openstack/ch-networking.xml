@@ -4,14 +4,16 @@
          xmlns:xlink="http://www.w3.org/1999/xlink" version="5.0"
          xml:id="ch-networking">
   <title>Networking</title>
-  <para>Es importante conocer todas las opciones de configuración a nivel de red
-  que proporciona OpenStack para diseñar una infraestructura de red acorde a
-  nuestras necesidades.</para>
+  <para>Uno de los aspectos más importantes a la hora de configurar una
+  infraestructura de Cloud Computing es la red. Esto hace completamente
+  indispensable conocer todas las opciones de configuración de red 
+  que OpenStack proporciona, para poder diseñar una infraestructura de
+  comunicaciones acorde a nuestras necesidades.</para>
 
   <section>
     <title>Opciones de red</title>
     <para>En esta sección se ofrece un breve resumen de los conceptos
-    importantes sobre red para Nova Compute. Desde la release
+    importantes sobre la red para Nova Compute. Desde la release
     <literal>Folsom</literal> se puede configurar la red eligiendo entre dos
     alternativas:</para>
     <itemizedlist>
@@ -39,9 +41,9 @@
     redes virtuales que habilitan a los nodos de computación interactuar entre
     ellos y con la red pública.</para>
 
-    <para>Actualmente, la configuración de Nova Compute con nova-network soporta
+    <para>Actualmente, la configuración Nova Compute más nova-network soporta
     tres clases de redes, implementadas a través de tres gestores de redes
-    ("Network Manager"):</para>
+    ("Network Managers"):</para>
     <itemizedlist>
       <listitem>
 	<para>Flat Network Manager.</para>
@@ -58,7 +60,7 @@
     </itemizedlist>
     
     <para>En principio, las tres clases de redes pueden coexistir en un único
-    sistema cloud. Sin embargo no cabe la posibilidad de elegir dentro de un
+    sistema cloud. Sin embargo, no cabe la posibilidad de elegir dentro de un
     proyecto entre los tres tipos de redes, por lo que hasta ahora no se puede
     elegir más de un tipo de red para una única instalación de Nova
     Compute.</para>
@@ -73,7 +75,7 @@
       la red pública y otra para la red privada. Esto viene configurado a través de la
       opción <literal>public_interface</literal> en el caso de la red pública y
       <literal>flat_interface</literal>/<literal>vlan_interface</literal> en el caso
-      de la red privada (según el gestor utilizado flat/VLAN).</para>
+      de la red privada (según el gestor utilizado Flat/VLAN).</para>
 
       <para>La interfaz de la red interna se utiliza en la comunicación entre
       las VMs y NO DEBERÍA tener ninguna dirección IP configurada antes de la
@@ -102,7 +104,7 @@
     ejecuta un único servidor DHCP (dnsmasq). Mientras que el modo multi-host
     todos los nodos de computación ejecutan su propio instancia de
     <literal>nova-network</literal>. En cualquier caso, todo el tráfico entre
-    las VMs y la red externa fluye a través del servicio
+    las VMs y la red externa es responsabilidad exclusiva del servicio
     <literal>nova-network</literal>.</para>
 
     <para>Compute realiza un distinción entre las direcciones que se asignan a
@@ -120,7 +122,7 @@
     instancia recibe una única dirección IP del pool de direcciones
     disponibles. El administrador de la red debe configurar el bridge de Linux
     (normalmente denominando <literal>br100</literal>, aunque esto es
-    configurable) tanto en el nodo que hospeda al controlador de la red, como en
+    configurable) tanto en el nodo que hospeda al gestor de la red, como en los
     nodos que ejecutan las instancias. Todas las instancias del sistema se unen
     al mismo bridge, configurado manualmente por el administrador de la
     red.</para>
@@ -131,58 +133,56 @@
       a través del fichero <filename>/etc/network/interfaces</filename>.</para>
     </note>
 
-    <para>En el modo <literal>Flat DHCP</literal>, OpenStack inicia un servidor
+    <para>En el modo <literal>FlatDHCP</literal>, OpenStack inicia un servidor
     DHCP (a través del proceso dnsmasq) para la asignación de direcciones IP a
-    las instancias desde la subred especificada además de configurar el bridge
+    las instancias desde la subred especificada, además de configurar el bridge
     de red.</para>
 
-    <para>De la misma forma que en el modo Flat, todas las instancias se
-    conectan a un único bridge en el nodo de computación, en este modo, además,
-    se ejecuta un servidor DHCP encargado de configurar las instancias
-    (dependiendo del modo single/multi-host junto a cada uno de los procesos
-    nova-network). En este modo, Compute hace un poco más de trabajo aparte de
-    unir al bridge una interfaz de red (la indicada a través de
+    <para>De la misma forma que en el modo Flat, en el modo FlatDHCP todas las
+    instancias se conectan a un único bridge en el nodo de computación, en este
+    modo, además, se ejecuta un servidor DHCP encargado de configurar las instancias
+    (dependiendo del modo single/multi-host) junto a cada uno de los procesos
+    nova-network). En este modo, Compute hace un poco más de trabajo aparte de unir
+    al bridge una interfaz de red (la indicada a través de
     <literal>flat_interface</literal>, <literal>eth0</literal> por defecto),
-    configura y ejecuta un proceso dnsmasq, que actúa como servidor DHCP sobre
-    el bridge configurado, normalmente en la dirección 10.0.0.1. Para cada
-    máquina virtual, Nova reserva una dirección IP fija y configura a dnsmasq
-    con el par MAC/IP para la VM; dnsmasq no participa en el proceso de reserva
-    de las direcciones, solo gestiona las IPs según el mapeo realizado por Nova.
-    Las instancias reciben una dirección IP fija a través de un dhcpdiscover,
-    estas IPs no se asignan a ninguna de las interfaces del anfitrión, solo a
-    las interfaces de las máquinas virtuales.</para>
+    configura y ejecuta un proceso dnsmasq, que actúa como servidor DHCP sobre el
+    bridge configurado, normalmente en la dirección 10.0.0.1. Para cada máquina
+    virtual, Nova reserva una dirección IP fija y configura a dnsmasq con el par
+    MAC/IP para la VM; dnsmasq no participa en el proceso de reserva de las
+    direcciones, solo gestiona las IPs según el mapeo realizado por Nova.  Las
+    instancias reciben una dirección IP fija a través de un dhcpdiscover, estas IPs
+    no se asignan a ninguna de las interfaces del anfitrión, solo a las interfaces
+    de las máquinas virtuales.</para>
 
-    <para>En cualquier configuración de red <literal>Flat</literal>, los hosts
-    que ejecutan el servicio nova-network son los responsables de reenviar el
-    tráfico desde la red privada, configurada en el fichero
-    <filename>nova-conf</filename> a través del parámetro
-    <literal>fixed_range</literal>. Estos hosts necesitan tener configurado un
-    bridge, br100, y conectado físicamente a cualquier otro nodo que hospede
-    máquinas virtuales. Es necesario configurar la opción
+    <para>En cualquier configuración de red Flat, los hosts que ejecutan el
+    servicio nova-network son los responsables de reenviar el tráfico desde la red
+    privada, configurada en el fichero <filename>nova-conf</filename> a través del
+    parámetro <literal>fixed_range</literal>. Estos hosts necesitan tener
+    configurado un bridge, br100, y conectado físicamente a cualquier otro nodo que
+    hospede máquinas virtuales. Es necesario configurar la opción
     <literal>flat_network_bridge</literal> o crear redes con el parámetro bridge
     para evitar posibles errores.</para>
 
     <note>
-      <para>En el modo Flat DHCP con una configuración single-host es posible
-      hacer pings a las máquinas virtuales a través de sus dirección IP fijas
-      desde el nodo que ejecuta el servicio nova-network, sin embargo no es
-      posible hacerlo desde el resto de nodos. Este es el comportamiento que se
-      debe esperar.</para>
+      <para>En el modo <literal>FlatDHCP</literal> con una configuración
+      single-host es posible hacer pings a las máquinas virtuales a través de sus
+      dirección IP fijas desde el nodo que ejecuta el servicio nova-network, sin
+      embargo no es posible hacerlo desde el resto de nodos. Este es el comportamiento
+      que se debe esperar.</para>
     </note>
 
-    <para>El modo de red VLAN es el modo por defecto para una instalación de
-    OpenStack. En este modo, Compute crea una VLAN y un bridge para cada
-    proyecto. Para una instalación de múltiples máquinas, el modo de red VLAN
+    <para>El modo de red <literal>VLAN</literal> es el modo por defecto para una
+    instalación de OpenStack. En este modo, Compute crea una VLAN y un bridge para
+    cada proyecto. Para una instalación de múltiples máquinas, el modo de red VLAN
     necesita de un switch que soporte etiquetado VLAN (802.1q). Cada proyecto
-    consigue un rango de direcciones privadas que son accesibles únicamente
-    desde dentro de la VLAN. Para que un usuario pueda acceder a las instancias
-    de su proyecto, se tiene que crear una instancia especial VPN (con nombre en
-    clave cloudpipe). Compute genera un certificado y una clave para que el
-    usuario pueda acceder a la VPN y la inicia de forma automática. Esto
-    proporciona un segmento de red privado para las instancias de cada
-    proyecto y permite que puedan ser accedidas desde Internet a través de una
-    conexión VPN. En este modo, cada proyecto obtiene su propia VLAN, su propio
-    bridge Linux y su subred.</para>
+    consigue un rango de direcciones privadas que son accesibles únicamente desde
+    dentro de la VLAN. Para que un usuario pueda acceder a las instancias de su
+    proyecto, se tiene que crear una instancia especial VPN (con nombre en clave
+    cloudpipe). Compute genera un certificado y una clave para que el usuario pueda
+    acceder a la VPN y la inicia de forma automática. Esto proporciona un segmento
+    de red privado para las instancias de cada proyecto y permite que puedan ser
+    accedidas desde Internet a través de una conexión VPN. En este modo, cada
+    proyecto obtiene su propia VLAN, su propio bridge Linux y su subred.</para>
 
     <para>Las subredes son especificadas por el administrador de la red, y se
     asignan de forma dinámica a un proyecto cuando se requiere. Dentro de cada
@@ -190,7 +190,7 @@
     IP a las máquinas virtuales desde la subred asignada al proyecto. Todas las
     instancias que pertenecen a un proyecto se unen a un mismo bridge dentro de
     la misma VLAN del proyecto. OpenStack Compute crea todos los bridges de
-    Linux necesarios así como las VLANs cuando se requiera.</para>
+    Linux necesarios así como las VLANs cuando se requiere.</para>
 
     <note>
       <para>Con la configuración por defecto de Compute, una vez que una máquina
@@ -221,9 +221,9 @@
   <section>
     <title>Servidor DHCP: dnsmasq</title>
     <para>El servicio Compute utiliza <literal>dnsmasq</literal> como servidor
-    DHCP, tanto en modo Flat DHCP como en el modo VLAN. El servicio
-    <literal>nova-network</literal> es el encargado de iniciar los procesos
-    dnsmasq necesarios.</para>
+    DHCP, tanto en modo <literal>FlatDHCP</literal> como en el modo
+    <literal>VLAN</literal>. El servicio <literal>nova-network</literal> es el
+    encargado de iniciar los procesos dnsmasq necesarios.</para>
 
     <para>El comportamiento del proceso dnsmasq es configurable a través de la
     creación de su fichero de configuración. Basta especificar el fichero a
@@ -237,10 +237,10 @@ dnsmasq_config_file=/etc/dnsmasq-nova.conf
     se recomienda leer la documentación oficial de dnsmasq.</para>
 
     <para>dnsmasq también es capaz de actuar de caché DNS para las máquinas
-    virtuales, se puede configurar directamente en el fichero de configuración
-    de Nova, <filename>nova.conf</filename>, a través de la opción
-    <literal>dns_server</literal> qué servidor DNS se utilizará, por
-    ejemplo, si queremos utilizar el servidor DNS público de Google, basta con
+    virtuales, se puede configurar directamente en el fichero de configuración de
+    Nova, <filename>nova.conf</filename>, a través de la opción
+    <literal>dns_server</literal>. En ella se indica qué servidor DNS se utilizará,
+    por ejemplo, si queremos utilizar el servidor DNS público de Google, basta con
     especificar:</para>
     <programlisting>
 dns_server=8.8.8.8
@@ -631,6 +631,16 @@ public_interface=eth0
        <para>Acto seguido, el host configurado con nova-network actúa como
        router reenviando el tráfico hacia Internet.</para>
 
+       <figure>
+	 <title>Hosts con una sola interfaz, segunda ruta</title>
+	 <mediaobject>
+	   <imageobject>
+	     <imagedata scale="80"
+			 fileref="figures/SingleInterfaceOutbound_2.png" />
+	   </imageobject>
+	 </mediaobject>
+       </figure>	
+
        <warning>
 	 <para>Si se está utilizando una única interfaz , entonces la interfaz
 	 (a menudo eth0) debe estar configurada en modo promiscuo para que el
@@ -641,7 +651,237 @@ public_interface=eth0
 
      <section>
        <title>Configurando VLAN Networking</title>
-       <para></para>
+       <para>Nova Compute puede configurarse para que las máquinas virtuales de
+       los diferentes proyectos (<emphasis role="italic">projects</emphasis> o
+       <emphasis role="italic">tenants</emphasis>) residan en subredes
+       distintas; de esta forma las máquinas virtuales de un proyecto no pueden
+       comunicarse con las máquinas virtuales de otros proyectos. Cada una de
+       las subredes en las que se enmarcan los proyectos tienen una etiqueta
+       VLAN distinta. Esto es muy útil para entornos de red con un gran espacio
+       de direcciones IP ya que permite separarlo en subredes más
+       pequeñas. El propósito de dividir las redes a nivel 3 y a nivel 2 es
+       conseguir un control de los dominios de broadcasting y conseguir un nivel
+       adicional de aislamiento en entornos multiproyecto (multi-tenant).</para>
+
+       <note>
+	 <para>Los términos red y subred son a menudo intercambiables cuando se
+	 habla de redes VLAN. En cualquier caso, estamos haciendo referencia a
+	 un rango de direcciones IP especificadas por una subred (como en
+	 <literal>172.16.20.0/24</literal>) que se encuentran en la misma VLAN
+	 (red nivel 2).</para>
+       </note>
+
+       <para>Implementar el modo de red VLAN es más complicado que el resto de
+       modos de red. En particular: </para>
+
+       <itemizedlist>
+	 <listitem>
+	   <para>Hay que habilitar el reenvío IP (IP forwarding).</para>
+	 </listitem>
+
+	 <listitem>
+	   <para>Los hosts que ejecuten nova-network y nova-compute deben cargar
+	   el módulo del kernel <literal>8021q</literal>.</para>
+	 </listitem>
+
+	 <listitem>
+	   <para>Los switches de la red deben ser configurados para habilitar
+	   las etiquetas VLAN específicas de la configuración de Nova.</para>
+	 </listitem>
+
+	 <listitem>
+	   <para>Se necesita obtener información del administrador de la red
+	   para configurar nova Compute de forma adecuada (máscaras derd,
+	   direcciones broadcast, gateways, identificadores VLAN, etc).</para>
+	 </listitem>	 
+       </itemizedlist>
+
+       <para>VLAN es el modo de red por defecto en OpenStack, se puede
+       configurar a través del parámetro:</para>
+
+       <programlisting>
+network_manager=nova.network.manager.VlanManager
+       </programlisting>
+
+       <para>Los bridges creados por el gestor de red se unirán a la interfaz
+       indicada en el parámetro <literal>vlan_interface</literal>, por defecto
+       <literal>eth0</literal>.</para>
+
+       <para>La opción <literal>fixed_range</literal> indica el bloque CIDR que
+       describe el espacio de direcciones IP para todas las máquinas
+       virtuales. Este espacio se dividirá en subredes, normalmente direcciones
+       privadas como por ejemplo 172.16.0.0/12.</para>
+
+       <para>La opción <literal>network_size</literal> normalmente hace
+       referencia al número de direcciones IP en cada red, aunque este
+       comportamiento puede ser anulado cuando se crea la red. Un tamaño de
+       <literal>256</literal> se corresponder con una red
+       <literal>/24</literal>.</para>
+
+       <para>Las redes se crean a través del comando <command>nova-manage
+       network create</command>. Ejemplo: podemos crear una red, como root,
+       a través del siguiente comando:</para>
+
+       <screen>
+         <prompt>#</prompt> <userinput>nova-manage network create --label=example-net --fixed_range_v4=172.16.169.0/24 --vlan=169 --bridge=br169 --project_id=a421ae28356b4cc3a25e1429a0b02e98 --num_networks=1</userinput>
+       </screen>
+
+       <para>Este ejemplo crea una red denominada <literal>example-net</literal>
+       asociada al proyecto (tenant) <literal>a421ae...0b02e9</literal>. La
+       subred es la <literal>172.16.169.0/24</literal> con una etiqueta VLAN
+       (tag) de <literal>169</literal>, no es necesario que la etiqueta coincida
+       con el tercer byte de la dirección, pero es una asociación muy útil como
+       nemotécnico. Este comando crea además un bridge denominado
+       <literal>br169</literal> en el host que ejecuta el servicio nova-network.
+       Este bridge aparecerá al ejecutar el comando
+       <command>ifconfig</command>.</para>
+
+       <para>Cada red se asocia con un proyecto o tenant, esta asociación se
+       puede hacer patente en el momento de la creación a través de la opción
+       <literal>project_id</literal> indicando el identificador del proyecto. Se
+       puede obtener una lista de los proyectos y sus correspondientes
+       identificadores a través del comando <command>keystone
+       tenant-list</command>.</para>
+
+       <para>En vez de especificar manualmente una VLAN, un bridge y un
+       proyecto, se pueden crear todas las redes de una sola vez, y de dejar que
+       el servicio Nova Compute asocie de forma automática estas redes con los
+       proyectos según se vaya necesitando. De la misma forma se generarían los
+       identificadores de la VLAN y los nombres de los bridges.</para>
+
+       <para>Por ejemplo, el siguiente comando crearía 100 redes, desde la
+       <literal>172.16.100.0/24</literal> hasta la
+       <literal>172.16.199.0/24</literal>. Asumiendo que se ha fijado en el
+       fichero de configuración <filename>nova.conf</filename> el parámetro
+       <literal>network_size=256</literal> (este valor siempre se puede pasar
+       también en el comando <command>nova-manage</command>:</para>
+       <screen>
+         <prompt>#</prompt> nova-manage network create --num_networks=100 --fixed_range_v4=172.16.100.0/24
+       </screen>
+
+       <para>El comando <command>nova-manage network create</command> soporta
+       una gran variedad de opciones de configuración, las cuáles pueden
+       obtenerse a través de la opción <literal>--help</literal></para>
+
+       <programlisting>
+root@jupiter:~# nova-manage network create --help
+Usage: nova-manage network create &lt;args> [options]
+
+Options:
+  -h, --help            show this help message and exit
+  --label=&lt;label>       Label for network (ex: public)
+  --fixed_range_v4=&lt;x.x.x.x/yy>
+                        IPv4 subnet (ex: 10.0.0.0/8)
+  --num_networks=&lt;number>
+                        Number of networks to create
+  --network_size=&lt;number>
+                        Number of IPs per network
+  --vlan=&lt;vlan id>      vlan id
+  --vpn=VPN_START       vpn start
+  --fixed_range_v6=FIXED_RANGE_V6
+                        IPv6 subnet (ex: fe80::/64
+  --gateway=GATEWAY     gateway
+  --gateway_v6=GATEWAY_V6
+                        ipv6 gateway
+  --bridge=&lt;bridge>     VIFs on this network are connected to this bridge
+  --bridge_interface=&lt;bridge interface>
+                        the bridge is connected to this interface
+  --multi_host=&lt;'T'|'F'>
+                        Multi host
+  --dns1=&lt;DNS Address>  First DNS
+  --dns2=&lt;DNS Address>  Second DNS
+  --uuid=&lt;network uuid>
+                        Network UUID
+  --fixed_cidr=&lt;x.x.x.x/yy>
+                        IPv4 subnet for fixed IPS (ex: 10.20.0.0/16)
+  --project_id=&lt;project id>
+                        Project id
+  --priority=&lt;number>   Network interface priority
+
+       </programlisting>
+       
+       <para>En particular, las opciones del comando <command>nova-manage
+       network create</command> que pueden ser utilizadas para anular ciertos
+       valores del fichero de configuración <filename>nova.conf</filename> son:</para>
+
+       <variablelist>
+	 <varlistentry>
+	   <term><literal>--network-size</literal></term>
+	   <listitem>
+	     <para>Reemplaza a la opción <literal>network_size</literal>.</para>
+	   </listitem>
+	 </varlistentry>
+	 
+	 <varlistentry>
+	   <term><literal>--bridge_interface</literal></term>
+	   <listitem>
+	     <para>Reemplaza a la opción <literal>vlan_interface</literal>.</para>
+	   </listitem>
+	 </varlistentry>	 
+       </variablelist>
+
+       <para>Para la lista de las redes que tenemos creadas ejecutamos, como
+       root, el comando:</para>
+
+       <screen><prompt>#</prompt> <userinput>nova-manage network list</userinput></screen>
+
+       <para>Para modificar una red existente, podemos utilizar, como root, el
+       comando <command>nova-manage network modify</command>:</para>
+
+       <programlisting>
+root@jupiter:~# nova-manage network modify --help
+Usage: nova-manage network modify &lt;args> [options]
+
+Options:
+  -h, --help            show this help message and exit
+  --fixed_range=&lt;x.x.x.x/yy>
+                        Network to modify
+  --project=&lt;project name>
+                        Project name to associate
+  --host=&lt;host>         Host to associate
+  --disassociate-project
+                        Disassociate Network from Project
+  --disassociate-host   Disassociate Host from Project
+       </programlisting>
+
+       <para>Para eliminar una red podemos utilizar el comando
+       <command>nova-manage network delete</command>, como root:</para>
+
+       <programlisting>
+root@jupiter:~# nova-manage network delete --help
+Usage: nova-manage network delete &lt;args> [options]
+
+Options:
+  -h, --help            show this help message and exit
+  --fixed_range=&lt;x.x.x.x/yy>
+                        Network to delete
+  --uuid=&lt;uuid>         UUID of network to delete
+       </programlisting>
+
+       <para>Hay que destacar que no se puede borrar una red sin antes
+       desasociarla de su proyecto, podemos hacerlo a través del comando
+       <command>nova-manage network modify</command>.</para>
+
+       <para>Crear una red de forma automática puede hacer que AQUI</para>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+       
+
+
+
        
      </section>
    
