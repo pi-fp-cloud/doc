@@ -1274,10 +1274,11 @@ rbd_pool=nova
 
   </section>
 
+<!--
   <section xml:id="id-arranque-volumenes">
     <title>Iniciando una instancia desde un volumen</title>
     <para>POR HACER.</para>
     
   </section>
-
+-->
 </chapter>
