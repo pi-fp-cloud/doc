@@ -96,7 +96,9 @@
         diversas prácticas.</para>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="figures/epoca1.png" width="15cm" format="PNG"/>
+          <imagedata fileref="figures/epoca1.png" scalefit="1"
+width="100%" contentdepth="100%" format="PNG"
+		     align="center"/>
         </imageobject>
         <caption>
           <para>Esquema de un aula de la primera época en la que los alumnos debían compartir los
@@ -162,7 +164,9 @@
         diversas.</para>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="figures/epoca2.png" width="15cm" format="PNG"/>
+          <imagedata fileref="figures/epoca2.png" scalefit="1"
+		     width="100%" contentdepth="100%" format="PNG"
+		     align="center"/>
         </imageobject>
         <caption>
           <para>Esquema de un aula de la segunda época en la que los alumnos ejecutan máquinas
@@ -233,7 +237,9 @@
         infraestructura único en el centro educativo y que lo utilicen todos los alumnos.</para>
       <mediaobject>
         <imageobject>
-          <imagedata fileref="figures/epoca3.png" width="15cm" format="PNG"/>
+          <imagedata fileref="figures/epoca3.png" scalefit="1"
+		     width="100%" contentdepth="100%" format="PNG"
+		     align="center"/>
         </imageobject>
         <caption>
           <para>Hipotético esquema de un aula de la tercera época en la que los alumnos ejecutan

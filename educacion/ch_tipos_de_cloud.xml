@@ -8,7 +8,9 @@
     siguiente figura:</para>
   <mediaobject>
     <imageobject>
-      <imagedata fileref="figures/tipos_de_cloud.png" width="20cm" format="PNG"/>
+      <imagedata fileref="figures/tipos_de_cloud.png"
+		  scalefit="1" width="100%" contentdepth="100%" format="PNG"
+		  align="center"/> 
     </imageobject>
     <caption>
       <para>Diagrama esquemático con los diferentes tipos de cloud, lo que ofrece cada uno y a quién
