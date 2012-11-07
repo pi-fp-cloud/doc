@@ -491,14 +491,14 @@ iscsi_target_prefix=iqn.2012-08.net.iescierva:jupiter:
 	<para>Comprobamos que el servicio está activo a través del
 	comando:</para>
 	<screen><prompt>root@jupiter:~# </prompt><userinput>nova-manage service	list</userinput>
-Binary           Host                                 Zone             Status     State Updated_At
-nova-scheduler   jupiter                              nova             enabled    :-)   2012-08-06 08:13:10
-nova-consoleauth jupiter                              nova             enabled    :-)   2012-08-06 08:13:09
-nova-cert        jupiter                              nova             enabled    :-)   2012-08-06 08:13:10
-nova-compute     jupiter                              nova             enabled    :-)   2012-08-06 08:13:12
-nova-volume      jupiter                              nova             enabled    :-)   2012-08-06 08:13:11
-nova-network     jupiter                              nova             enabled    :-)   2012-08-06 08:13:13
-nova-compute     io                                   nova             enabled    :-)   2012-08-06 08:13:13
+Binary           Host        Zone     Status     State Updated_At
+nova-scheduler   jupiter     nova     enabled    :-)   2012-08-06 08:13:10
+nova-consoleauth jupiter     nova     enabled    :-)   2012-08-06 08:13:09
+nova-cert        jupiter     nova     enabled    :-)   2012-08-06 08:13:10
+nova-compute     jupiter     nova     enabled    :-)   2012-08-06 08:13:12
+nova-volume      jupiter     nova     enabled    :-)   2012-08-06 08:13:11
+nova-network     jupiter     nova     enabled    :-)   2012-08-06 08:13:13
+nova-compute     io          nova     enabled    :-)   2012-08-06 08:13:13
 	</screen>
 
       </listitem>
@@ -620,11 +620,11 @@ Target 1: iqn.2012-08.net.iescierva:jupiter:volume-00000001
 	    <para>El estado del volumen ha cambiado:</para>
 	    <screen>
 <prompt>root@jupiter:~# </prompt><userinput>nova volume-list</userinput>
-+----+--------+--------------+------+-------------+--------------------------------------+
-| ID | Status | Display Name | Size | Volume Type |             Attached to              |
-+----+--------+--------------+------+-------------+--------------------------------------+
-| 1  | in-use | volumen00    | 5    | None        | de701111-5b42-456a-b3ea-1609d49ebc2f |
-+----+--------+--------------+------+-------------+--------------------------------------+
++----+--------+--------------+------+-------------+-------------------+
+| ID | Status | Display Name | Size | Volume Type |      Attached to  |
++----+--------+--------------+------+-------------+-------------------+
+| 1  | in-use | volumen00    | 5    | None        | de701111-5b42-... |
++----+--------+--------------+------+-------------+-------------------+
 	    </screen>
 	  </listitem>
 
@@ -784,11 +784,9 @@ nova volume-create [--snapshot_id <snapshot_id>]
       <listitem>
 	<para><emphasis role="bold">nova volume-attach</emphasis></para>
 	<para>Conecta un volumen a una instancia (máquina virtual).</para>
-	<programlisting>
-<![CDATA[
-nova volume-attach <server> <volume> <device>
-]]>
-	</programlisting>
+	<screen>
+$ nova volume-attach &lt;server&gt; &lt;volume&gt; &lt;device&gt;
+	</screen>
 	<para>Es necesario indicar:</para>
 	<itemizedlist>
 	  <listitem>
@@ -830,9 +828,7 @@ nova volume-attach <server> <volume> <device>
 	<para><emphasis role="bold">nova volume-detach</emphasis></para>
 	<para>Desconecta un volumen de una instancia (máquina virtual).</para>
 	<programlisting>
-<![CDATA[
-nova volume-detach <server> <volume>
-]]>  
+<![CDATA[nova volume-detach <server> <volume>]]>  
 	</programlisting>
 	<para>Es necesario indicar:</para>
 	<itemizedlist>
@@ -856,9 +852,7 @@ nova volume-detach <server> <volume>
 	<para><emphasis role="bold">nova volume-delete</emphasis></para>
 	<para>Elimina un volumen.</para>
 	<programlisting>
-<![CDATA[
-nova volume-delete <volume>
-]]>  
+<![CDATA[nova volume-delete <volume>]]>  
 	</programlisting>
 	<para>Es necesario indicar:</para>
 	<itemizedlist>
@@ -927,9 +921,7 @@ usage: nova volume-list
 	<para><emphasis role="bold">nova volume-show</emphasis></para>
 	<para>Muestra información detallada sobre un volumen.</para>
 	<programlisting>
-<![CDATA[
-usage: nova volume-show <volume>
-]]>
+<![CDATA[usage: nova volume-show <volume>]]>
 	</programlisting>
 	<para>Es necesario indicar:</para>
 	<itemizedlist>
