@@ -5,33 +5,24 @@
          xml:id="ch-admin-openstack">
   <title>Administración de OpenStack</title>
 
-  <para>Aunque gran parte de tareas de administración de OpenStack se pueden realizar
-  de forma intuitiva desde la interfaz gráfica web Horizon(dashboard), aquí se presentan los comandos más usados para la administración desde la consola</para>
+  <para>Aunque gran parte de tareas de administración de OpenStack se pueden
+  realizar de forma intuitiva desde la interfaz gráfica web Horizon(dashboard),
+  aquí se presentan los comandos más usados para la administración desde la 
+  consola</para>
  
   <section>
-    <title>Gestión de instancias</title>
-    
+    <title>Gestión de instancias</title>    
     <para>Una vez que se tenga alguna imagen dada de alta en nuestro sistema se
     podrán arrancar instancias de ésta. Estas instancias se ejecutarán en el o
     los nodos de computación que estén activos.</para>
-
     <para>Podemos listar las imágenes que tengamos en glance:</para>
-
-    <screen><prompt>$ </prompt><userinput>glance index</userinput></screen>
-
     <screen>
-root@neo:~# glance index
-ID                                   Name                           Disk Format
-Container Format     Size          
------------------------------------- ------------------------------
--------------------- -------------------- --------------
-86119171-9ed6-435c-9620-573e0b440e58 Windows 7 general              vdi
-bare                    14463094784
-2710174c-9388-4d55-8ece-ace0250817de Ubuntu 12.04 Server            qcow2
-bare                      233177088
-838d547b-4a6c-4177-9e6a-fb6695b67cd4 Cirros (test) 0.3.0 64 bits    qcow2
-bare                        9761280
-root@neo:~#
+<prompt>root@jupiter:~# </prompt><userinput>glance index</userinput>
+ID      Name                        Disk Format   Container Format Size          
+------- --------------------------- ------------- ---------------- -----------
+861-... Windows 7 general            vdi          bare             14463094784
+271-... Ubuntu 12.04 Server          qcow2        bare             233177088
+838-... Cirros (test) 0.3.0 64 bits  qcow2        bare             9761280
     </screen>
     
     <para>Como vemos tenemos actualmente tres imágenes disponibles para ser
@@ -39,12 +30,9 @@ root@neo:~#
     imagenes en qcow2, una de Ubuntu 12.04 Server y otra Cirros.</para>
 
     <para>Para instanciar una de las imágenes es necesario saber qué plantillas
-    de ejecución (flavor) tenemos disponibles en nuestro sistema.</para>
-
-    <para>Si no las conocemos, listamos las plantillas disponibles en nuestro sistema:</para>
-    
-    <screen><prompt>$ </prompt><userinput>nova manage flavor list</userinput></screen>
-
+    de ejecución (flavor) tenemos disponibles en nuestro sistema. Si no las
+    conocemos, listamos las plantillas disponibles en nuestro sistema:</para>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova manage flavor list</userinput></screen>
     <screen>
 m1.medium: Memory: 4096MB, VCPUS: 2, Root: 40GB, Ephemeral: 0Gb, FlavorID: 3,
 Swap: 0MB, RXTX Factor: 1.0
@@ -64,7 +52,7 @@ Swap: 0MB, RXTX Factor: 1.0
     <para>En nuestro ejemplo vamos a instanciar la imagen de Ubuntu con la plantilla
     <emphasis>m1.small</emphasis></para>
 
-    <screen><prompt>$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small ubuntuserver1</userinput></screen>
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small ubuntuserver1</userinput></screen>
 
     <screen>
 +-------------------------------------+--------------------------------------+
@@ -96,22 +84,18 @@ Swap: 0MB, RXTX Factor: 1.0
 | user_id                             | 4c249654613e41208b2d03169ef29580     |
 +-------------------------------------+--------------------------------------+
     </screen>
-
-
     <para>Podemos ver que el sistema nos ha devuelto todos los datos de la instancia que se
     está construyendo.</para>
 
     <para>Seguidamente se puede listar en qué estado está nuestras instancias con:</para>
 
-    <screen><prompt>$ </prompt><userinput>nova list</userinput></screen>
-
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova list</userinput></screen>
     <screen>
-+--------------------------------------+---------------+--------+------------------+
-|                  ID                  |      Name     | Status |     Networks
-|
-+--------------------------------------+---------------+--------+------------------+
-| f7cb19ef-06a4-433e-806c-ab0db55e30a2 | ubuntuserver1 | BUILD  | private=10.0.0.2 |
-+--------------------------------------+---------------+--------+------------------+
++--------------+---------------+--------+------------------+
+|   ID         |      Name     | Status |     Networks     |
++--------------+---------------+--------+------------------+
+| f7cb19ef-... | ubuntuserver1 | BUILD  | private=10.0.0.2 |
++--------------+---------------+--------+------------------+
     </screen>
 
     <para>Como vemos la instancia está aún construyéndose</para>
@@ -119,34 +103,27 @@ Swap: 0MB, RXTX Factor: 1.0
     <para>Si todo ha ido bien al cabo de un tiempo deberá aparecer la instancia como
     activa</para>
 
-    <screen><prompt>$ </prompt><userinput>nova list</userinput>
-+--------------------------------------+---------------+--------+------------------+
-|                  ID                  |      Name     | Status |     Networks
-|
-+--------------------------------------+---------------+--------+------------------+
-| f7cb19ef-06a4-433e-806c-ab0db55e30a2 | ubuntuserver1 | ACTIVE | private=10.0.0.2 |
-+--------------------------------------+---------------+--------+------------------+
+    <screen><prompt>usuario@venus:~$ </prompt><userinput>nova list</userinput>
++--------------+---------------+--------+------------------+
+|   ID         |      Name     | Status |     Networks     |
++--------------+---------------+--------+------------------+
+| f7cb19ef-... | ubuntuserver1 | ACTIVE | private=10.0.0.2 |
++--------------+---------------+--------+------------------+
     </screen>
 
     <para>Una vez creadas varias instancias podemos ver su estado:</para>
 
     <screen><prompt>$ </prompt><userinput>nova list</userinput></screen>
     <screen>
-+--------------------------------------+---------------+--------+------------------+
-|                  ID                  |      Name     | Status |     Networks
-|
-+--------------------------------------+---------------+--------+------------------+
-| 9273c28b-7db9-41aa-916a-b4589420af58 | ubuntuserver4 | ACTIVE |
-private=10.0.0.5 |
-| cd5e6c35-9e62-49d7-815f-c3ea09540806 | ubuntuserver2 | ACTIVE |
-private=10.0.0.3 |
-| dbefde80-48e1-48b0-a8b0-84f2ddc7a1f7 | ubuntuserver3 | ACTIVE |
-private=10.0.0.4 |
-| f7cb19ef-06a4-433e-806c-ab0db55e30a2 | ubuntuserver1 | ACTIVE |
-private=10.0.0.2 |
-+--------------------------------------+---------------+--------+------------------+
++--------------+---------------+--------+------------------+
+|   ID         |      Name     | Status |     Networks     |
++--------------+---------------+--------+------------------+
+| 9273c28b-... | ubuntuserver4 | ACTIVE | private=10.0.0.2 |
+| cd5e6c35-... | ubuntuserver2 | ACTIVE | private=10.0.0.3 |
+| dbefde80-... | ubuntuserver3 | ACTIVE | private=10.0.0.4 |
+| f7cb19ef-... | ubuntuserver1 | ACTIVE | private=10.0.0.5 |
++--------------+---------------+--------+------------------+
     </screen>
-
     <para>Las demás acciones que se pueden realizar con una instancia se listan
     a continuación:</para>
     <itemizedlist>
@@ -157,63 +134,39 @@ private=10.0.0.2 |
 	<screen><prompt>$ </prompt><userinput>nova boot --image "Ubuntu 12.04 Server" --flavor m1.small --hint force_hosts=trinity ubuntuserver5</userinput></screen>
 
 <screen>
-+-------------------------------------+----------------------------------------------------------+
-|               Property              |                          Value
-|
-+-------------------------------------+----------------------------------------------------------+
-| OS-DCF:diskConfig                   | MANUAL
-|
-| OS-EXT-SRV-ATTR:host                | trinity
-|
-| OS-EXT-SRV-ATTR:hypervisor_hostname | None
-|
-| OS-EXT-SRV-ATTR:instance_name       | instance-0000003c
-|
-| OS-EXT-STS:power_state              | 1
-|
-| OS-EXT-STS:task_state               | None
-|
-| OS-EXT-STS:vm_state                 | active
-|
-| accessIPv4                          |
-|
-| accessIPv6                          |
-|
-| config_drive                        |
-|
-| created                             | 2012-09-19T18:30:48Z
-|
-| flavor                              | m1.small
-|
-| hostId                              |
-c4cfd12e74d001411d189ab076248cd268b2b7cfda5017cf67376682 |
-| id                                  | d21be20f-3a03-4979-8d5c-6a32dab71a43
-|
-| image                               | Ubuntu 12.04 Server
-|
-| key_name                            |
-|
-| metadata                            | {}
-|
-| name                                | ubuntuserver5
-|
-| private network                     | 10.0.0.6
-|
-| progress                            | 0
-|
-| status                              | ACTIVE
-|
-| tenant_id                           | a70373bf297a42eb9203645d84476c23
-|
-| updated                             | 2012-09-19T18:30:29Z
-|
-| user_id                             | 4c249654613e41208b2d03169ef29580
-|
-+-------------------------------------+----------------------------------------------------------+
++-------------------------------------+--------------------------------+
+|               Property              |                Value           |
++-------------------------------------+--------------------------------+
+| OS-DCF:diskConfig                   | MANUAL                         |
+| OS-EXT-SRV-ATTR:host                | trinity                        |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | None                           |
+| OS-EXT-SRV-ATTR:instance_name       | instance-0000003c              |
+| OS-EXT-STS:power_state              | 1                              |
+| OS-EXT-STS:task_state               | None                           |
+| OS-EXT-STS:vm_state                 | active                         |
+| accessIPv4                          |                                |
+| accessIPv6                          |                                |
+| config_drive                        |                                |
+| created                             | 2012-09-19T18:30:48Z           |
+| flavor                              | m1.small                       |
+| hostId                              |c4cfd12e74d001411d189ab076248...|
+| id                                  | d21be20f-3a03-4979-8d5c-6a32...|
+| image                               | Ubuntu 12.04 Server            |
+| key_name                            |                                |
+| metadata                            | {}                             |
+| name                                | ubuntuserver5                  |
+| private network                     | 10.0.0.6                       |
+| progress                            | 0                              |
+| status                              | ACTIVE                         |
+| tenant_id                           | a70373bf297a42eb9203645d8447...|
+| updated                             | 2012-09-19T18:30:29Z           |
+| user_id                             | 4c249654613e41208b2d03169ef2...|
++-------------------------------------+--------------------------------+
 	</screen>
-	<note><para>Atención la funcionalidad de forzar nodo de computación solo funciona con ciertos tipos
-	de planificadores (scheduler). No funciona
-	con<emphasis>SimpleScheduler</emphasis> pero si con <emphasis>Filter Scheduler</emphasis></para></note> 
+	<note><para>Atención la funcionalidad de forzar nodo de computación solo
+	funciona con ciertos tipos de planificadores (scheduler). No funciona
+	con <emphasis>SimpleScheduler</emphasis> pero si con <emphasis>Filter
+	Scheduler</emphasis></para></note>
 
       </listitem>
       <listitem>
@@ -273,11 +226,10 @@ m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 
     <listitem>
       <para><emphasis role="bold">Borrar una plantilla
       existente</emphasis></para>
-      <screen><prompt>$</prompt><userinput>nova-manage flavor delete --name=m1.xxlarge</userinput></screen>
+      <screen><prompt>$ </prompt><userinput>nova-manage flavor delete --name=m1.xxlarge</userinput></screen>
     </listitem>
   </itemizedlist>
 </section>
-
 
 <section xml:id="id_admin_usuarios">
   <title>Gestión de usuarios</title>
@@ -295,79 +247,71 @@ m1.xlarge: Memory: 16384MB, VCPUS: 8, Root: 10GB, Ephemeral: 160Gb, FlavorID: 5 
   <itemizedlist>
   <listitem>
     <para> <emphasis role="bold">Listar los usuarios existentes</emphasis></para>
-    <screen><prompt>$</prompt><userinput>keystone user-list</userinput></screen>
+    <screen><prompt>$ </prompt><userinput>keystone user-list</userinput></screen>
     <screen>
 +----------------------------------+---------+--------------------+--------+
 |                id                | enabled |       email        |  name  |
 +----------------------------------+---------+--------------------+--------+
-| 05743001bbf14700bcdf2ecc43edbf9b | True    | alex@iescierva.net | admin  |
-| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | alex@iescierva.net | swift  |
-| 291c58f7258747758d109ecee2eb4a69 | True    | alex@iescierva.net | glance |
-| 404dafc53b364a7e9f1476aa98082966 | True    | alex@iescierva.net | nova   |
+| 05743001bbf14700bcdf2ecc43edbf9b | True    | user@example.com   | admin  |
+| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | user@example.com   | swift  |
+| 291c58f7258747758d109ecee2eb4a69 | True    | user@example.com   | glance |
+| 404dafc53b364a7e9f1476aa98082966 | True    | user@example.com   | nova   |
 +----------------------------------+---------+--------------------+--------+
     </screen>
   </listitem>
   <listitem>
   <para><emphasis role="bold">Crear un usuario nuevo asociado a un proyecto (sabiendo el id de proyecto-tenant)</emphasis></para>
-<screen><prompt>$</prompt><userinput> keystone user-create --name alumno
+<screen><prompt>$ </prompt><userinput> keystone user-create --name alumno
 --tenant_id e7b1868b24a742318f1d73f612ecfe1d --pass curso12-13 --email correo@gmail.com 
 </userinput></screen>
 
 <screen>
-+----------+-------------------------------------------------------------------------------------------------------------------------+
-| Property |                                                          Value
-|
-+----------+-------------------------------------------------------------------------------------------------------------------------+
-| email    | correo@gmail.com
-|
-| enabled  | True
-|
-| id       | d0bfed18cce3460892ae99ee812d8aa3
-|
-| name     | alumno
-|
-| password |
-$6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiOwVSHtLU5HvkZBXrqXEmU0dvqjgNhfBc6eK6HZbatJ.CQDgQvkUNVrIBAjY1
-|
-| tenantId | e7b1868b24a742318f1d73f612ecfe1d
-|
-+----------+-------------------------------------------------------------------------------------------------------------------------+
-<prompt>$</prompt><userinput> keystone user-list </userinput>
++----------+----------------------------------------------------------------+
+| Property |  Value                                                         |
++----------+----------------------------------------------------------------+
+| email    | correo@gmail.com                                               |
+| enabled  | True                                                           |
+| id       | d0bfed18cce3460892ae99ee812d8aa3                               |
+| name     | alumno                                                         |
+| password |$6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiO... |
+| tenantId | e7b1868b24a742318f1d73f612ecfe1d                               |
++----------+----------------------------------------------------------------+
+<prompt>$ </prompt><userinput> keystone user-list </userinput>
 +----------------------------------+---------+--------------------+--------+
 |                id                | enabled |       email        |  name  |
 +----------------------------------+---------+--------------------+--------+
-| 05743001bbf14700bcdf2ecc43edbf9b | True    | alex@iescierva.net | admin  |
-| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | alex@iescierva.net | swift  |
-| 291c58f7258747758d109ecee2eb4a69 | True    | alex@iescierva.net | glance |
-| 404dafc53b364a7e9f1476aa98082966 | True    | alex@iescierva.net | nova   |
+| 05743001bbf14700bcdf2ecc43edbf9b | True    | user@example.com   | admin  |
+| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | user@example.com   | swift  |
+| 291c58f7258747758d109ecee2eb4a69 | True    | user@example.com   | glance |
+| 404dafc53b364a7e9f1476aa98082966 | True    | user@example.com   | nova   |
 | d0bfed18cce3460892ae99ee812d8aa3 | True    | correo@gmail.com   | alumno |
 +----------------------------------+---------+--------------------+--------+
 </screen>     
 </listitem>
 <listitem>
 <para><emphasis role="bold">Borrar un usuario sabiendo su id (ejemplo borrar usuario alumno)</emphasis></para>
-<screen><prompt>$</prompt><userinput> keystone user-delete d0bfed18cce3460892ae99ee812d8aa3 </userinput>
-<prompt>$</prompt><userinput> keystone user-list</userinput></screen>
+<screen><prompt>$ </prompt><userinput> keystone user-delete d0bfed18cce3460892ae99ee812d8aa3 </userinput>
+<prompt>$ </prompt><userinput> keystone user-list</userinput></screen>
 <screen>
 +----------------------------------+---------+--------------------+--------+
 |                id                | enabled |       email        |  name  |
 +----------------------------------+---------+--------------------+--------+
-| 05743001bbf14700bcdf2ecc43edbf9b | True    | alex@iescierva.net | admin  |
-| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | alex@iescierva.net | swift  |
-| 291c58f7258747758d109ecee2eb4a69 | True    | alex@iescierva.net | glance |
-| 404dafc53b364a7e9f1476aa98082966 | True    | alex@iescierva.net | nova   |
+| 05743001bbf14700bcdf2ecc43edbf9b | True    | user@example.com   | admin  |
+| 246ba4e3d81c4ae8bdde8ec5784e74d3 | True    | user@example.com   | swift  |
+| 291c58f7258747758d109ecee2eb4a69 | True    | user@example.com   | glance |
+| 404dafc53b364a7e9f1476aa98082966 | True    | user@example.com   | nova   |
 +----------------------------------+---------+--------------------+--------+
 </screen>
 </listitem>
 <listitem>
 <para>Obtener información detallada de un usuario</para>
-<screen><prompt>$</prompt><userinput> keystone user-get 05743001bbf14700bcdf2ecc43edbf9b</userinput></screen>
+<screen><prompt>$ </prompt><userinput> keystone user-get 05743001bbf14700bcdf2ecc43edbf9b</userinput></screen>
 
 <screen>
 +----------+----------------------------------+
 | Property |              Value               |
 +----------+----------------------------------+
-| email    | alex@iescierva.net               |
+| email    | user@example.com                 |
 | enabled  | True                             |
 | id       | 05743001bbf14700bcdf2ecc43edbf9b |
 | name     | admin                            |
@@ -377,7 +321,7 @@ $6$rounds=40000$8Q0MqKruQVZXvYZN$MeAsef3ihVpBWJrVUyBACF5TuiOwVSHtLU5HvkZBXrqXEmU
 </listitem>
 <listitem>
 <para>Cambiar password de usuario</para>
-<screen><prompt>$</prompt><userinput>keystone user-password-update --pass nuevopass 05743001bbf14700bcdf2ecc43edbf9b</userinput>
+<screen><prompt>$ </prompt><userinput>keystone user-password-update --pass nuevopass 05743001bbf14700bcdf2ecc43edbf9b</userinput>
 </screen>
 </listitem>
 </itemizedlist>
@@ -392,7 +336,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 <itemizedlist>
 <listitem>
   <para><emphasis role="bold">Listar proyectos (tenant)</emphasis></para>
-  <screen><prompt>$</prompt><userinput> keystone tenant-list</userinput>
+  <screen><prompt>$ </prompt><userinput> keystone tenant-list</userinput>
 +----------------------------------+---------+---------+
 |                id                |   name  | enabled |
 +----------------------------------+---------+---------+
@@ -403,7 +347,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 </listitem>
 <listitem>
   <para><emphasis role="bold">Crear un proyecto</emphasis></para>
-<screen><prompt>$</prompt><userinput>keystone tenant-create --name asir1 --description "1 curso asir" </userinput>
+<screen><prompt>$ </prompt><userinput>keystone tenant-create --name asir1 --description "1 curso asir" </userinput>
 +-------------+----------------------------------+
 |   Property  |              Value               |
 +-------------+----------------------------------+
@@ -416,7 +360,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 </listitem>
 <listitem>
 <para><emphasis role="bold">Listar información detallada de un proyecto</emphasis></para>
-<screen><prompt>$</prompt><userinput>keystone tenant-get 8c6d42b3e339448fb3068ec512df7802 </userinput></screen>
+<screen><prompt>$ </prompt><userinput>keystone tenant-get 8c6d42b3e339448fb3068ec512df7802 </userinput></screen>
 
 <screen>
 +-------------+----------------------------------+
@@ -431,7 +375,7 @@ se debe utilizar <emphasis role="bold">keystone.</emphasis>
 </listitem>
 <listitem>
 <para><emphasis role="bold">Borrar un proyecto</emphasis></para>
-<screen><prompt>$</prompt><userinput>keystone tenant-delete 8c6d42b3e339448fb3068ec512df7802</userinput>
+<screen><prompt>$ </prompt><userinput>keystone tenant-delete 8c6d42b3e339448fb3068ec512df7802</userinput>
 </screen>           
 </listitem>
 </itemizedlist>
@@ -447,7 +391,7 @@ proyecto se les debe asignar uno o varios roles</para>
 <itemizedlist>
 <listitem>
   <para><emphasis role="bold">Listar roles existentes</emphasis></para>
-  <screen><prompt>$</prompt><userinput>keystone role-list</userinput></screen>
+  <screen><prompt>$ </prompt><userinput>keystone role-list</userinput></screen>
 <screen>
 +----------------------------------+--------+
 |                id                |  name  |
@@ -463,7 +407,7 @@ proyecto se les debe asignar uno o varios roles</para>
 <listitem>
   <para><emphasis role="bold">Asignación de rol a usuario</emphasis>
 </para>
- <screen><prompt>$</prompt><userinput>keystone user-role-add
+ <screen><prompt>$ </prompt><userinput>keystone user-role-add
  --user=4ca77dc4d8a448219b1c6ae7a208ff47 --tenant=e7b1868b24a742318f1d73f612ecfe1d
  --role=622c78f77bbe4a298452783f25cb4635
 </userinput>
@@ -471,7 +415,7 @@ proyecto se les debe asignar uno o varios roles</para>
 <para>Se le ha asignado el rol <emphasis role="bold">Member</emphasis>al usuario <emphasis role="bold">alumno</emphasis>
 en el proyecto <emphasis role="bold">asir1</emphasis></para>
 <para>Para verificarlo se puede ver con:</para>
-<screen><prompt>$</prompt><userinput>keystone role-list
+<screen><prompt>$ </prompt><userinput>keystone role-list
 --user=4ca77dc4d8a448219b1c6ae7a208ff47
 --tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput></screen>
 <screen>
@@ -484,11 +428,11 @@ en el proyecto <emphasis role="bold">asir1</emphasis></para>
 </listitem>
 <listitem>
   <para><emphasis role="bold">Desasignación de rol a usuario</emphasis></para>
-<screen><prompt>$</prompt><userinput>keystone user-role-remove --user=4ca77dc4d8a448219b1c6ae7a208ff47
+<screen><prompt>$ </prompt><userinput>keystone user-role-remove --user=4ca77dc4d8a448219b1c6ae7a208ff47
 --tenant=e7b1868b24a742318f1d73f612ecfe1d
 --role=622c78f77bbe4a298452783f25cb4635</userinput>
 </screen>
-<screen><prompt>$</prompt><userinput>keystone role-list
+<screen><prompt>$ </prompt><userinput>keystone role-list
 --user=4ca77dc4d8a448219b1c6ae7a208ff47
 --tenant=e7b1868b24a742318f1d73f612ecfe1d</userinput></screen>
 <screen>
@@ -513,7 +457,7 @@ de <emphasis role="bold">nova-manage</emphasis>
 <itemizedlist>
 <listitem>
   <para><emphasis role="bold">Obtener cuotas actuales de proyecto</emphasis></para>
-<screen><prompt>$</prompt><userinput>nova-manage project quota
+<screen><prompt>$ </prompt><userinput>nova-manage project quota
 --project=e7b1868b24a742318f1d73f612ecfe1d</userinput></screen>
 <screen>
 metadata_items: 128
@@ -532,7 +476,7 @@ cores: 20
 <listitem>
  <para><emphasis role="bold">Modificar parámetro de cuota de
  proyecto (ej:ampliar num de cores a 50)</emphasis></para>
-<screen><prompt>$</prompt><userinput>nova-manage project quota
+<screen><prompt>$ </prompt><userinput>nova-manage project quota
 --project=e7b1868b24a742318f1d73f612ecfe1d --key=cores --value=50</userinput>
 metadata_items: 128
 volumes: 40
@@ -559,108 +503,81 @@ cores: 50
  <listitem>
    <para><emphasis role="bold">Listar instancias existentes en
    nova</emphasis></para>
-   <screen><prompt>$</prompt><userinput>nova list</userinput></screen>
+   <screen><prompt>$ </prompt><userinput>nova list</userinput></screen>
    <screen>
-+--------------------------------------+---------------+--------+-------------------+
-|                  ID                  |      Name     | Status |      Networks
-|
-+--------------------------------------+---------------+--------+-------------------+
-| 0167eee1-9cbe-4bf2-a1b1-7d88b8259423 | UbuntuServer  | ACTIVE | private=10.0.0.17 |
-| 0cf6b815-d7d5-4a0d-af3f-c45468eab6b5 | UbuntuServer1 | ACTIVE | private=10.0.0.9  |
-| 11dada1d-90a5-46d5-b855-bbb447e48e65 | UbuntuServer2 | ACTIVE | private=10.0.0.30 |
-| 1a8bba78-65fd-4ac5-96bb-8538d39f4825 | UbuntuServer3 | ACTIVE | private=10.0.0.32 |
-| 1a8d14fb-39b1-4c9c-8501-fd81d0d59f01 | UbuntuServer4 | ACTIVE | private=10.0.0.21 |
-| 32d9aa7c-3e94-4d73-afd8-f441ab7a00b7 | UbuntuServer5 | ACTIVE | private=10.0.0.24 |
-| 3a4f4e81-48be-486a-82e8-ddec95aa6c40 | UbuntuServer6 | ACTIVE | private=10.0.0.22 |
--------------------------------------------------------------------------------------
++-------------------------+---------------+--------+-------------------+
+|                  ID     |      Name     | Status |      Networks     |
++-------------------------+---------------+--------+-------------------+
+| 0167eee1-9cbe-4bf2-a... | UbuntuServer  | ACTIVE | private=10.0.0.17 |
+| 0cf6b815-d7d5-4a0d-a... | UbuntuServer1 | ACTIVE | private=10.0.0.9  |
+| 11dada1d-90a5-46d5-b... | UbuntuServer2 | ACTIVE | private=10.0.0.30 |
+| 1a8bba78-65fd-4ac5-9... | UbuntuServer3 | ACTIVE | private=10.0.0.32 |
+| 1a8d14fb-39b1-4c9c-8... | UbuntuServer4 | ACTIVE | private=10.0.0.21 |
+| 32d9aa7c-3e94-4d73-a... | UbuntuServer5 | ACTIVE | private=10.0.0.24 |
+| 3a4f4e81-48be-486a-8... | UbuntuServer6 | ACTIVE | private=10.0.0.22 |
+------------------------------------------------------------------------
    </screen>
  </listitem>
  <listitem>
  <para>Mostrar información de una instancia determinada</para>
- <screen><prompt>$</prompt><userinput>nova show
+ <screen><prompt>$ </prompt><userinput>nova show
  0167eee1-9cbe-4bf2-a1b1-7d88b8259423</userinput></screen>
 <screen>
-+-------------------------------------+----------------------------------------------------------+
-|               Property              |                          Value
-|
-+-------------------------------------+----------------------------------------------------------+
-| OS-DCF:diskConfig                   | MANUAL
-|
-| OS-EXT-SRV-ATTR:host                | trinity
-|
-| OS-EXT-SRV-ATTR:hypervisor_hostname | None
-|
-| OS-EXT-SRV-ATTR:instance_name       | instance-0000004b
-|
-| OS-EXT-STS:power_state              | 1
-|
-| OS-EXT-STS:task_state               | None
-|
-| OS-EXT-STS:vm_state                 | active
-|
-| accessIPv4                          |
-|
-| accessIPv6                          |
-|
-| config_drive                        |
-|
-| created                             | 2012-09-24T09:06:40Z
-|
-| flavor                              | m1.medium
-|
-| hostId                              |
-bcc6c02ce3eeaf89b869048bdf5039817b7c989be5e6ef7498dd09f9 |
-| id                                  | 0167eee1-9cbe-4bf2-a1b1-7d88b8259423
-|
-| image                               | windows7plantilla
-|
-| key_name                            |
-|
-| metadata                            | {}
-|
-| name                                | UbuntuServer
-|
-| private network                     | 10.0.0.17
-|
-| progress                            | 0
-|
-| status                              | ACTIVE
-|
-| tenant_id                           | a70373bf297a42eb9203645d84476c23
-|
-| updated                             | 2012-09-24T09:06:38Z
-|
-| user_id                             | 4c249654613e41208b2d03169ef29580
-|
-+-------------------------------------+----------------------------------------------------------+
++-------------------------------------+-------------------------------+
+|               Property              |         Value                 |
++-------------------------------------+-------------------------------+
+| OS-DCF:diskConfig                   | MANUAL                        |
+| OS-EXT-SRV-ATTR:host                | trinity                       |
+| OS-EXT-SRV-ATTR:hypervisor_hostname | None                          |
+| OS-EXT-SRV-ATTR:instance_name       | instance-0000004b             |
+| OS-EXT-STS:power_state              | 1                             |
+| OS-EXT-STS:task_state               | None                          |
+| OS-EXT-STS:vm_state                 | active                        |
+| accessIPv4                          |                               |
+| accessIPv6                          |                               |
+| config_drive                        |                               |
+| created                             | 2012-09-24T09:06:40Z          |
+| flavor                              | m1.medium                     |
+| hostId                              | bcc6c02ce3eeaf89b869048bdf503 |
+| id                                  | 0167eee1-9cbe-4bf2-a1b1-7d88b |
+| image                               | windows7plantilla             |
+| key_name                            |                               |
+| metadata                            | {}                            |
+| name                                | UbuntuServer                  |
+| private network                     | 10.0.0.17                     |
+| progress                            | 0                             |
+| status                              | ACTIVE                        |
+| tenant_id                           | a70373bf297a42eb9203645d84476 |
+| updated                             | 2012-09-24T09:06:38Z          |
+| user_id                             | 4c249654613e41208b2d03169ef29 |
++-------------------------------------+-------------------------------+
  </screen>
 </listitem>
 <listitem>
 <para><emphasis role="bold">Mostrar estado de los servicios de nova</emphasis></para>
-<screen><prompt>$</prompt><userinput>nova-manage service list</userinput></screen>
+<screen><prompt>$ </prompt><userinput>nova-manage service list</userinput></screen>
 
 <screen>
-Binary           Host                                 Zone             Status
-State Updated_At
-nova-cert        neo                                  nova             enabled :-)   2012-10-28 17:26:22
-nova-network     neo                                  nova             enabled :-)   2012-10-28 17:26:22
-nova-scheduler   neo                                  nova             enabled :-)   2012-10-28 17:26:22
-nova-consoleauth neo                                  nova             enabled :-)   2012-10-28 17:26:22
-nova-compute     trinity                              nova             enabled XXX   2012-10-28 17:25:11
-nova-compute     cifra                                nova             enabled XXX   2012-09-28 15:12:00
-nova-compute     tanque                               nova             enabled XXX   2012-09-28 15:12:27
-nova-compute     dozer                                nova             enabled XXX   2012-09-28 15:12:50
+Binary           Host       Zone     Status  State Updated_At
+nova-cert        neo        nova     enabled :-)   2012-10-28 17:26:22
+nova-network     neo        nova     enabled :-)   2012-10-28 17:26:22
+nova-scheduler   neo        nova     enabled :-)   2012-10-28 17:26:22
+nova-consoleauth neo        nova     enabled :-)   2012-10-28 17:26:22
+nova-compute     trinity    nova     enabled XXX   2012-10-28 17:25:11
+nova-compute     cifra      nova     enabled XXX   2012-09-28 15:12:00
+nova-compute     tanque     nova     enabled XXX   2012-09-28 15:12:27
+nova-compute     dozer      nova     enabled XXX   2012-09-28 15:12:50
 </screen>
 </listitem>
 <listitem>
 <para><emphasis role="bold">Mostrar estado de recursos en un determinado nodo</emphasis></para>
-<screen><prompt>$</prompt><userinput>nova-manage service describe_resource trinity</userinput></screen>
+<screen><prompt>$ </prompt><userinput>nova-manage service describe_resource trinity</userinput></screen>
 <screen>
-HOST                              PROJECT     cpu mem(mb)     hdd
-trinity         (total)                        24   64414     824
-trinity         (used_now)                     15    5995     101
-trinity         (used_max)                     15   30720     300
-trinity                  a70373bf297a42eb9203645d84476c23      15   30720 300
+HOST             PROJECT                        cpu  mem(mb)   hdd
+trinity          (total)                        24   64414     824
+trinity          (used_now)                     15    5995     101
+trinity          (used_max)                     15   30720     300
+trinity   a70373bf297a42eb9203645d84476c23      15   30720     300
 </screen>
 </listitem>
 </itemizedlist>
@@ -749,7 +666,7 @@ general VNC-proxy desarrolla varias funciones</para>
 <para>Nova ofrece la posibilidad de crear URL's de acceso (access_urls) a través
 de utilidades de consola</para>
 <para>Se realiza a través de novaclient:</para>
-<screen><prompt>$</prompt><userinput>nova get-vnc-console [server_id] [novnc|xvpnc]</userinput></screen>
+<screen><prompt>$ </prompt><userinput>nova get-vnc-console [server_id] [novnc|xvpnc]</userinput></screen>
 <para>Si se especifíca "novnc" se obtiene una URL válida para utilizarla en un
 navegador web. Por el contrario si se especifíca "xvpnc" se obtiene una URL para
 utilizarla en un cliente Java.</para>
@@ -810,24 +727,24 @@ configurarse como sigue:</para>
 <para>Como cliente se necesita un cliente especial Java que es una versión
 especial de TightVNC modificada para soportar los token de autenticación.</para>
 <para>Para obtener ese cliente se puede hacer desde github</para>
-<screen><prompt>$</prompt><userinput>git clone https://github.com/cloudbuilders/nova-xvpvncviewer</userinput>
-<prompt>$</prompt><userinput>cd nova-xvpvncviewer</userinput>
-<prompt>$</prompt><userinput>make</userinput></screen>
+<screen><prompt>$ </prompt><userinput>git clone https://github.com/cloudbuilders/nova-xvpvncviewer</userinput>
+<prompt>$ </prompt><userinput>cd nova-xvpvncviewer</userinput>
+<prompt>$ </prompt><userinput>make</userinput></screen>
 
 <para>Una vez que tengamos el cliente, para crear una conexión, debemos primero
 obtener la URL de acceso a través de novaclient, como se ha comentado
 anteriormente, y luego realizar la conexión a través del cliente</para>
 
 <para>Para obtener la URL de acceso:</para>
-<screen><prompt>$</prompt><userinput>nova get-vnc-console [server_id] xvpvnc</userinput></screen>
+<screen><prompt>$ </prompt><userinput>nova get-vnc-console [server_id] xvpvnc</userinput></screen>
 
 <para>Para realizar la conexión al host desde el cliente:</para>
-<screen><prompt>$</prompt><userinput>java -jar VncViewer.jar [access_url]</userinput></screen>
+<screen><prompt>$ </prompt><userinput>java -jar VncViewer.jar [access_url]</userinput></screen>
 
 <para><emphasis role="bold">Acceso VNC a través de navegador web</emphasis></para>
 <para>Al igual que para el cliente Java, se debe obtener la URL de
 acceso:</para>
-<screen><prompt>$</prompt><userinput>nova get-vnc-console [server_id] novnc</userinput></screen>
+<screen><prompt>$ </prompt><userinput>nova get-vnc-console [server_id] novnc</userinput></screen>
 <para> Una vez obtenida se le pasa al navegador web para realizar la conexión</para> 
 </section>
 
