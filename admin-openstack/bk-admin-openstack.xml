@@ -9,6 +9,7 @@
       xml:id="AdminOpenStack">
   <?rax pdf.url="../AdminOpenStack.pdf"?>
   <title>Administración de OpenStack Essex</title>
+  <titleabbrev>Administración de OpenStack</titleabbrev>
   <subtitle>
     Instalación, configuración y explotación
   </subtitle>
