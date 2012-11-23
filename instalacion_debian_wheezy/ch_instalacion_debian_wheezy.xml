@@ -941,7 +941,7 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
     <section>
       <title>Instalación</title>
       <para>Instalamos desde el repositorio de Debian:</para>
-      <screen><prompt>root@jupiter:~# </prompt><userinput>aptitude install nova-api nova-cert nova-network nova-compute</userinput></screen>
+      <screen><prompt>root@ganimedes:~# </prompt><userinput>aptitude install nova-api nova-cert nova-network nova-compute</userinput></screen>
       <para>De la misma manera que encontramos descrito en la sección de "Nova
       en el nodo controlador" instalamos en cada nodo de computación los
       paquetes python-novnc y novnc.</para>
@@ -956,7 +956,14 @@ export OS_PASSWORD=$OS_PASSWORD_INPUT
 	<listitem>
 	  <para>En el parámetro routing_source_ip tenemos que indicar la IP
 	  pública del nodo.</para>
-	</listitem> 
+	</listitem>
+	<listitem>
+	  <para>Cargamos en memoria el módulo nbd que permite montar las instancias
+	  temporalmente con guestmount e inyectar ciertos parámetros
+	  particulares, como por ejemplo la clave ssh pública del usuario que va
+	  a acceder remotamente:</para>
+	  <screen><prompt>root@ganimedes:~# </prompt><userinput>modprobe nbd && echo "nbd" >> /etc/modules</userinput></screen>
+	</listitem>
 	<listitem>
 	  <para>Por último para configurar el acceso por vnc, tenemos que
 	  indicar en los parámetros vncserver_proxyclient_address y
