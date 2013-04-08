@@ -1,0 +1,641 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<book xmlns="http://docbook.org/ns/docbook"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:xi="http://www.w3.org/2001/XInclude"
+    xmlns:svg="http://www.w3.org/2000/svg"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    version="5.0"  xml:lang="es"
+    xml:id="infraestructura">
+    <title>OpenStack Folsom en Debian Wheezy</title>
+    <info>
+        <author>
+            <personname>
+                <firstname>Alberto</firstname>
+                <surname>Molina Coballes</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>Jesús</firstname>
+                <surname>Moreno León</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <author>
+            <personname>
+                <firstname>José Domingo</firstname>
+                <surname>Muñoz Rodríguez</surname>
+            </personname>
+            <affiliation>
+                <orgname>IES Gonzalo Nazareno</orgname>
+            </affiliation>
+        </author>
+        <!-- <copyright> -->
+        <!--     <year>2012</year> -->
+        <!-- </copyright> -->
+        <abstract>
+	  <para>En este documento se describe de forma detallada la instalación
+	  de OpenStack Folsom en la versión de pruebas de Debian (actualmente
+	  <emphasis>Wheezy</emphasis>). Este documento aún se
+	  encuentra en borrador, espera a la versión definitiva o
+	  asume los riesgos de usarlo ;).</para> 
+        </abstract>
+    </info>
+    <!-- <xi:include href="ch_pasos_previos.xml"/> -->
+    <!-- <xi:include href="ch_keystone.xml"/>  -->
+    <!-- <xi:include href="ch_glance.xml"/>  -->
+    <!-- <xi:include href="ch_nova_en_controlador.xml"/> -->
+    <!-- <xi:include href="ch_nova_en_nodos.xml"/>  -->
+    <!-- <xi:include href="ch_horizon.xml"/>  -->
+    <!-- <preface> -->
+    <!--   <title>sdf</title> -->
+    <!--   <para>asd</para> -->
+    <!-- </preface> -->
+    <chapter xmlns="http://docbook.org/ns/docbook"
+	     xmlns:xi="http://www.w3.org/2001/XInclude"
+	     xmlns:xlink="http://www.w3.org/1999/xlink"
+	     version="5.0" xml:lang="es">
+      <title>Pasos previos</title>
+      <para>Antes de comenzar con la instalación de paquetes en sí, hay que
+      plantear claramente la estructura de red y los componentes que se
+      instalarán en cada equipo. La descripción física de los equipos que
+      componen el cloud ya se realizó en <link
+      xlink:href="???">enlace</link>, por lo que nos centraremos ahora en
+      la instalación en sí.</para>
+      <section xml:id="nombres">
+	<title>Nombres de los equipos</title>
+	<para>Se han elegido los siguientes nombres para los equipos en los que se
+	va a realizar la instalación del Cloud:</para>
+	<itemizedlist>
+	  <listitem><para>corot: para el nodo controlador, que será el encargado
+	  de gestionar todos los recursos del cloud, interaccionar con los clientes
+	  y ordenar a los nodos de virtualización que ejecuten las instancias, pero
+	  en el que no se ejecutarán máquinas virtuales. La mayor parte de
+	  componentes del Cloud y configuración se realizará en este
+	  equipo, pero comparado con los <emphasis>nodos de
+	  computación</emphasis> la carga de trabajo será pequeña, por lo
+	  que no es necesario un equipo con mucha memoria RAM o gran
+	  capacidad de procesamiento.</para></listitem>
+	  <listitem><para>io, europa, ganimedes y calisto (son las 4 lunas
+	  principales de júpiter): para los 4 nodos de virtualización o
+	  nodos de computación, como se les denomina habitualmente en la
+	  jerga propia de OpenStack. En estos equipos se instalarán
+	  sólo los componentes necesarios para que se ejecuten las
+	  instancias en ellos y estarán esperando las órdenes de
+	  jupiter.</para></listitem>
+	  <listitem><para>saturno: para el nodo de almacenamiento, ya que es tan
+	  importante como júpiter y a la vez independiente. En este equipo todavía
+	  no está definido el software que se instalará.</para></listitem>
+	</itemizedlist>
+      </section>
+      <section xml:id="esquema_red">
+	<title>Esquema de red</title>
+	<para>Cada uno de estos equipos está conectado a dos redes, lo que en
+	terminología de OpenStack se conoce como una red
+	<emphasis>pública</emphasis> y una red <emphasis>privada</emphasis>,  
+	términos a los que no se debe dar el sentido habitual que tienen en redes
+	IPv4, ya que en OpenStack la red pública se refiere a la que interaccionará
+	con los clientes y la privada la que se utiliza para la
+	intercomunicación de los componentes del cloud y en nuestro caso muy
+	destacadamente, de la  transferencia de imágenes a los nodos en los
+	que se deben ejecutar las instancias. La red privada es una red aislada
+	que no está conectada con otras redes, mientras que la red pública sí lo
+	está, bien a una red local bien a Internet. Las transferencias de datos
+	más importante se realizan a través de la red privada, por lo que se ha
+	optado por conectar cada equipo (salvo corot) mediante tres interfaces
+	de red Gigabit Ethernet, para que configurándolas adecuadamente en modo
+	<emphasis>link aggregation</emphasis> de acuerdo al estándar 802.3ad,
+	puedan aumentar las tasas de transferencia en la red privada.</para>
+	<para>En la siguiente imagen, se puede ver de forma esquemática los equipos
+	y las redes a las que están conectados:</para>
+	<mediaobject>
+	  <imageobject>
+	    <imagedata fileref="figures/esquema_red_iesgn.png" width="20cm" format="PNG"/>
+	  </imageobject>
+	  <caption>
+	    <para>Esquema de red del Cloud, en la que aparecen los 6 equipos
+	    conectados a las redes privada y pública del cloud.</para>
+	  </caption>
+	</mediaobject>
+      </section>
+      <section xml:id="direccionamieno_ip">
+	<title>Direcciones IP de los equipos</title>
+	<para>En la siguiente tabla aparecen las direcciones IPv4 privadas y
+	públicas elegidas para los nodos del cloud.</para>
+	<table xml:id="tabla_ips">
+	  <title>Direcciones IP de los equipos del cloud</title>
+	  <tgroup cols='3' align='left' colsep='1' rowsep='1'>
+	    <thead>
+	      <row>
+		<entry align="center"></entry>
+		<entry align="center">IP pública</entry>
+		<entry align="center">IP privada</entry>
+	      </row>
+	    </thead>
+	    <tbody>
+	      <row>
+		<entry align="center">corot</entry>
+		<entry align="center">172.22.202.1</entry>
+		<entry align="center">192.168.202.1</entry>
+	      </row>
+	      <row>
+		<entry align="center">saturno</entry>
+		<entry align="center">172.22.202.2</entry>
+		<entry align="center">192.168.202.2</entry>
+	      </row>
+	      <row>
+		<entry align="center">io</entry>
+		<entry align="center">172.22.202.11</entry>
+		<entry align="center">192.168.202.11</entry>
+	      </row>
+	      <row>
+		<entry align="center">europa</entry>
+		<entry align="center">172.22.202.12</entry>
+		<entry align="center">192.168.202.12</entry>
+	      </row>
+	      <row>
+		<entry align="center">ganimedes</entry>
+		<entry align="center">172.22.202.13</entry>
+		<entry align="center">192.168.202.13</entry>
+	      </row>
+	      <row>
+		<entry align="center">calisto</entry>
+		<entry align="center">172.22.202.14</entry>
+		<entry align="center">192.168.202.14</entry>
+	      </row>
+	    </tbody>
+	  </tgroup>
+	</table>
+      </section>
+      <section xml:id="instalacion_corot">
+	<title>Instalación de corot</title>
+	<section xml:id="configuracion_raid_corot">
+	  <title>Configuración previa de RAID</title>
+	  <para>corot incluye dos discos duros SATAII de 500 GiB y una
+	  controladora de disco 3ware 9650SE. Se ha optado por configurar esta
+	  controladora de disco en modo RAID 1, para incluir un nivel elemental
+	  de seguridad y consistencia de datos, aunque obviamente esto no
+	  descarta la utilización adicional de otros mecanismos de copias de
+	  seguridad que se configurarán posteriormente. Al tratarse de una
+	  controladora RAID hardware y estar configurado previamente, el sistema
+	  operativo que arranque en el equipo sólo verá un disco duro en
+	  <code>/dev/sda</code> de 500GB aproximadamente.</para>
+	</section>
+	<section xml:id="instalacion_debian_corot">
+	  <title>Instalación de Debian Wheezy</title>
+	  <para>El sistema operativo elegido para los equipos del cloud es la
+	  versión de pruebas <emphasis>(testing)</emphasis> de Debian GNU/Linux
+	  (amd64), que actualmente se conoce con el nombre de código
+	  <emphasis>wheezy</emphasis> y que cuando finalmente se estabilice se
+	  conocerá como Debian 7. Pensamos que es la mejor opción en el caso de
+	  Debian, ya que <emphasis>squeeze</emphasis>, la versión estable
+	  actualmente, no incluye paquetes de OpenStack y la opción de instalar
+	  directamente desde los ficheros fuente o bien utilizar repositorios no
+	  oficiales, no nos parece tan acertada. La
+	  <emphasis>inestabilidad</emphasis> que comporta utilizar una versión
+	  no estabilizada de Debian, nos parece en este momento asumible, más
+	  teniendo en cuenta que vamos a implementar un cloud privado y no
+	  crítico, que se utilizará a partir del curso próximo con fines
+	  formativos.</para>
+	  <para>Durante la instalación realizamos el siguiente esquema de
+	  particionado:</para>
+      <programlisting>
+Disposit. Inicio    Comienzo      Fin      Bloques  Id  Sistema
+/dev/sda1   *        2048     3905535     1951744   83  Linux
+/dev/sda2         3907582   976539647   486316033    5  Extendida
+/dev/sda5         3907584   976539647   486316032   8e  Linux LVM
+      </programlisting>
+      <para>Es decir, reservamos una pequeña partición de 2G en la que
+      ubicaremos el directorio /boot y el resto lo gestionamos con
+      LVM. Inicialmente creamos sólo dos volúmenes lógicos (uno para el sistema
+      raíz y otro para el área de intercambio):</para>
+      <programlisting>
+LV           VG   Attr   LSize
+corot-root vg   -wi-ao    18,62g
+corot-swap vg   -wi-ao-- 952,00m                                           
+      </programlisting>
+      <section xml:id="gestion_raid_corot">
+	<title>Gestión del RAID desde el sistema operativo</title>
+	<para>Aunque la controladora RAID es hardware y el sistema
+	operativo no la gestiona, es importante que se pueda controlar
+	su estado a través de alǵun módulo del kernel. En este caso el
+	módulo 3w-9xxx que se carga automáticamente y nos envía estos
+	mensajes al log del sistema:</para>
+	<programlisting>
+[    2.381798] 3ware 9000 Storage Controller device driver for Linux v2.26.02.014.
+[    2.381841] 3w-9xxx 0000:01:00.0: PCI INT A -> GSI 19 (level, low) -> IRQ 19
+[    2.381849] 3w-9xxx 0000:01:00.0: setting latency timer to 64
+[    2.612067] scsi0 : 3ware 9000 Storage Controller
+[    2.612128] 3w-9xxx: scsi0: Found a 3ware 9000 Storage Controller at 0xfe8df000, IRQ: 19.
+[    2.952039] 3w-9xxx: scsi0: Firmware FE9X 4.08.00.006, BIOS BE9X 4.08.00.001, Ports: 2.
+	</programlisting>	    
+	<para>Pendiente de hacer:</para>
+	<para>http;//jonas.genannt.name/  Hay repositorio, con
+	aplicaciones para manejar el RAID 3ware 9650SE</para>
+      </section>
+    </section>
+    <section xml:id="configuracion_red_corot">
+      <title>Configuración de red corot</title>
+      <para>La configuración de red de corot es muy sencilla, ya que es un
+      equipo con dos interfaces de red (eth0 y eth1), conectadas a la red
+      pública y a la red privada respectivamente, el contenido del fichero
+      <filename>/etc/network/interfaces</filename> incluye la configuración 
+      estática de las dos interfaces de red:</para>
+      <programlisting>
+auto lo
+iface lo inet loopback
+
+auto eth0
+iface eth0 inet static
+        address 172.22.202.1
+        netmask 255.255.0.0
+        network 172.22.0.0
+        broadcast 172.22.255.255
+        gateway 172.22.0.1
+
+auto eth1
+iface eth1 inet static
+        address 192.168.202.1
+        netmask 255.255.255.0
+        network 192.168.222
+        broadcast 255.255.255.0
+      </programlisting>
+    </section>
+    <section xml:id="backports">
+      <title>Configuración de los repositorios"</title>
+      <para>Añadimos los repositorios de backport:</para>
+      <programlisting>
+deb http://ftp.gplhost.com/debian/ wheezy-backports main
+deb http://ftp.gplhost.com/debian/ openstack main
+      </programlisting>
+    </section>
+    <section xml:id="instalacion_mysql">
+      <title>Instalación y configuración inicial de MySQL</title>
+      <para>Antes de instalar MySQL instalamos dbconfig de acuerdo al
+      wiki.</para>
+      <para>Todos los componentes de OpenStack (incluso glance y
+      keystone que por defecto utilizan sqlite) guardarán sus datos en
+      bases de datos MySQL. El servidor de bases de datos se instala
+      en corot, el nodo controlador:</para>
+      <screen><prompt>#</prompt><userinput>aptitude install
+      mysql-server</userinput></screen>
+      <para>Introducimos la contraseña del usuario root de MySQL
+      cuando se requiera y esperamos a que finalice la
+      instalación. Una vez concluida, abrimos el fichero
+      <filename>/etc/mysql/my.cnf</filename> y realizamos la siguiente
+      modificación:</para>
+      <literallayout class="monospaced">
+      bind_address = 0.0.0.0</literallayout>
+      <para>Para que la base de datos sea accesible también desde el resto de
+      equipos del cloud.</para>
+<!--       <para>Entramos en MySQL con el usuario root que se crea durante -->
+<!--       la instalación y creamos diferentes bases de datos para -->
+<!--       los componentes keystone, glance y nova y un usuario para -->
+<!--       OpenStack, que tendrá todos los permisos sobre  las bases de -->
+<!--       datos:</para> -->
+<!--       <programlisting> -->
+<!-- mysql> CREATE DATABASE keystone; -->
+<!-- mysql> CREATE DATABASE glance; -->
+<!-- mysql> CREATE DATABASE nova; -->
+<!-- mysql> CREATE USER "usuario_admin_openstack" IDENTIFIED BY 'password'; -->
+<!-- mysql> GRANT ALL PRIVILEGES ON keystone.* TO 'openstackadmin'@'localhost' \ -->
+<!--     -> IDENTIFIED BY 'password'; -->
+<!-- mysql> GRANT ALL PRIVILEGES ON glance.* TO 'opentackadmin"'@'localhost'; -->
+<!-- mysql> GRANT ALL PRIVILEGES ON nova.* TO 'openstackadmin"'@'localhost'; -->
+<!-- 	</programlisting> -->
+    </section>
+    <section xml:id="otros_paquetes">
+      <title>Instalación de otros paquetes</title>
+      <para>Antes de instalar propiamente los paquetes relacionados
+      con los diferentes componentes de Openstack, es recomendable
+      instalar los siguientes paquetes:</para>
+      <screen><userinput>apt-get install rabbitmq-server
+      memcached</userinput></screen>
+      <para>rabbitmq-server se encarga de la gestión de mensajes
+      entre los diferentes componentes de OpenStack (es un paquete
+      obligatorio que si no instalamos ahora se instalará por
+      dependencias) y memcached de cachear en memoria peticiones a
+      bases de datos o a APIs</para>      
+    </section>
+  </section>
+  <section xml:id="instalacion_4_lunas">
+    <title>Instalación de io, europa, ganimedes y calisto</title>
+    <para>La instalación de estos cuatro nodos es idéntica, por lo que
+    sólo explicaremos la instalación de uno de ellos.</para>
+    <section xml:id="configuracion_raid_4_lunas">
+      <title>Configuración previa de RAID</title>
+      <para>Cada uno de estos equipos incluye dos discos duros SAS
+      de 300 GiB a 15000 rpm y una controladora LSI MegaRAID SAS que se
+      configura en modo RAID 0 al iniciar el equipo por primera
+      vez. Se opta por RAID 0 ya que en estos equipos la
+      configuración es muy sencilla y no hay datos persistentes,
+      sólo los discos volátiles de las instancias que se estén
+      ejecutando en ese momento, por lo que es más conveniente
+      utilizar RAID 0 para conseguir mayor rendimiento en el proceso
+      de lectura/escritura a disco. Una vez configurado el raid, el
+      sistema operativo que arranque en el equipo sólo ve un disco duro en
+      <code>/dev/sda</code> de 600GB aproximadamente.</para>
+    </section>
+    <section xml:id="instalacion_debian_4_lunas">
+      <title>Instalación de Debian Wheezy</title>
+      <para>Al igual que para el nodo controlador, para los nodos de
+      computación, se va a utilizar la versión wheezy de Debian
+      GNU/Linux (amd64), durante la instalación realizamos el
+      siguiente sencillo esquema de particionado:</para>
+      <programlisting>
+Disposit. Inicio    Comienzo      Fin      Bloques  Id  Sistema
+/dev/sda1   *        2048     1953791      975872   83  Linux
+/dev/sda2         1955838  1167964159   583004161    5  Extendida
+/dev/sda5      1164060672  1167964159     1951744   82  Linux swap / Solaris
+/dev/sda6         1955840  1164060671   581052416   83  Linux
+      </programlisting>
+      <para>Es decir, a parte de dos pequeñas particiones para el
+      área de intercambio y /boot, se utiliza prácticamente todo el
+      disco para el sistema raíz.</para>
+      <section xml:id="configuracion_bonding">
+	<title>Configuración de red</title>
+	<para></para>
+      </section>
+    </section>
+  </section>
+  <section xml:id="ntp">
+    <title>Sincronización de la hora de los equipos con ntp</title>
+    <para>Es muy importante que todos los equipos del cloud tengan
+    sus relojes sincronizados, por lo que lo más sencillo es
+    configurar un servidor local como servidor ntp, que se
+    sincronice con los servidores de hora públicos que hay
+    disponibles en Internet y ofrezca la hora a todos los equipos
+    del cloud. Realmente no es fundamental que la hora de los
+    equipos del cloud sea muy exacta, pero sí que estén siempre
+    sincronizados.</para>
+    <para>Ya que en la red local existía previamente un servidor ntp,
+    simplemente hay que instalar el paquete ntp en <emphasis>todos los
+    nodos</emphasis>, comentar todas las líneas que empiecen por
+    server en el fichero <filename>/etc/ntp.conf</filename> y añadir
+    una línea del tipo:</para>
+    <screen>server ntp.your-provider.example</screen>
+    <para>Podemos comprobar el funcionamiento correcto tras
+    reiniciar el servicio ntp y realizar una consulta:</para>
+    <screen><userinput>ntpq -np</userinput></screen>
+    <para>De forma paulatina, el reloj del equipo se irá sincronizanco
+    con el del servidor de hora de la red.</para>
+  </section>
+</chapter>
+<chapter xmlns="http://docbook.org/ns/docbook"
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+	 version="5.0" xml:lang="es">
+  <title>Keystone</title>
+  <para>Este capítulo describe la instalación y configuración del
+  módulo de OpenStack, Keystone. Este módulo es el encargado del
+  sistema de autentificación y autorización de los distintos módulos
+  que conforman el sistema.</para>
+  <section xml:id="instalación">
+    <title>Instalación de keystone</title>
+    <para>Vamos a instalar Keystone utilizando el paquete del
+    repositorio oficial de Debian Wheezy. Para ello ejecutamos la
+    siguiente instrucción como administrador del sistema:</para>
+    <screen><userinput>aptitude install keystone</userinput></screen>
+    <para>Durante la instalación nos pide el ADMIN_TOKEN, que nos
+    servirá durante la configuración inicial y que se guarda en la
+    directiva admin_token del fichero de configuración 
+    /etc/keystone/keystone.conf.</para>
+    <para>Durante la instalación se pregunta si quiere realizar la configuración
+    de las bases de datos con dbconfig, lo configuramos utilizando 
+      <para>Con Keystone recién instalado no tenemos ningún usuario
+      con privilegios de administración en la base de datos de
+      keystone, por lo no podríamos hacer ninguna modificación. El
+      mecanismo que proporciona keystone para solventar esta situación
+      es definir en el fichero de configuración un token con
+      privilegios de administración, que recibe el nombre de
+      ADMIN_TOKEN, que puede definirse directamente en la instalación
+      o cuando queramos en el fichero
+      <filename>/etc/keystone/keystone.conf</filename>, el ADMIN_TOKEN
+      puede tener cualquier valor, pero hay que custodiarlo
+      adecuadamente mientras esté activo, ya que otorga privilegios de
+      administración sobre Keystone a quien lo
+      conozca. Posteriormente, una vez definidos los usuarios en  
+      keystone y los demás elementos, podemos borrar este campo del
+      fichero de configuración de keystone y no volver a
+      utilizarlo.</para>
+    </section>
+    <section>
+      <title>Uso del ADMIN_TOKEN</title>
+      <para>De forma general en Keystone, un usuario deberá tener algo
+      con que demostrar su autenticidad (una contraseña o un token) y
+      la URL de un API con la que desea interaccionar, en este caso
+      vamos a definir con dos variables de entorno el token con
+      privilegios de administrador y la URL del servicio de
+      administración de keystone:</para>
+      <screen><userinput>export SERVICE_ENDPOINT=http://127.0.0.1:35357/v2.0/</userinput></screen>
+      <screen><userinput>export SERVICE_TOKEN=12345678</userinput></screen>
+      <para>donde 12345678 representa el valos que hayamos elegido para
+      nuestro ADMIN_TOKEN y tendrá el mismo valor que el parámetro
+      ADMIN_TOKEN que tenemos guardado en el fichero de
+      configuración. Una vez realizado esto el usuario de esa sesión
+      actúa como administrador de keystone, por lo que los pasos
+      siguientes serán crear usuarios, darles roles, definir los
+      servicios, etc.</para>      
+    </section>
+  </section>
+  <section xml:id="configuración_keystone">
+    <title>Configuración de keystone</title>
+    <para>El fichero de configuración de keystone lo encontramos en
+    <filename>/etc/keystone/keystone.conf</filename>. La primera
+    configuración que realizamos será la conexión con la base de
+    datos, ya que como dijimos anteriormente, vamos a utilizar bases
+    de datos en MySQL para cada uno de los componentes de
+    OpenStack:</para>
+    <para><code>connection =
+    mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/keystone</code></para> 
+    <para>Reiniciamos keystone y ejecutamos el comando que sincroniza
+    la BBDD de keystone, es decir, crea la tablas necesarias para el
+    funcionamiento de Keystone:</para>
+    <screen><userinput>keystone-manage db_sync</userinput></screen>
+    <para>Esto simplemente crea las tablas necesarias en la base de
+    datos que hemos llamado keystone, pero no añade ningún registro,
+    este procedimiento todavía no está automatizado y lo haremos en
+    las siguientes secciones.</para>
+  </section>
+  <section xml:id="user">
+    <title>Creación de proyectos, usuarios y roles</title>
+    <section xml:id="proyectos">
+      <title>Creación de proyectos (tenants)</title>
+      <para>Comenzamos creando los dos proyectos (tenants) inciales
+      con los que vamos a trabajar: admin y service. Para ello
+      ejecutamos las siguientes intrucciones:</para>
+      <para><code>root@jupiter:~# keystone tenant-create --name admin</code></para>
+      <para><code>root@jupiter:~# keystone tenant-create --name
+      service</code></para>
+      <para>Los valores de los id resultantes de cada instrucción, los
+      asociamos a las variables de entorno ADMIN_TENANT y
+      SERVICE_TENANT (podría hacerse en un solo paso utilizando la
+      función get_id que recomiendan en la wiki de Debian), para que
+      sea más cómodo utilizarlo luego:</para>
+      <para><code>root@jupiter:~# export ADMIN_TENANT="id del tenant
+      admin"</code></para>
+      <para><code>root@jupiter:~# export SERVICE_TENANT="id del tenant
+      service"</code></para>
+    </section>
+     <section xml:id="usuarios">
+      <title>Creación de usuarios</title>
+      <para>A diferencia de la documentación de OpenStack, vamos a crear
+      dos usuarios (uno que tendrá el rol de admin sobre el tenant admin
+      y otro que tendrá el rol de admin sobre el tenant service que
+      utilizan el resto de componentes de OpenStack):</para>
+      <screen><userinput>keystone user-create --name "nombre gran jefe" --pass "contraseña" --email "correo-e" </userinput></screen>
+      <screen><userinput>keystone user-create --name "nombre jefe" --pass "contraseña" --email "correo-e"</userinput></screen>
+      <para>De nuevo asociamos los id resultantes de ambas
+      instrucciones a variables de entorno que utilizaremos después
+      (ADMIN_USER y SERVICE_USER):</para>
+      <screen><userinput>export ADMIN_USER="id del usuario gran jefe"</userinput></screen>
+      <screen><userinput>export SERVICE_USER="id del usuario jefe"</userinput></screen>
+     </section>
+     <section xml:id="roles">
+       <title>Creación de roles</title>
+	<para>Creamos los roles admin y Member que tendrán diferentes
+	privilegios (de momento sólo utilizaremos el rol
+	admin):</para> 
+	<para><code>root@jupiter:~# keystone role-create --name admin</code></para>
+	<para><code>root@jupiter:~# keystone role-create --name
+	Member</code></para>
+	<para>Listamos los roles y asignamos el rol de admin a la
+	variable ADMIN_ROLE:</para>
+	<para><code>root@jupiter:~# ADMIN_ROLE = $(keystone role-list|awk '/
+	admin / { print $2 }')</code></para>
+      </section>
+       <section xml:id="asignacion-roles-usuarios-proyectos">
+	<title>Asignación de los roles</title>
+	<para>Asignamos el rol admin en el tenant admin al usuario que
+	queremos que sea el administrador:</para>
+	<para><code>root@jupiter:~# keystone user-role-add --user
+	$ADMIN_USER --role $ADMIN_ROLE --tenant_id $ADMIN_TENANT</code></para>
+	<para>Asignamos el rol admin en el tenant service al otro
+	usuario:</para>
+	<para><code>root@jupiter:~# keystone user-role-add --user
+	$SERVICE_USER --role $ADMIN_ROLE --tenant_id
+	$SERVICE_TENANT</code></para>
+       </section>
+       <section xml:id="politicas">
+	 <title>Configuración de las políticas de autorización</title>
+	 <para>policy.json</para>
+	 <para>http://docs.openstack.org/essex/openstack-compute/admin/content/keystone-concepts.html</para>
+       </section>
+  </section>
+  <section xml:id="service">
+    <title>Configuración de los servicios</title>
+    <para>En Debian Wheezy inicialmente, los "endpoints" se definen de
+    forma estática en el fichero
+    <filename>/etc/keystone/default_catalog.templates</filename> y los 
+    servicios en ram, mientras que en la documentación oficial de
+    OpenStack, se explican los pasos para incluirlos en la base de
+    datos MySQL. Es lo que vamos a hacer nosotros, para lo que
+    editamos el fichero
+    <filename>/etc/keystone/keystone.conf</filename>:</para>
+    <programlisting>
+      [catalog]
+      #driver = keystone.catalog.backends.templated.TemplatedCatalog
+      #template_file = /etc/keystone/default_catalog.templates
+      driver = keystone.catalog.backends.sql.Catalog
+    </programlisting>
+    <section xml:id="addservice">
+      <title>Creación de servicios</title>
+      <para>Creamos los servicios keystone, nova, volume y grance (de
+      momento obviamos swift y ec2):</para>
+      <programlisting>
+	root@jupiter:# keystone service-create --name keystone --type identity --description 'OpenStack Identity Service'
+	root@jupiter:~# keystone service-create --name nova --type compute --description 'OpenStack Compute Service'
+	root@jupiter:~# keystone service-create --name volume --type volume --description 'OpenStack Volume Service'
+	root@jupiter:~# keystone service-create --name glance --type image --description 'OpenStack Image Service'
+      </programlisting>
+    </section>
+    <section xml:id="add_endpoints">
+      <title>Creación de los "endpoints"</title>
+      <para>Los endpoints son las urls para el manejo de las
+      diferentes APIS. Para cada componente de OpenStack se definen
+      tres URLs (la pública, la de administración y la interna), en
+      algunos casos el puerto es el mismo, pero en otros no. Es
+      necesario revisar muy bien este paso porque es bastante propenso
+      a errores. En nuestro caso, utilizaremos la dirección IP pública
+      de jupiter para la url pública y la IP privada para la de
+      administración e interna, además definimos una sola región con
+      el nombre iesgn (OpenStack permite crear cloud de gran tamaño en
+      los que pueden definirse regiones, cada una de ellas con
+      parámetros propios, pero no es nuestro caso):</para>
+      <programlisting>
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de keystone" --publicurl http://172.22.222.1:5000/v2.0 \
+	--adminurl http://192.168.222.1:35357/v2.0 --internalurl http://192.168.222.1:5000/v2.0
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de nova"  --publicurl 'http://172.22.222.1:8774/v2/$(tenant_id)s' \
+	--adminurl 'http://192.168.222.1:8774/v2/$(tenant_id)s' --internalurl 'http://192.168.222.1:8774/v2/$(tenant_id)s'
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de nova-volume" --publicurl 'http://172.22.222.1:8776/v1/$(tenant_id)s' \
+	--adminurl 'http://192.168.222.1:8776/v1/$(tenant_id)s'	--internalurl 'http://192.168.222.1:8776/v1/$(tenant_id)s'
+	root@jupiter:~# keystone endpoint-create --region iesgn
+	--service_id "id de glance" --publicurl 'http://172.22.222.1:9292/v1' \
+	--adminurl 'http://192.168.222.1:9292/v1' --internalurl	'http://192.168.222.1:9292/v1'
+      </programlisting>
+    </section>
+  </section>
+  <section xml:id="final">
+    <title>Método de autentificación</title>
+    <para>Un vez que tenemos añadidos nuestros usuarios, con sus
+    respectivos roles en los distintos proyectos, la forma normal de
+    acceder es autentificándose con algunos de estos usuarios.</para>
+    <para>Para ello creamos dos ficheros de configuración de las
+    variables de entorno de los dos usuarios creados, lo llamamos por
+    ejemplo /root/.granjefe:</para>
+    <programlisting>
+      export OS_USERNAME="usuario gran jefe"
+      export OS_PASSWORD="password"
+      export OS_TENANT_NAME=admin
+      export OS_AUTH_URL=http://192.168.222.1:5000/v2.0/
+      export OS_VERSION=1.1
+    </programlisting>
+    <para>Y para el otro usuario creamos /root/.jefe:</para>
+    <programlisting>
+      export OS_USERNAME="usuario jefe"
+      export OS_PASSWORD="password"
+      export OS_TENANT_NAME=service
+      export OS_AUTH_URL=http://192.168.222.1:5000/v2.0/
+      export OS_VERSION=1.1
+    </programlisting>
+    <para>Obviamente protegemos estos ficheros:</para>
+    <programlisting>
+      root@jupiter:~# chmod 600 /root/.granjefe
+      root@jupiter:~# chmod 600 /root/.jefe
+    </programlisting>
+  </section>
+  <section xml:id="api">
+    <title>Utilización de la API</title>
+    <para>Como hemos visto a lo largo de este manual, podemos utilizar
+    el cliente keystone para gestionar los usuarios, roles, proyectos,
+    servicios y endpoints. En concreto, hemos visto las instrucciones
+    que nos permiten crear nuevos elementos.</para>
+    <para>Otros comandos interesantes nos permiten listar los objetos
+    que hemos creado:</para>
+    <programlisting>
+root@jupiter:~# keystone role-list
+root@jupiter:~# keystone user-list
+root@jupiter:~# keystone tenant-list
+root@jupiter:~# keystone service-list
+root@jupiter:~# keystone endpoint-list
+    </programlisting>
+    <para>Otro ejemplo de comando que podemos usar a menudo, es el que
+    nos permite cambiar la contraseña de un usuario:</para>
+    <para><code>root@jupiter:~# keystone user-password-update uuid --pass
+    nueva_contraseña</code></para>
+    <para>Para encontrar una descripción detallada de todos los
+    comandos que podemos usar con el cliente keystone, podemos visitar
+    el siguiente enlace: <link
+    xlink:href="http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html">
+    http://docs.openstack.org/essex/openstack-compute/admin/content/adding-users-tenants-and-roles-with-python-keystoneclient.html</link></para>
+  </section>
+</chapter>
+    
+</book>
