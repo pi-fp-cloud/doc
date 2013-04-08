@@ -270,14 +270,29 @@ iface eth1 inet static
       <title>Configuración de los repositorios"</title>
       <para>Añadimos los repositorios de backport:</para>
       <programlisting>
-deb http://ftp.gplhost.com/debian/ wheezy-backports main
-deb http://ftp.gplhost.com/debian/ openstack main
+deb http://33.apt-proxy.gplhost.com/debian/ wheezy-backports main
+deb http://33.apt-proxy.gplhost.com/debian/ openstack main 
       </programlisting>
+      <para>Se install el gplhost-archive-keyring para obtener la clave gnupg:
+      <programlisting>
+# wget
+http://ftparchive.gplhost.com/debian/pool/squeeze/main/g/gplhost-archive-keyring/gplhost-archive-keyring_20100926-1_all.deb
+# dpkg -i gplhost-archive-keyring_20100926-1_all.deb
+      </programlisting>
+      </para>
     </section>
     <section xml:id="instalacion_mysql">
       <title>Instalación y configuración inicial de MySQL</title>
-      <para>Antes de instalar MySQL instalamos dbconfig de acuerdo al
-      wiki.</para>
+      <para>Antes de proceder con la instalación de MySQL se instala dbconfig.
+      <programlisting>
+# apt-get install dbconfig-common
+# dpkg-reconfigure dbconfig-common
+      </programlisting>
+     Durante la instalación de dbconfig es posible elegir si se desea mantener
+     la clave de administración de la base de datos y configurar si se va a
+     utilizar una base de datos remota. En nuestro caso ambas preguntas son
+     contestadas de forma negativa.
+      </para>
       <para>Todos los componentes de OpenStack (incluso glance y
       keystone que por defecto utilizan sqlite) guardarán sus datos en
       bases de datos MySQL. El servidor de bases de datos se instala
@@ -393,73 +408,69 @@ Disposit. Inicio    Comienzo      Fin      Bloques  Id  Sistema
   <para>Este capítulo describe la instalación y configuración del
   módulo de OpenStack, Keystone. Este módulo es el encargado del
   sistema de autentificación y autorización de los distintos módulos
-  que conforman el sistema.</para>
+  que conforman el sistema y actúa, al mismo tiempo, como catálogo de los
+  servicios que usan los clientes para conocer cómo contactar con cada servicio. </para>
   <section xml:id="instalación">
     <title>Instalación de keystone</title>
-    <para>Vamos a instalar Keystone utilizando el paquete del
-    repositorio oficial de Debian Wheezy. Para ello ejecutamos la
-    siguiente instrucción como administrador del sistema:</para>
+    <para>Para instalar Keystone se utiliza el paquete de los repositorios no
+    oficiales configurados previamente.Para ello ejecutamos la siguiente
+    instrucción como administrador del sistema:</para> 
     <screen><userinput>aptitude install keystone</userinput></screen>
-    <para>Durante la instalación nos pide el ADMIN_TOKEN, que nos
-    servirá durante la configuración inicial y que se guarda en la
-    directiva admin_token del fichero de configuración 
-    /etc/keystone/keystone.conf.</para>
-    <para>Durante la instalación se pregunta si quiere realizar la configuración
-    de las bases de datos con dbconfig, lo configuramos utilizando 
-      <para>Con Keystone recién instalado no tenemos ningún usuario
-      con privilegios de administración en la base de datos de
-      keystone, por lo no podríamos hacer ninguna modificación. El
-      mecanismo que proporciona keystone para solventar esta situación
-      es definir en el fichero de configuración un token con
-      privilegios de administración, que recibe el nombre de
-      ADMIN_TOKEN, que puede definirse directamente en la instalación
-      o cuando queramos en el fichero
-      <filename>/etc/keystone/keystone.conf</filename>, el ADMIN_TOKEN
-      puede tener cualquier valor, pero hay que custodiarlo
-      adecuadamente mientras esté activo, ya que otorga privilegios de
-      administración sobre Keystone a quien lo
-      conozca. Posteriormente, una vez definidos los usuarios en  
-      keystone y los demás elementos, podemos borrar este campo del
-      fichero de configuración de keystone y no volver a
-      utilizarlo.</para>
+    <para>Al igual que ocurre con el resto de paquetes que necesitan acceder a
+    la base de datos, durante la instalación de keystone se hace uso de dbconfig
+    para crear la base de datos para el servicio (keystonedb), por lo que se
+    requiere introducir la contraseña del administrador SQL así como la
+    contraseña para este servicio. De esta forma se crea una directiva de
+    conexión SQL como la que se muestra a continuación:
+    <programlisting>
+{{ sql_connection = mysql://keystone:pass@localhost/keystonedb }}
+    </programlisting>
+    Esta conexión puede editarse a mano en el fichero de configuración <filename>/etc/keystone/keystone.conf</filename>.</para>
+    <para>Durante la instalación, además de crear un usuario administrador del
+    servicio (por defecto es 'admin'), también se crea el ADMIN_TOKEN, una
+    especie de clave maestra utilizada para realizar tareas administrativas que
+    nos servirá durante la configuración inicial y que se guarda en la directiva
+    admin_token del fichero de configuración.El ADMIN_TOKEN puede tener
+    cualquier valor, pero hay que custodiarlo adecuadamente mientras esté
+    activo, ya que otorga privilegios de administración sobre Keystone a quien
+    lo conozca. Posteriormente, una vez definidos los usuarios en Keystone y los
+    demás elementos, podemos borrar este campo del fichero de configuración y no
+    volver a utilizarlo.</para> 
+    <para>Keystone también necesita ser registrado como endpoint de forma que
+    los usuarios del cloud puedan utilizarlo, para lo que el instalador solicita
+    la dirección IP pública que se usará para acceder al servicio y crea en la
+    base de datos los endpoint..</para>
     </section>
-    <section>
-      <title>Uso del ADMIN_TOKEN</title>
-      <para>De forma general en Keystone, un usuario deberá tener algo
-      con que demostrar su autenticidad (una contraseña o un token) y
-      la URL de un API con la que desea interaccionar, en este caso
-      vamos a definir con dos variables de entorno el token con
-      privilegios de administrador y la URL del servicio de
-      administración de keystone:</para>
-      <screen><userinput>export SERVICE_ENDPOINT=http://127.0.0.1:35357/v2.0/</userinput></screen>
-      <screen><userinput>export SERVICE_TOKEN=12345678</userinput></screen>
-      <para>donde 12345678 representa el valos que hayamos elegido para
-      nuestro ADMIN_TOKEN y tendrá el mismo valor que el parámetro
-      ADMIN_TOKEN que tenemos guardado en el fichero de
-      configuración. Una vez realizado esto el usuario de esa sesión
-      actúa como administrador de keystone, por lo que los pasos
-      siguientes serán crear usuarios, darles roles, definir los
-      servicios, etc.</para>      
-    </section>
-  </section>
-  <section xml:id="configuración_keystone">
+    <section xml:id="configuración_keystone">
     <title>Configuración de keystone</title>
-    <para>El fichero de configuración de keystone lo encontramos en
-    <filename>/etc/keystone/keystone.conf</filename>. La primera
-    configuración que realizamos será la conexión con la base de
-    datos, ya que como dijimos anteriormente, vamos a utilizar bases
-    de datos en MySQL para cada uno de los componentes de
-    OpenStack:</para>
-    <para><code>connection =
-    mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/keystone</code></para> 
-    <para>Reiniciamos keystone y ejecutamos el comando que sincroniza
-    la BBDD de keystone, es decir, crea la tablas necesarias para el
-    funcionamiento de Keystone:</para>
-    <screen><userinput>keystone-manage db_sync</userinput></screen>
-    <para>Esto simplemente crea las tablas necesarias en la base de
-    datos que hemos llamado keystone, pero no añade ningún registro,
-    este procedimiento todavía no está automatizado y lo haremos en
-    las siguientes secciones.</para>
+    <para>El registro automático de los endpoint con el instalador utiliza la
+    misma dirección IP para la url pública, interna y de administración, lo que
+    no es correcto. Por tanto, es necesario modificar la dirección IP de la url
+    interna, para lo que usa la siguiente instrucción:</para>
+    <programlisting>
+keystone endpoint-create --region iesgn --service_id 
+"9efa1283f81d43f4a2910ea8b558ae12" --publicurl http://172.22.202.1:5000/v2.0             
+--adminurl http://172.22.202.1:35357/v2.0 --internalurl
+http://192.168.202.1:5000/v2.0 
+    </programlisting>
+    <para>Además de modificar la IP de la url interna, se ha cambiado también la
+    región, que por defecto es 'regionOne'.</para>
+    <!-- <para>El fichero de configuración de keystone lo encontramos en -->
+    <!-- <filename>/etc/keystone/keystone.conf</filename>. La primera -->
+    <!-- configuración que realizamos será la conexión con la base de -->
+    <!-- datos, ya que como dijimos anteriormente, vamos a utilizar bases -->
+    <!-- de datos en MySQL para cada uno de los componentes de -->
+    <!-- OpenStack:</para> -->
+    <!-- <para><code>connection = -->
+    <!-- mysql://"usuario_admin_openstack":"password"@127.0.0.1:3306/keystone</code></para>  -->
+    <!-- <para>Reiniciamos keystone y ejecutamos el comando que sincroniza -->
+    <!-- la BBDD de keystone, es decir, crea la tablas necesarias para el -->
+    <!-- funcionamiento de Keystone:</para> -->
+    <!-- <screen><userinput>keystone-manage db_sync</userinput></screen> -->
+    <!-- <para>Esto simplemente crea las tablas necesarias en la base de -->
+    <!-- datos que hemos llamado keystone, pero no añade ningún registro, -->
+    <!-- este procedimiento todavía no está automatizado y lo haremos en -->
+    <!-- las siguientes secciones.</para> -->
   </section>
   <section xml:id="user">
     <title>Creación de proyectos, usuarios y roles</title>
